@@ -1,0 +1,125 @@
+<UserControl
+    x:Class="MapManager.GUI.Views.BetmapInfoControl"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:iconPacks="https://github.com/MahApps/IconPacks.Avalonia"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mc:Ignorable="d">
+    <Grid MinHeight="160" RowDefinitions="auto, *">
+        <Border
+            Padding="2,0"
+            BorderBrush="Gray"
+            BorderThickness="0,0,0,1">
+            <Grid>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        FontSize="26"
+                        FontWeight="600"
+                        Foreground="White">
+                        <Run Text="{Binding SelectedBeatmapSet.Artist}" />
+                        <Run Text=" - " />
+                        <Run Text="{Binding SelectedBeatmapSet.Title}" />
+                    </TextBlock>
+                </StackPanel>
+                <StackPanel
+                    HorizontalAlignment="Right"
+                    Orientation="Horizontal"
+                    Spacing="6">
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        FontSize="16"
+                        FontWeight="600"
+                        Text="{Binding SelectedBeatmap.Creator}" />
+                    <ComboBox ItemsSource="{Binding SelectedBeatmapSet.Beatmaps}" SelectedItem="{Binding SelectedBeatmap, Mode=TwoWay}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Difficulty}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </StackPanel>
+            </Grid>
+        </Border>
+        <Grid Grid.Row="1">
+            <StackPanel
+                Margin="0,4,0,0"
+                VerticalAlignment="Top"
+                Orientation="Horizontal"
+                Spacing="4">
+                <StackPanel.Styles>
+                    <Style Selector="iconPacks|PackIconForkAwesome">
+                        <Setter Property="Height" Value="12" />
+                        <Setter Property="VerticalAlignment" Value="Center" />
+                        <Setter Property="Margin" Value="-4,0,4,0" />
+                    </Style>
+                    <Style Selector="iconPacks|PackIconFontAwesome">
+                        <Setter Property="Height" Value="12" />
+                        <Setter Property="VerticalAlignment" Value="Center" />
+                        <Setter Property="Margin" Value="-4,0,4,0" />
+                    </Style>
+                </StackPanel.Styles>
+                <TextBlock Foreground="White" Text="AR:" />
+                <TextBlock Foreground="White" Text="{Binding SelectedBeatmap.ApproachRate}" />
+                <iconPacks:PackIconForkAwesome Kind="CircleThin" />
+                <TextBlock Foreground="White" Text="CS:" />
+                <TextBlock Foreground="White" Text="{Binding SelectedBeatmap.CircleSize}" />
+                <iconPacks:PackIconFontAwesome Kind="UpRightAndDownLeftFromCenterSolid" />
+                <TextBlock Foreground="White" Text="HP:" />
+                <TextBlock Foreground="White" Text="{Binding SelectedBeatmap.HPDrain}" />
+                <iconPacks:PackIconFontAwesome Kind="HeartPulseSolid" />
+                <TextBlock Foreground="White" Text="OD:" />
+                <TextBlock Foreground="White" Text="{Binding SelectedBeatmap.OverallDifficulty}" />
+                <iconPacks:PackIconFontAwesome Kind="BoltSolid" />
+                <TextBlock Foreground="White" Text="Star:" />
+                <TextBlock Foreground="White" Text="{Binding SelectedBeatmap.StandardStarRatingNone, StringFormat={}{0:0.00}}" />
+                <iconPacks:PackIconFontAwesome Foreground="Gold" Kind="StarSolid" />
+            </StackPanel>
+            <StackPanel
+                Margin="0,4,0,0"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Top"
+                Orientation="Vertical">
+                <TextBlock
+                    HorizontalAlignment="Right"
+                    FontSize="16"
+                    Text="{Binding SelectedBeatmap.Duration, StringFormat='Duration: {0}'}" />
+                <TextBlock
+                    HorizontalAlignment="Right"
+                    FontSize="16"
+                    Text="{Binding SelectedBeatmap.ObjectsCount, StringFormat='Objects: {0}'}" />
+            </StackPanel>
+            <ScrollViewer
+                MaxWidth="700"
+                MaxHeight="52"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Bottom">
+                <ItemsControl ItemsSource="{Binding SelectedBeatmap.TagsList}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border
+                                Margin="4,2"
+                                Padding="8,4"
+                                Background="#191435"
+                                CornerRadius="8">
+                                <TextBlock
+                                    FontSize="10"
+                                    Foreground="White"
+                                    Text="{Binding}" />
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+</UserControl>

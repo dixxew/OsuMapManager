@@ -1,0 +1,183 @@
+<UserControl
+    x:Class="MapManager.GUI.Views.AudioPlayerControl"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:iconPacks="https://github.com/MahApps/IconPacks.Avalonia"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mc:Ignorable="d">
+    <Border
+        CornerRadius="20">
+        <StackPanel Margin="20,6" Orientation="Vertical">
+            <Grid ColumnDefinitions="auto, *, auto">
+                <TextBlock
+                    Grid.Column="0"
+                    VerticalAlignment="Center"
+                    FontSize="10"
+                    Text="{Binding FormattedSongProgress}" />
+                <ProgressBar
+                    x:Name="TrackProgressBar"
+                    Grid.Column="1"
+                    Margin="6,0"
+                    VerticalAlignment="Center"
+                    Maximum="{Binding SongDuration}"
+                    Minimum="0"
+                    PointerExited="ProgressBar_PointerExited"
+                    PointerMoved="ProgressBar_PointerMoved"
+                    PointerPressed="ProgressBar_PointerPressed"
+                    ShowProgressText="False"
+                    Value="{Binding SongProgress}" />
+                <Popup
+                    x:Name="TimePopup"
+                    HorizontalOffset="-10"
+                    IsOpen="{Binding IsPopupOpen}"
+                    PlacementMode="Pointer"
+                    VerticalOffset="-30">
+                    <Border
+                        Padding="4"
+                        Background="Black"
+                        CornerRadius="4">
+                        <TextBlock Foreground="White" Text="{Binding PopupTime}" />
+                    </Border>
+                </Popup>
+                <TextBlock
+                    Grid.Column="2"
+                    VerticalAlignment="Center"
+                    FontSize="10"
+                    Text="{Binding FormattedSongDuration}" />
+            </Grid>
+            <Grid>
+                <StackPanel
+                    Margin="0,0,8,0"
+                    Orientation="Horizontal"
+                    Spacing="8">
+                    <StackPanel.Styles>
+                        <Style Selector="Grid">
+                            <Setter Property="Background" Value="Transparent" />
+                        </Style>
+                    </StackPanel.Styles>
+                    <Grid
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        PointerPressed="PrevPressed">
+                        <Grid.RenderTransform>
+                            <ScaleTransform ScaleX="1" ScaleY="1" />
+                        </Grid.RenderTransform>
+                        <Grid.RenderTransformOrigin>0.5,0.5</Grid.RenderTransformOrigin>
+                        <iconPacks:PackIconFontAwesome
+                            Height="16"
+                            VerticalAlignment="Center"
+                            Kind="AngleLeftSolid" />
+                    </Grid>
+                    <Grid
+                        Margin="10,0,6,0"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        PointerPressed="PlayPressed">
+                        <Grid.RenderTransform>
+                            <ScaleTransform ScaleX="1" ScaleY="1" />
+                        </Grid.RenderTransform>
+                        <Grid.RenderTransformOrigin>0.5,0.5</Grid.RenderTransformOrigin>
+                        <iconPacks:PackIconFontAwesome
+                            Height="26"
+                            VerticalAlignment="Center"
+                            Kind="{Binding IsPlaying, Converter={StaticResource BoolConverter}, ConverterParameter=PlayerPlay}" />
+                    </Grid>
+                    <Grid
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        PointerPressed="NextPressed">
+                        <Grid.RenderTransform>
+                            <ScaleTransform ScaleX="1" ScaleY="1" />
+                        </Grid.RenderTransform>
+                        <Grid.RenderTransformOrigin>0.5,0.5</Grid.RenderTransformOrigin>
+                        <iconPacks:PackIconFontAwesome
+                            Height="16"
+                            VerticalAlignment="Center"
+                            Kind="AngleRightSolid" />
+                    </Grid>
+                    <StackPanel
+                        Margin="12,0,-8,0"
+                        Orientation="Horizontal"
+                        Spacing="8">
+                        <Grid
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            PointerPressed="HeartPressed">
+                            <Grid.RenderTransform>
+                                <ScaleTransform ScaleX="1" ScaleY="1" />
+                            </Grid.RenderTransform>
+                            <Grid.RenderTransformOrigin>0.5,0.5</Grid.RenderTransformOrigin>
+                            <iconPacks:PackIconFontAwesome
+                                Height="18"
+                                VerticalAlignment="Center"
+                                Kind="{Binding IsFavorite, Converter={StaticResource BoolConverter}, ConverterParameter=PlayerHeart}" />
+                        </Grid>
+                        <Grid
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            PointerPressed="RandomPressed">
+                            <Grid.RenderTransform>
+                                <ScaleTransform ScaleX="1" ScaleY="1" />
+                            </Grid.RenderTransform>
+                            <Grid.RenderTransformOrigin>0.5,0.5</Grid.RenderTransformOrigin>
+                            <iconPacks:PackIconForkAwesome
+                                Height="18"
+                                VerticalAlignment="Center"
+                                Foreground="{Binding IsRandomEnabled, Converter={StaticResource BoolConverter}, ConverterParameter=PlayerRandom}}"
+                                Kind="Random" />
+                        </Grid>
+                        <Grid
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            PointerPressed="RepeatPressed">
+                            <Grid.RenderTransform>
+                                <ScaleTransform ScaleX="1" ScaleY="1" />
+                            </Grid.RenderTransform>
+                            <Grid.RenderTransformOrigin>0.5,0.5</Grid.RenderTransformOrigin>
+                            <iconPacks:PackIconForkAwesome
+                                Height="18"
+                                VerticalAlignment="Center"
+                                Foreground="{Binding IsLoopEnabled, Converter={StaticResource BoolConverter}, ConverterParameter=PlayerRepeat}}"
+                                Kind="Repeat" />
+                        </Grid>
+                    </StackPanel>
+                    <Slider
+                        Width="160"
+                        VerticalAlignment="Center"
+                        IsSnapToTickEnabled="True"
+                        Maximum="1"
+                        Minimum="0"
+                        TickFrequency="0.01"
+                        Value="{Binding Volume}" />
+                </StackPanel>
+                <StackPanel
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    Orientation="Horizontal"
+                    Spacing="8">
+                    <TextBlock VerticalAlignment="Center" Text="Speed" />
+                    <ComboBox SelectedValue="{Binding SelectedPlaybackRate}" SelectedValueBinding="{Binding Text}">
+                        <ComboBox.Styles>
+                            <Style Selector="TextBlock">
+                                <Setter Property="Foreground" Value="White" />
+                            </Style>
+                        </ComboBox.Styles>
+                        <ComboBox.Items>
+                            <TextBlock VerticalAlignment="Center" Text="0.5" />
+                            <TextBlock VerticalAlignment="Center" Text="0.75" />
+                            <TextBlock VerticalAlignment="Center" Text="1" />
+                            <TextBlock VerticalAlignment="Center" Text="1.25" />
+                            <TextBlock VerticalAlignment="Center" Text="1.5" />
+                            <TextBlock VerticalAlignment="Center" Text="1.75" />
+                            <TextBlock VerticalAlignment="Center" Text="2" />
+                        </ComboBox.Items>
+                    </ComboBox>
+                </StackPanel>
+            </Grid>
+        </StackPanel>
+    </Border>
+</UserControl>

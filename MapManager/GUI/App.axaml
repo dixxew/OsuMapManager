@@ -1,0 +1,25 @@
+<Application
+    x:Class="MapManager.GUI.App"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="clr-namespace:MapManager.GUI.Converters"
+    xmlns:local="using:MapManager.GUI"
+    xmlns:sukiUi="clr-namespace:SukiUI;assembly=SukiUI"
+    RequestedThemeVariant="Default">
+    <!--  "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options.  -->
+
+    <Application.DataTemplates>
+        <local:ViewLocator />
+    </Application.DataTemplates>
+
+    <Application.Styles>
+        <sukiUi:SukiTheme ThemeColor="Blue" />
+        <StyleInclude Source="avares://IconPacks.Avalonia.FontAwesome/FontAwesome.axaml" />
+        <StyleInclude Source="avares://IconPacks.Avalonia.ForkAwesome/ForkAwesome.axaml" />
+    </Application.Styles>
+
+
+    <Application.Resources>
+        <converters:BoolConverter x:Key="BoolConverter" />
+    </Application.Resources>
+</Application>
