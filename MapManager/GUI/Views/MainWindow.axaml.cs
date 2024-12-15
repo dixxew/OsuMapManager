@@ -24,6 +24,4 @@ public partial class MainWindow : SukiWindow
         var viewModel = DataContext as MainWindowViewModel;
         viewModel.OnMainWindowLoaded();
     }
-
-
 }

@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<VersionPrefix>6.3.2</VersionPrefix>
+		<TargetFramework>net6.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<Authors>Allan Mercou</Authors>
+		<Description>Package for the JSON models for the osu!api v2</Description>
+		<PackageProjectUrl>https://github.com/Kiritsu/OsuSharp</PackageProjectUrl>
+		<PackageLicenseUrl>https://github.com/Kiritsu/OsuSharp/blob/feature/api-v2/LICENSE.txt</PackageLicenseUrl>
+		<RepositoryUrl>https://github.com/Kiritsu/OsuSharp</RepositoryUrl>
+		<PackageTags>osu osusharp osu!api api csharp dotnet</PackageTags>
+		<RepositoryType>Git</RepositoryType>
+		<LangVersion>default</LangVersion>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+	</ItemGroup>
+
+</Project>

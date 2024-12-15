@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="13.0.1" />
     <PackageReference Include="Avalonia" Version="11.2.1" />
     <PackageReference Include="Avalonia.Desktop" Version="11.2.1" />
     <PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.1" />
@@ -23,10 +24,15 @@
     <PackageReference Include="Avalonia.ReactiveUI" Version="11.2.1" />
     <PackageReference Include="IconPacks.Avalonia.FontAwesome" Version="1.0.0" />
     <PackageReference Include="IconPacks.Avalonia.ForkAwesome" Version="1.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.0" />
     <PackageReference Include="NAudio" Version="2.2.1" />
     <PackageReference Include="NAudio.Core" Version="2.2.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="OsuParsers" Version="1.7.1" />
+    <!--<PackageReference Include="OsuSharp" Version="6.4.1" />
+    <PackageReference Include="OsuSharp.JsonModels" Version="6.4.1" />-->
     <PackageReference Include="SoundTouch.Net" Version="2.3.2" />
     <PackageReference Include="SoundTouch.Net.NAudioSupport.Core" Version="2.3.2" />
     <PackageReference Include="SukiUI" Version="6.0.0-rc" />
@@ -46,5 +52,11 @@
 
   <ItemGroup>
     <Folder Include="GUI\Converters\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OsuSharp-dev\src\OsuSharp.Domain\OsuSharp.Domain.csproj" />
+    <ProjectReference Include="..\OsuSharp-dev\src\OsuSharp.JsonModels\OsuSharp.JsonModels.csproj" />
+    <ProjectReference Include="..\OsuSharp-dev\src\OsuSharp\OsuSharp.csproj" />
   </ItemGroup>
 </Project>

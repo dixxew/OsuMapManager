@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<VersionPrefix>6.3.2</VersionPrefix>
+		<TargetFramework>net6.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<Authors>Allan Mercou</Authors>
+		<Description>An osu!api v2 wrapper</Description>
+		<PackageProjectUrl>https://github.com/Kiritsu/OsuSharp</PackageProjectUrl>
+		<PackageLicenseUrl>https://github.com/Kiritsu/OsuSharp/blob/feature/api-v2/LICENSE.txt</PackageLicenseUrl>
+		<RepositoryUrl>https://github.com/Kiritsu/OsuSharp</RepositoryUrl>
+		<PackageTags>osu osusharp osu!api api csharp dotnet</PackageTags>
+		<RepositoryType>Git</RepositoryType>
+		<LangVersion>default</LangVersion>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Extensions.Options" Version="7.0.1" />
+		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="7.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\OsuSharp.Domain\OsuSharp.Domain.csproj" />
+		<ProjectReference Include="..\OsuSharp.JsonModels\OsuSharp.JsonModels.csproj" />
+	</ItemGroup>
+
+</Project>

@@ -114,7 +114,7 @@ public class AudioPlayerViewModel : ReactiveObject
         set => this.RaiseAndSetIfChanged(ref _audioFilePath, value);
     }
 
-    private float _volume = 0.05f;
+    private float _volume = 0f;
     public float Volume
     {
         get => _volume;
@@ -227,21 +227,29 @@ public class AudioPlayerViewModel : ReactiveObject
     {
         if (_audioFileReader != null && _wavePlayer?.PlaybackState == PlaybackState.Playing)
         {
+            // Обновляем прогресс песни
             SongProgress = _audioFileReader.CurrentTime.TotalSeconds;
-        }
 
-        if (SongProgress >= SongDuration && _wavePlayer?.PlaybackState != PlaybackState.Playing)
-        {
-            if (IsLoopEnabled)
+            // Проверяем, если песня достигла конца
+            if (SongProgress >= SongDuration - 0.1) // Допустимый допуск для точности
             {
-                SetSongAndPlay(AudioFilePath);
-            }
-            else
-            {
-                NextCommand();
+                // Останавливаем текущий трек, если ещё не остановлен
+                _wavePlayer.Stop();
+
+                if (IsLoopEnabled)
+                {
+                    // Повтор текущей песни
+                    SetSongAndPlay(AudioFilePath);
+                }
+                else
+                {
+                    // Переход к следующей песне
+                    NextCommand();
+                }
             }
         }
     }
+
 
     public void ToggleFavorite()
     {
