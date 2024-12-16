@@ -9,6 +9,9 @@
     d:DesignHeight="450"
     d:DesignWidth="800"
     mc:Ignorable="d">
+    <UserControl.DataContext>
+        <Binding Path="SettingsViewModel" Source="{StaticResource Locator}" />
+    </UserControl.DataContext>
     <Grid>
         <ScrollViewer>
             <Grid ColumnDefinitions="*, 8,*">
@@ -28,7 +31,8 @@
                 <sukiUi:GlassCard Grid.Column="2">
                     <StackPanel FlowDirection="LeftToRight" Orientation="Horizontal">
                         <TextBlock Text="Osu api key:" />
-                        <TextBox Width="250" Text="{Binding OsuApiKey}" />
+                        <TextBox Width="250" Text="{Binding OsuClientSecret}" />
+                        <TextBox Width="50" Text="{Binding OsuClientId}" />
                         <Button
                             Margin="8,5"
                             Classes="Standard Icon"

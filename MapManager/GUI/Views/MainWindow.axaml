@@ -5,6 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:iconPacks="https://github.com/MahApps/IconPacks.Avalonia"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:model="using:MapManager.GUI.Models"
     xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
     xmlns:view="using:MapManager.GUI.Views"
     xmlns:vm="using:MapManager.GUI.ViewModels"
@@ -40,47 +41,100 @@
         </Button>
     </sukiUi:SukiWindow.RightWindowTitleBarControls>
     <Grid ColumnDefinitions="2*, 8, 6*">
-        <Grid Background="#0fffffff" RowDefinitions="auto, *">
-            <DockPanel FlowDirection="RightToLeft">
-                <TextBlock
-                    Margin="8,0,0,0"
-                    VerticalAlignment="Center"
-                    FontSize="16"
-                    FontWeight="550">
-                    <Run Text="{Binding BeatmapsCount}" />
-                    <Run Text="Maps" />
-                </TextBlock>
-                <TextBox
-                    FlowDirection="LeftToRight"
-                    Text="{Binding SearchText}"
-                    Watermark="Search" />
-            </DockPanel>
-            <ListBox
-                x:Name="MapsListBox"
-                Grid.Row="1"
-                FontSize="16"
-                FontWeight="550"
-                Foreground="White"
-                ItemsSource="{Binding FilteredBeatmaps}"
-                SelectedItem="{Binding SelectedBeatmapSet}">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <Grid>
-                            <StackPanel
-                                Grid.Column="1"
-                                Margin="0,0,20,0"
-                                Orientation="Horizontal"
-                                Spacing="8">
-                                <TextBlock Width="{Binding $parent.Bounds.Width}">
-                                    <Run Text="{Binding Artist}" />
-                                    <Run Text=" - " />
-                                    <Run Text="{Binding Title}" />
-                                </TextBlock>
+        <Grid Background="#0fffffff">
+            <TabControl>
+                <TabItem Header="Maps">
+                    <Grid RowDefinitions="auto, *">
+                        <sukiUi:GlassCard Padding="12,6" Classes="Primary">
+                            <StackPanel Orientation="Vertical">
+                                <TextBox
+                                    FlowDirection="LeftToRight"
+                                    Text="{Binding SearcBeatmapSethText}"
+                                    Watermark="Search" />
+                                <DockPanel>
+                                    <ComboBox
+                                        HorizontalAlignment="Left"
+                                        SelectedValue="{Binding SearchComboboxSelectedDestination}"
+                                        SelectedValueBinding="{Binding Text}">
+                                        <ComboBox.Items>
+                                            <TextBlock Foreground="White" Text="Local" />
+                                            <TextBlock Foreground="White" Text="Global" />
+                                        </ComboBox.Items>
+                                    </ComboBox>
+                                    <TextBlock
+                                        VerticalAlignment="Center"
+                                        FontSize="16"
+                                        FontWeight="550">
+                                        <Run Text="{Binding BeatmapsCount}" />
+                                        <Run Text="Maps" />
+                                    </TextBlock>
+                                    <CheckBox Content="Only favorites" IsChecked="{Binding IsShowOnlyFavorites}" />
+                                </DockPanel>
                             </StackPanel>
-                        </Grid>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+                        </sukiUi:GlassCard>
+                        <ListBox
+                            Grid.Row="1"
+                            FontSize="16"
+                            FontWeight="550"
+                            Foreground="White"
+                            ItemsSource="{Binding FilteredBeatmaps}"
+                            SelectedItem="{Binding SelectedBeatmapSet}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <StackPanel
+                                            Grid.Column="1"
+                                            Margin="0,0,20,0"
+                                            Orientation="Horizontal"
+                                            Spacing="8">
+                                            <TextBlock Width="{Binding $parent.Bounds.Width}">
+                                                <Run Text="{Binding Artist}" />
+                                                <Run Text=" - " />
+                                                <Run Text="{Binding Title}" />
+                                            </TextBlock>
+                                        </StackPanel>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </Grid>
+                </TabItem>
+                <TabItem Header="Collections">
+                    <Grid RowDefinitions="auto, *">
+                        <sukiUi:GlassCard Padding="12,6" Classes="Primary">
+                            <StackPanel Orientation="Vertical">
+                                <TextBox
+                                    FlowDirection="LeftToRight"
+                                    Text="{Binding SearchCollectionText}"
+                                    Watermark="Search" />
+                                <DockPanel>
+                                    <TextBlock
+                                        VerticalAlignment="Center"
+                                        FontSize="16"
+                                        FontWeight="550">
+                                        <Run Text="{Binding CollectionsCount}" />
+                                        <Run Text="Collections" />
+                                    </TextBlock>
+                                </DockPanel>
+                            </StackPanel>
+                        </sukiUi:GlassCard>
+                        <TreeView Grid.Row="1" ItemsSource="{Binding Collections}">
+                            <TreeView.DataTemplates>
+                                <TreeDataTemplate DataType="model:Collection" ItemsSource="{Binding Beatmaps}">
+                                    <TextBlock Text="{Binding Name}" />
+                                </TreeDataTemplate>
+                                <DataTemplate DataType="model:Beatmap">
+                                    <TextBlock>
+                                        <Run Text="{Binding Artist}" />
+                                        <Run Text=" - " />
+                                        <Run Text="{Binding Title}" />
+                                    </TextBlock>
+                                </DataTemplate>
+                            </TreeView.DataTemplates>
+                        </TreeView>
+                    </Grid>
+                </TabItem>
+            </TabControl>
         </Grid>
         <Grid Grid.Column="2">
             <Grid
@@ -179,8 +233,8 @@
                                     <sukiUi:Loading
                                         HorizontalAlignment="Center"
                                         VerticalAlignment="Center"
-                                        IsVisible="{Binding IsGLobalRankingsLoadingVisible}" />
-                                    <ScrollViewer IsVisible="{Binding !IsGLobalRankingsLoadingVisible}">
+                                        IsVisible="{Binding IsGlobalRankingsLoadingVisible}" />
+                                    <ScrollViewer IsVisible="{Binding !IsGlobalRankingsLoadingVisible}">
                                         <ItemsControl ItemsSource="{Binding GlobalScores}">
                                             <ItemsControl.ItemTemplate>
                                                 <DataTemplate>

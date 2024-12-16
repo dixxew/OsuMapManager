@@ -9,6 +9,5 @@ public partial class SettingsControl : UserControl
     public SettingsControl()
     {
         InitializeComponent();
-        DataContext = AppStore.SettingsVM;
     }
 }

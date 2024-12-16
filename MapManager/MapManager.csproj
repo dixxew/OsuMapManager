@@ -57,6 +57,8 @@
   <ItemGroup>
     <ProjectReference Include="..\OsuSharp-dev\src\OsuSharp.Domain\OsuSharp.Domain.csproj" />
     <ProjectReference Include="..\OsuSharp-dev\src\OsuSharp.JsonModels\OsuSharp.JsonModels.csproj" />
+    <ProjectReference Include="..\OsuSharp-dev\src\OsuSharp.Legacy.Oppai\OsuSharp.Legacy.Oppai.csproj" />
+    <ProjectReference Include="..\OsuSharp-dev\src\OsuSharp.Legacy\OsuSharp.Legacy.csproj" />
     <ProjectReference Include="..\OsuSharp-dev\src\OsuSharp\OsuSharp.csproj" />
   </ItemGroup>
 </Project>

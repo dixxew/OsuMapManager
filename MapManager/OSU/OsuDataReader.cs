@@ -13,15 +13,25 @@ using System;
 
 public class OsuDataReader
 {
-    private readonly string osuDirectory;
-    private readonly string osuDbPath;
-    private readonly string scoresDbPath;
+    private readonly AppSettings _appSettings;
 
-    public OsuDataReader()
+    private string osuDirectory;
+    private string osuDbPath;
+    private string scoresDbPath;
+    private string collectionsDbPath;
+
+    public OsuDataReader(AppSettings appSettings)
     {
-        this.osuDirectory = AppStore.OsuDirectory;
+        _appSettings = appSettings;
+        osuDirectory = appSettings.OsuDirectory;
         osuDbPath = Path.Combine(osuDirectory, "osu!.db");
         scoresDbPath = Path.Combine(osuDirectory, "scores.db");
+        collectionsDbPath = Path.Combine(osuDirectory, "collection.db");
+    }
+    public void UpdateSettings(AppSettings updatedSettings)
+    {
+        // Set new settings
+        osuDirectory = updatedSettings.OsuDirectory;
     }
 
     public List<DbBeatmap> GetBeatmapList()
@@ -31,6 +41,12 @@ public class OsuDataReader
         return osuDb.Beatmaps;
     }
 
+    public List<Collection> GeCollectionsList()
+    {
+        var collectionsDb = DatabaseDecoder.DecodeCollection(collectionsDbPath);
+
+        return collectionsDb.Collections;
+    }
     public List<Tuple<string, List<Score>>> GetScoresList()
     {
         var scoresDb = DatabaseDecoder.DecodeScores(scoresDbPath);
@@ -42,10 +58,10 @@ public class OsuDataReader
     {
         return BeatmapDecoder.Decode(beatmapPath);
     }
-    public static string GetBeatmapImage(string beatmapFolder, string beatmapFileName)
+    public string GetBeatmapImage(string beatmapFolder, string beatmapFileName)
     {
         // Путь к файлу карты
-        var beatmapPath = Path.Combine(AppStore.OsuDirectory, "Songs", beatmapFolder, beatmapFileName);
+        var beatmapPath = Path.Combine(osuDirectory, "Songs", beatmapFolder, beatmapFileName);
 
         // Список допустимых расширений изображений
         var imageExtensions = new[] { ".jpg", ".png", ".jpeg" };
@@ -76,7 +92,7 @@ public class OsuDataReader
                                 var relativeImagePath = line.Substring(startIndex, endIndex - startIndex);
 
                                 // Полный путь к картинке
-                                var fullImagePath = Path.Combine(AppStore.OsuDirectory, "Songs", beatmapFolder, relativeImagePath);
+                                var fullImagePath = Path.Combine(osuDirectory, "Songs", beatmapFolder, relativeImagePath);
 
                                 if (File.Exists(fullImagePath))
                                 {
@@ -89,7 +105,7 @@ public class OsuDataReader
             }
 
             // Если путь из файла .osu не найден, ищем картинку по названию в папке
-            var imageFiles = Directory.GetFiles(Path.Combine(AppStore.OsuDirectory, "Songs", beatmapFolder), "*.*", SearchOption.AllDirectories)
+            var imageFiles = Directory.GetFiles(Path.Combine(osuDirectory, "Songs", beatmapFolder), "*.*", SearchOption.AllDirectories)
                                       .Where(file => imageExtensions.Contains(Path.GetExtension(file).ToLower()));
 
             // Находим файл с наибольшим размером

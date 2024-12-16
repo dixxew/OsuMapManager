@@ -5,6 +5,7 @@
     xmlns:converters="clr-namespace:MapManager.GUI.Converters"
     xmlns:local="using:MapManager.GUI"
     xmlns:sukiUi="clr-namespace:SukiUI;assembly=SukiUI"
+    xmlns:vm="using:MapManager.GUI.ViewModels"
     RequestedThemeVariant="Default">
     <!--  "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options.  -->
 
@@ -21,5 +22,6 @@
 
     <Application.Resources>
         <converters:BoolConverter x:Key="BoolConverter" />
+        <vm:ViewModelLocator x:Key="Locator" />
     </Application.Resources>
 </Application>

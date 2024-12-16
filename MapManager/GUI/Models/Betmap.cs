@@ -13,8 +13,8 @@ namespace MapManager.GUI.Models
     {
         public int BeatmapId { get; set; }
         public int BeatmapSetId { get; set; }
+        public string Name => $"{Artist} - {Title}";
 
-        // Реактивные свойства
         private int _bytesOfBeatmapEntry;
         public int BytesOfBeatmapEntry
         {
@@ -26,7 +26,11 @@ namespace MapManager.GUI.Models
         public string Artist
         {
             get => _artist;
-            set => this.RaiseAndSetIfChanged(ref _artist, value);
+            set
+            {
+                this.RaiseAndSetIfChanged(ref _artist, value);
+                this.RaisePropertyChanged(nameof(Name));
+            }
         }
 
         private string _artistUnicode;
@@ -40,7 +44,11 @@ namespace MapManager.GUI.Models
         public string Title
         {
             get => _title;
-            set => this.RaiseAndSetIfChanged(ref _title, value);
+            set
+            {
+                this.RaiseAndSetIfChanged(ref _title, value);
+                this.RaisePropertyChanged(nameof(Name));
+            }
         }
 
         private string _titleUnicode;
@@ -225,5 +233,6 @@ namespace MapManager.GUI.Models
                  s.ScoreId               // ScoreId
              )).ToList();
         }
+
     }
 }

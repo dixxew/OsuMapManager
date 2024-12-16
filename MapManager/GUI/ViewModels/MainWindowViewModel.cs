@@ -1,7 +1,10 @@
-﻿using Avalonia.Media.Imaging;
+﻿using AutoMapper;
+using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using DynamicData;
 using MapManager.GUI.Models;
+using MapManager.GUI.Services;
+using MapManager.OSU;
 using OsuParsers.Database.Objects;
 using ReactiveUI;
 using System;
@@ -16,32 +19,103 @@ namespace MapManager.GUI.ViewModels;
 
 public class MainWindowViewModel : ViewModelBase
 {
-    public MainWindowViewModel()
+
+    private readonly OsuDataReader OsuDataReader;
+    private readonly OsuService _osuService;
+    private readonly AudioPlayerViewModel _audioPlayerVM;
+    private readonly SettingsViewModel _settingsVM;
+    private readonly Mapper _mapper;
+
+    public MainWindowViewModel(OsuService osuService, AudioPlayerViewModel audioPlayerVM, SettingsViewModel settingsVM, OsuDataReader osuDataReader, Mapper mapper)
     {
-        OsuDataReader = new();
+        _osuService = osuService;
+        _audioPlayerVM = audioPlayerVM;
+        _audioPlayerVM.ToggleFavorite += ToggleFavorite;
+        _settingsVM = settingsVM;
+        OsuDataReader = osuDataReader;
+        _mapper = mapper;
+
+        _audioPlayerVM.NextMapSetRequested += SelectNextBeatmapSet;
+        _audioPlayerVM.PrevMapSetRequested += SelectPrevBeatmapSet;
+        _audioPlayerVM.RandomMapSetRequested += SelectRandomBeatmapSet;
     }
 
-    private OsuDataReader OsuDataReader;
-
     #region private props
-    private string _searchText;
+    private string _searchBeatmapSetText;
     private ObservableCollection<BeatmapSet> filteredBeatmaps;
     private int _selectedRightTabIndex;
     private BeatmapSet _selectedBeatmapSet;
     private Bitmap _mapBackground;
     private Beatmap _selectedBeatmap;
+    private bool _isGlobalRankingsLoadingVisible;
+    private string _searchComboboxSelectedDestination = "Local";
+    private bool _isLocalBeatmapsVisible;
+    private bool _isGlobalBeatmapsVisible;
+    private string _searchCollectionText;
+    private long _collectionsCount;
+    private ObservableCollection<int> _favoriteBeatmaps;
     #endregion
 
-    private bool _isGLobalRankingsLoadingVisible;
+    private bool _isShowOnlyFavorites;
 
-    public bool IsGLobalRankingsLoadingVisible
+    public bool IsShowOnlyFavorites
     {
-        get => _isGLobalRankingsLoadingVisible;
-        set => this.RaiseAndSetIfChanged(ref _isGLobalRankingsLoadingVisible, value);
+        get => _isShowOnlyFavorites;
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _isShowOnlyFavorites, value);
+            PerformSearch();
+        }
     }
 
 
     #region public props
+    public ObservableCollection<int> FavoriteBeatmapSets
+    {
+        get => _favoriteBeatmaps;
+        set => this.RaiseAndSetIfChanged(ref _favoriteBeatmaps, value);
+    }
+
+    public long CollectionsCount
+    {
+        get => _collectionsCount;
+        set => this.RaiseAndSetIfChanged(ref _collectionsCount, value);
+    }
+
+    public string SearchCollectionText
+    {
+        get => _searchCollectionText;
+        set => this.RaiseAndSetIfChanged(ref _searchCollectionText, value);
+    }
+
+    public bool IsGlobalBeatmapsVisible
+    {
+        get => _isGlobalBeatmapsVisible;
+        set => this.RaiseAndSetIfChanged(ref _isGlobalBeatmapsVisible, value);
+    }
+
+    public bool IsLocalBeatmapsVisible
+    {
+        get => _isLocalBeatmapsVisible;
+        set => this.RaiseAndSetIfChanged(ref _isLocalBeatmapsVisible, value);
+    }
+
+    public string SearchComboboxSelectedDestination
+    {
+        get => _searchComboboxSelectedDestination;
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _searchComboboxSelectedDestination, value);
+            SearchComboboxDestinationChanged();
+        }
+    }
+
+    public bool IsGlobalRankingsLoadingVisible
+    {
+        get => _isGlobalRankingsLoadingVisible;
+        set => this.RaiseAndSetIfChanged(ref _isGlobalRankingsLoadingVisible, value);
+    }
+
     public long BeatmapsCount { get; set; } = 0;
 
     public ObservableCollection<BeatmapSet> FilteredBeatmaps
@@ -54,12 +128,12 @@ public class MainWindowViewModel : ViewModelBase
             this.RaisePropertyChanged(nameof(BeatmapsCount));
         }
     }
-    public string SearchText
+    public string SearchBeatmapSetText
     {
-        get => _searchText;
+        get => _searchBeatmapSetText;
         set
         {
-            this.RaiseAndSetIfChanged(ref _searchText, value);
+            this.RaiseAndSetIfChanged(ref _searchBeatmapSetText, value);
             PerformSearch();
         }
     }
@@ -103,10 +177,31 @@ public class MainWindowViewModel : ViewModelBase
     }
     public ObservableCollection<BeatmapSet> BeatmapSets { get; set; } = new();
     public ObservableCollection<GlobalScore> GlobalScores { get; set; } = new();
+    public ObservableCollection<Models.Collection> Collections { get; set; } = new();
     #endregion
 
 
-    
+    private void SearchComboboxDestinationChanged()
+    {
+        switch (SearchComboboxSelectedDestination)
+        {
+            case "Local":
+                {
+                    IsLocalBeatmapsVisible = true;
+                    IsGlobalBeatmapsVisible = false;
+                    break;
+                }
+            case "Global":
+                {
+                    IsLocalBeatmapsVisible = false;
+                    IsGlobalBeatmapsVisible = true;
+
+                    break;
+                }
+
+        }
+    }
+
     private void UpdateRightTab()
     {
         switch (SelectedRightTabIndex)
@@ -118,14 +213,14 @@ public class MainWindowViewModel : ViewModelBase
             case 1: //GlobalRanks
                 {
                     GlobalScores.Clear();
-                    IsGLobalRankingsLoadingVisible = true;
+                    IsGlobalRankingsLoadingVisible = true;
                     Task.Run(async () =>
                     {
                         if (SelectedBeatmap != null)
                         {
-                            var scores = await AppStore.OsuService.GetBeatmapScoresByIdAsync(SelectedBeatmap.BeatmapId);
-                            GlobalScores.AddRange(scores.Scores.Select(s => AppStore.Mapper.Map<GlobalScore>(s)).ToList());
-                            IsGLobalRankingsLoadingVisible = false;
+                            var scores = await _osuService.GetBeatmapScoresByIdAsync(SelectedBeatmap.BeatmapId);
+                            GlobalScores.AddRange(scores.Scores.Select(s => _mapper.Map<GlobalScore>(s)).ToList());
+                            IsGlobalRankingsLoadingVisible = false;
                         }
                     });
                     break;
@@ -137,8 +232,8 @@ public class MainWindowViewModel : ViewModelBase
                     {
                         if (SelectedBeatmap != null)
                         {
-                            var scores = await AppStore.OsuService.GetBeatmapScoresByIdAsync(SelectedBeatmap.BeatmapId);
-                            GlobalScores.AddRange(scores.Scores.Select(s => AppStore.Mapper.Map<GlobalScore>(s)).ToList());
+                            var scores = await _osuService.GetBeatmapScoresByIdAsync(SelectedBeatmap.BeatmapId);
+                            GlobalScores.AddRange(scores.Scores.Select(s => _mapper.Map<GlobalScore>(s)).ToList());
                         }
                     });
                     break;
@@ -189,11 +284,46 @@ public class MainWindowViewModel : ViewModelBase
             // Устанавливаем FilteredBeatmaps и случайно выбираем BeatmapSet
             FilteredBeatmaps = BeatmapSets;
             SelectedBeatmapSet = FilteredBeatmaps.ElementAt(Random.Shared.Next(0, FilteredBeatmaps.Count));
+            LoadCollections();
         });
     }
 
+    private void LoadCollections()
+    {
+        var collections = OsuDataReader.GeCollectionsList();
+        Collections.AddRange(collections.Select(c => new Models.Collection
+        {
+            Beatmaps = new(BeatmapSets
+                .SelectMany(bs => bs.Beatmaps)
+                .Where(b => c.MD5Hashes.Contains(b.MD5Hash))
+                .ToList()),
+            Name = c.Name,
+            Count = c.Count
+        }).ToList());
+    }
 
-    private async Task<List<Tuple<string, List<OsuParsers.Database.Objects.Score>>>> LoadScores()
+    private void LoadFavoriteBeatmaps()
+    {
+        FavoriteBeatmapSets = new ObservableCollection<int>();
+        var list = FavoriteBeatmapManager.Load();
+        FavoriteBeatmapSets.AddRange(list);
+    }
+
+    private void UpdateFavoriteBeatmapSets(bool isAdded)
+    {
+        if (isAdded)
+        {
+            FavoriteBeatmapSets.Add(SelectedBeatmapSet.Id);
+            FavoriteBeatmapManager.Add(SelectedBeatmapSet.Id);
+        }
+        else
+        {
+            FavoriteBeatmapSets.Remove(SelectedBeatmapSet.Id);
+            FavoriteBeatmapManager.Remove(SelectedBeatmapSet.Id);
+        }
+    }
+
+    private List<Tuple<string, List<OsuParsers.Database.Objects.Score>>> LoadScores()
     {
         return OsuDataReader.GetScoresList();
 
@@ -203,7 +333,10 @@ public class MainWindowViewModel : ViewModelBase
     {
         SelectedBeatmap = SelectedBeatmapSet.Beatmaps.FirstOrDefault();
         if (SelectedBeatmap != null)
-            AppStore.AudioPlayerVM.SetSongAndPlay(Path.Combine(AppStore.OsuDirectory, "Songs", SelectedBeatmap.FolderName, SelectedBeatmap.AudioFileName));
+        {
+            _audioPlayerVM.SetSongAndPlay(Path.Combine(_settingsVM.OsuDirPath, "Songs", SelectedBeatmap.FolderName, SelectedBeatmap.AudioFileName));
+            _audioPlayerVM.SetSelectedBeatmapData(SelectedBeatmapSet);
+        }
     }
     private void SelectedBeatmapChanged()
     {
@@ -212,17 +345,25 @@ public class MainWindowViewModel : ViewModelBase
 
     private void PerformSearch()
     {
-        if (string.IsNullOrWhiteSpace(SearchText))
+        IEnumerable<BeatmapSet> beatmapSets = BeatmapSets;
+
+        // Если включен режим отображения только избранного
+        if (IsShowOnlyFavorites)
         {
-            // Если строка поиска пустая, показываем все BeatmapSets
-            FilteredBeatmaps = new ObservableCollection<BeatmapSet>(BeatmapSets);
+            beatmapSets = beatmapSets.Where(set => FavoriteBeatmapSets.Contains(set.Id));
+        }
+
+        if (string.IsNullOrWhiteSpace(SearchBeatmapSetText))
+        {
+            // Если строка поиска пустая, показываем отфильтрованные BeatmapSets
+            FilteredBeatmaps = new ObservableCollection<BeatmapSet>(beatmapSets);
         }
         else
         {
-            var query = SearchText.ToLower();
+            var query = SearchBeatmapSetText.ToLower();
 
-            // Фильтруем BeatmapSets по условию, чтобы хотя бы один Beatmap соответствовал поиску
-            var results = BeatmapSets
+            // Фильтруем BeatmapSets по строке поиска
+            var results = beatmapSets
                 .Where(set => set.Beatmaps.Any(b =>
                     (b.Artist != null && b.Artist.ToLower().Contains(query)) ||
                     (b.Creator != null && b.Creator.ToLower().Contains(query)) ||
@@ -236,10 +377,17 @@ public class MainWindowViewModel : ViewModelBase
     }
 
 
-    public async void OnMainWindowLoaded()
+    private void ToggleFavorite(bool value)
     {
-        var scores = await LoadScores();
+        SelectedBeatmapSet.IsFavorite = value;
+        UpdateFavoriteBeatmapSets(value);
+    }
+
+    public void OnMainWindowLoaded()
+    {
+        var scores = LoadScores();
         LoadBeatmaps(scores);
+        LoadFavoriteBeatmaps();
     }
 
     public void SelectNextBeatmapSet()

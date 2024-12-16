@@ -17,7 +17,6 @@ public partial class AudioPlayerControl : UserControl
     public AudioPlayerControl()
     {
         InitializeComponent();
-        DataContext = AppStore.AudioPlayerVM;
     }
 
     private void PlayPressed(object? sender, Avalonia.Input.PointerPressedEventArgs e)
@@ -32,7 +31,6 @@ public partial class AudioPlayerControl : UserControl
             }
             grid.PointerReleased += GridReleased;
         }
-        AppStore.AudioPlayerVM.PlayPauseCommand();
     }
     private void StopPressed(object? sender, Avalonia.Input.PointerPressedEventArgs e)
     {
@@ -46,7 +44,6 @@ public partial class AudioPlayerControl : UserControl
             }
             grid.PointerReleased += GridReleased;
         }
-        AppStore.AudioPlayerVM.StopCommand();
     }
     private void PrevPressed(object? sender, Avalonia.Input.PointerPressedEventArgs e)
     {
@@ -60,7 +57,6 @@ public partial class AudioPlayerControl : UserControl
             }
             grid.PointerReleased += GridReleased;
         }
-        AppStore.AudioPlayerVM.PrevCommand();
     }
     private void NextPressed(object? sender, Avalonia.Input.PointerPressedEventArgs e)
     {
@@ -74,7 +70,6 @@ public partial class AudioPlayerControl : UserControl
             }
             grid.PointerReleased += GridReleased;
         }
-        AppStore.AudioPlayerVM.NextCommand();
     }
     private void HeartPressed(object? sender, Avalonia.Input.PointerPressedEventArgs e)
     {
@@ -88,7 +83,6 @@ public partial class AudioPlayerControl : UserControl
             }
             grid.PointerReleased += GridReleased;
         }
-        AppStore.AudioPlayerVM.ToggleFavorite();
     }
     private void RandomPressed(object? sender, Avalonia.Input.PointerPressedEventArgs e)
     {
@@ -102,7 +96,6 @@ public partial class AudioPlayerControl : UserControl
             }
             grid.PointerReleased += GridReleased;
         }
-        AppStore.AudioPlayerVM.IsRandomEnabled = !AppStore.AudioPlayerVM.IsRandomEnabled;
     }
     private void RepeatPressed(object? sender, Avalonia.Input.PointerPressedEventArgs e)
     {
@@ -116,47 +109,34 @@ public partial class AudioPlayerControl : UserControl
             }
             grid.PointerReleased += GridReleased;
         }
-        AppStore.AudioPlayerVM.IsLoopEnabled = !AppStore.AudioPlayerVM.IsLoopEnabled;
     }
 
 
     private void ProgressBar_PointerExited(object? sender, Avalonia.Input.PointerEventArgs e)
     {
-        // Закрываем Popup при выходе курсора
-        AppStore.AudioPlayerVM.IsPopupOpen = false;
+        if (DataContext is AudioPlayerViewModel vm)
+        {
+            vm.ClosePopup();
+        }
     }
 
     private void ProgressBar_PointerMoved(object? sender, Avalonia.Input.PointerEventArgs e)
     {
-        if (sender is ProgressBar progressBar)
+        if (DataContext is AudioPlayerViewModel vm && sender is ProgressBar progressBar)
         {
-            // Позиция курсора относительно ProgressBar
             var position = e.GetPosition(progressBar);
-
-            // Вычисляем временную метку
             var relativePosition = position.X / progressBar.Bounds.Width;
-            var hoveredTime = progressBar.Minimum + relativePosition * (progressBar.Maximum - progressBar.Minimum);
-            _hoveredPosition = hoveredTime; // Сохраняем позицию для перемотки
-            AppStore.AudioPlayerVM.PopupTime = TimeSpan.FromSeconds(hoveredTime).ToString(@"m\:ss");
 
-            // Устанавливаем Popup в фиксированной высоте, но по горизонтали над курсором
-            TimePopup.PlacementMode = PlacementMode.AnchorAndGravity;
-            TimePopup.PlacementAnchor = PopupAnchor.Top; // Привязка к верхней части ProgressBar
-            TimePopup.PlacementGravity = PopupGravity.Bottom; // Размещаем Popup снизу вверх
-            TimePopup.HorizontalOffset = position.X; // Горизонтальное смещение по ширине ProgressBar
-            TimePopup.VerticalOffset = -40; // Фиксированное положение над ProgressBar
-
-            AppStore.AudioPlayerVM.IsPopupOpen = true;
+            vm.UpdatePopupState(relativePosition, progressBar.Bounds.Width, progressBar.Minimum, progressBar.Maximum);
+            vm.IsPopupOpen = true;
         }
     }
 
-
     private void ProgressBar_PointerPressed(object? sender, Avalonia.Input.PointerPressedEventArgs e)
     {
-        if (sender is ProgressBar progressBar)
+        if (DataContext is AudioPlayerViewModel vm)
         {
-            AppStore.AudioPlayerVM.SongProgress = _hoveredPosition;
-            AppStore.AudioPlayerVM.SetSongPosition(_hoveredPosition);
+            vm.SongProgress = vm.HoveredPosition;
         }
     }
     private async void GridReleased(object? sender, Avalonia.Input.PointerReleasedEventArgs e)

@@ -2,6 +2,7 @@
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
 
 namespace MapManager.GUI.Models;
 
@@ -246,11 +247,11 @@ public class GlobalUserCompact : ReactiveObject
             Avatar = null;
             return;
         }
-
+        var _httpClient = new HttpClient();
         try
         {
             // Загрузка данных аватарки
-            using var response = await AppStore.SharedHttpClient.GetAsync(_avatarUrl);
+            using var response = await _httpClient.GetAsync(_avatarUrl);
             response.EnsureSuccessStatusCode();
 
             // Чтение данных как поток

@@ -1,4 +1,5 @@
 ﻿using Avalonia.Controls;
+using MapManager.GUI.Models;
 using NAudio.Wave;
 using ReactiveUI;
 using SoundTouch.Net.NAudioSupport;
@@ -11,18 +12,6 @@ namespace MapManager.GUI.ViewModels;
 
 public class AudioPlayerViewModel : ReactiveObject
 {
-    private IWavePlayer _wavePlayer;
-    private AudioFileReader _audioFileReader;
-    private SoundTouchWaveProvider _soundTouchProvider;
-    private bool _isPlaying;
-    private Timer _progressTimer;
-    private readonly HashSet<string> _favorites = new();
-    private bool _isPopupOpen;
-    private string _popupTime;
-
-    private bool _isLoopEnabled;
-    private bool _isRandomEnabled;
-    private float _playbackRate = 1.0f; // Скорость воспроизведения
 
     public AudioPlayerViewModel()
     {
@@ -30,7 +19,20 @@ public class AudioPlayerViewModel : ReactiveObject
         _progressTimer.Elapsed += UpdateProgress;
     }
 
+    private IWavePlayer _wavePlayer;
+    private AudioFileReader _audioFileReader;
+    private SoundTouchWaveProvider _soundTouchProvider;
+    private bool _isPlaying;
+    private Timer _progressTimer;
+    private bool _isPopupOpen;
+    private string _popupTime;
+    private bool _isLoopEnabled;
+    private bool _isRandomEnabled;
+    private float _playbackRate = 1.0f;
+    private bool _isFavorite;
     private string _selectedPlaybackRate = "1";
+
+
 
     public string SelectedPlaybackRate
     {
@@ -39,12 +41,17 @@ public class AudioPlayerViewModel : ReactiveObject
         {
             this.RaiseAndSetIfChanged(ref _selectedPlaybackRate, value);
             PlaybackRate = float.Parse(value, CultureInfo.InvariantCulture);
-            }
+        }
     }
 
-    public bool IsFavorite => _favorites.Contains(AudioFilePath);
+    public bool IsFavorite
+    {
+        get => _isFavorite;
+        set => this.RaiseAndSetIfChanged(ref _isFavorite, value);
+    }
 
     public string FormattedSongProgress => TimeSpan.FromSeconds(SongProgress).ToString(@"m\:ss");
+
     public string FormattedSongDuration => TimeSpan.FromSeconds(SongDuration).ToString(@"m\:ss");
 
     public bool IsPlaying
@@ -114,7 +121,7 @@ public class AudioPlayerViewModel : ReactiveObject
         set => this.RaiseAndSetIfChanged(ref _audioFilePath, value);
     }
 
-    private float _volume = 0f;
+    private float _volume = 0.5f;
     public float Volume
     {
         get => _volume;
@@ -136,8 +143,28 @@ public class AudioPlayerViewModel : ReactiveObject
         get => _popupTime;
         set => this.RaiseAndSetIfChanged(ref _popupTime, value);
     }
+    private double _hoveredPosition;
+    public double HoveredPosition
+    {
+        get => _hoveredPosition;
+        set => this.RaiseAndSetIfChanged(ref _hoveredPosition, value);
+    }
 
+    public void UpdatePopupState(double relativePosition, double progressBarWidth, double progressBarMinimum, double progressBarMaximum)
+    {
+        HoveredPosition = progressBarMinimum + relativePosition * (progressBarMaximum - progressBarMinimum);
+        PopupTime = TimeSpan.FromSeconds(HoveredPosition).ToString(@"m\:ss");
+    }
 
+    public void ClosePopup()
+    {
+        IsPopupOpen = false;
+    }
+
+    public void SetSelectedBeatmapData(BeatmapSet beatmapset)
+    {
+        IsFavorite = beatmapset.IsFavorite;
+    }
     public void SetSongPosition(double positionInSeconds)
     {
         if (_audioFileReader != null && positionInSeconds >= 0 && positionInSeconds <= SongDuration)
@@ -201,19 +228,20 @@ public class AudioPlayerViewModel : ReactiveObject
     public void NextCommand()
     {
         if (IsRandomEnabled)
-        {
-            AppStore.MainWindowVM.SelectRandomBeatmapSet();
-        }
+            OnRandomMapSetRequested();
         else
-        {
-            AppStore.MainWindowVM.SelectNextBeatmapSet();
-        }
+            OnNextMapSetRequested();
     }
 
     public void PrevCommand()
-    {
-        AppStore.MainWindowVM.SelectPrevBeatmapSet();
-    }
+        => OnPrevMapSetRequested();
+
+    public void RandomCommand()
+        => IsRandomEnabled = !IsRandomEnabled;
+
+    public void RepeatCommand()
+        => IsLoopEnabled = !IsLoopEnabled;
+
 
     private void SetPlaybackRate()
     {
@@ -251,21 +279,36 @@ public class AudioPlayerViewModel : ReactiveObject
     }
 
 
-    public void ToggleFavorite()
+    public void ToggleFavoriteCommand()
     {
         if (!string.IsNullOrEmpty(AudioFilePath))
         {
-            if (_favorites.Contains(AudioFilePath))
+            if (IsFavorite)
             {
-                _favorites.Remove(AudioFilePath);
+                ToggleFavorite.Invoke(false);
+                IsFavorite = false;
                 this.RaisePropertyChanged(nameof(IsFavorite));
             }
             else
             {
-                _favorites.Add(AudioFilePath);
+                ToggleFavorite.Invoke(true);
+                IsFavorite = true;
                 this.RaisePropertyChanged(nameof(IsFavorite));
             }
         }
     }
+
+    public event Action<bool> ToggleFavorite;
+    public event Action PrevMapSetRequested;
+    public event Action NextMapSetRequested;
+    public event Action RandomMapSetRequested;
+
+    private void OnPrevMapSetRequested()
+        => PrevMapSetRequested.Invoke();
+    private void OnNextMapSetRequested()
+        => NextMapSetRequested.Invoke();
+    private void OnRandomMapSetRequested()
+        => RandomMapSetRequested.Invoke();
+
 
 }

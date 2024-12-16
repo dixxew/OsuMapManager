@@ -8,6 +8,10 @@ using OsuSharp.Exceptions;
 using OsuSharp.Extensions;
 using OsuSharp;
 using MapManager.OSU;
+using OsuSharp.Legacy;
+using MapManager.GUI.ViewModels;
+using System.Net.Http;
+using AutoMapper;
 
 namespace MapManager
 {
@@ -37,16 +41,33 @@ namespace MapManager
 
         public static IHost BuildHost(string[] args)
         {
+            var appSettings = AppSettingsManager.LoadSettingsAsync().GetAwaiter().GetResult();
+
             return Host.CreateDefaultBuilder(args)
                 .ConfigureOsuSharp((ctx, options) => options.Configuration = new OsuClientConfiguration
                 {
                     ClientId = 36783,
                     ClientSecret = "XnR2bWHI4f3qEeCN0jsAdMA54jixORj40s7x43Rd"
                 })
-                .ConfigureServices((context, services) =>
+                .ConfigureServices(async (context, services) =>
                 {
-                    // Регистрация других зависимостей
+                    services.AddSingleton(appSettings);
+
                     services.AddTransient<OsuService>();
+                    services.AddSingleton(_ => new LegacyOsuClient(new LegacyOsuSharpConfiguration
+                    {
+                        ApiKey = "c9f024e60c2551bea39b507163405098ed8fbd85"
+                    })); 
+                    services.AddSingleton<SettingsViewModel>();
+                    services.AddSingleton<OsuDataReader>();
+                    services.AddSingleton<AudioPlayerViewModel>();
+                    services.AddScoped<HttpClient>(); 
+                    services.AddScoped<Mapper>(provider =>
+                    {
+                        var configuration = new MapperConfig().MapperConfiguration;
+                        return new Mapper(configuration);
+                    });
+                    services.AddSingleton<MainWindowViewModel>();
                 })
                 .Build();
         }
