@@ -170,9 +170,11 @@ public class MainWindowViewModel : ViewModelBase
         get => _selectedBeatmapSet;
         set
         {
+            if (value == null || (_selectedBeatmapSet != null && value.Id == _selectedBeatmapSet.Id && FilteredBeatmaps.Count > 1))
+                return;
+
             this.RaiseAndSetIfChanged(ref _selectedBeatmapSet, value);
-            if (value != null)
-                SelectedBeatmapSetChanged();
+            SelectedBeatmapSetChanged();
         }
     }
     public ObservableCollection<BeatmapSet> BeatmapSets { get; set; } = new();
@@ -398,7 +400,7 @@ public class MainWindowViewModel : ViewModelBase
         var currIndex = FilteredBeatmaps.IndexOf(SelectedBeatmapSet);
 
         // Если текущий элемент последний, выбираем первый
-        if (currIndex == BeatmapSets.Count - 1)
+        if (currIndex == FilteredBeatmaps.Count - 1)
         {
             SelectedBeatmapSet = FilteredBeatmaps.First();
         }

@@ -41,6 +41,21 @@
         </Button>
     </sukiUi:SukiWindow.RightWindowTitleBarControls>
     <Grid ColumnDefinitions="2*, 8, 6*">
+        <Grid.Styles>
+            <Style Selector="Grid">
+                <Setter Property="Background" Value="Transparent" />
+            </Style>
+        </Grid.Styles>
+        <Image
+            Grid.ColumnSpan="3"
+            Opacity="0.1"
+            Source="{Binding MapBackground}"
+            Stretch="UniformToFill" >
+
+            <Image.Effect>
+                <BlurEffect Radius="35" />
+            </Image.Effect>
+        </Image>
         <Grid Background="#0fffffff">
             <TabControl>
                 <TabItem Header="Maps">
@@ -49,7 +64,7 @@
                             <StackPanel Orientation="Vertical">
                                 <TextBox
                                     FlowDirection="LeftToRight"
-                                    Text="{Binding SearcBeatmapSethText}"
+                                    Text="{Binding SearchBeatmapSetText}"
                                     Watermark="Search" />
                                 <DockPanel>
                                     <ComboBox

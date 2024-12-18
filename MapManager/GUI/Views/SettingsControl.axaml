@@ -32,7 +32,7 @@
                     <StackPanel FlowDirection="LeftToRight" Orientation="Horizontal">
                         <TextBlock Text="Osu api key:" />
                         <TextBox Width="250" Text="{Binding OsuClientSecret}" />
-                        <TextBox Width="50" Text="{Binding OsuClientId}" />
+                        <TextBox Width="100" Text="{Binding OsuClientId}" />
                         <Button
                             Margin="8,5"
                             Classes="Standard Icon"
