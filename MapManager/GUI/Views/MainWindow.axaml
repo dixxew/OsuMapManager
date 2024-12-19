@@ -65,8 +65,32 @@
                                 <TextBox
                                     FlowDirection="LeftToRight"
                                     Text="{Binding SearchBeatmapSetText}"
-                                    Watermark="Search" />
+                                    Watermark="Search, ex: Sotarks We Are" />
                                 <DockPanel>
+                                    <DropDownButton Content="Filters" FontSize="14">
+                                        <DropDownButton.Flyout>
+                                            <Flyout>
+                                                <Panel>
+                                                    <Border
+                                                        Margin="20"
+                                                        BoxShadow="{DynamicResource SukiPopupShadow}"
+                                                        CornerRadius="20" />
+                                                    <Border
+                                                        MinWidth="350"
+                                                        Margin="20"
+                                                        Background="{DynamicResource SukiCardBackground}"
+                                                        BorderBrush="{DynamicResource SukiLightBorderBrush}"
+                                                        BorderThickness="1"
+                                                        ClipToBounds="True"
+                                                        CornerRadius="15">
+                                                        <Border Padding="15" Background="{DynamicResource PopupGradientBrush}">
+                                                            <view:SearchFiltersControl />
+                                                        </Border>
+                                                    </Border>
+                                                </Panel>
+                                            </Flyout>
+                                        </DropDownButton.Flyout>
+                                    </DropDownButton>
                                     <ComboBox
                                         HorizontalAlignment="Left"
                                         SelectedValue="{Binding SearchComboboxSelectedDestination}"
