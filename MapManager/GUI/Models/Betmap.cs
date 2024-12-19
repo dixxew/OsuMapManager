@@ -1,5 +1,4 @@
-﻿using HarfBuzzSharp;
-using OsuParsers.Database.Objects;
+﻿using OsuParsers.Database.Objects;
 using OsuParsers.Enums;
 using OsuParsers.Enums.Database;
 using ReactiveUI;
@@ -170,12 +169,58 @@ namespace MapManager.GUI.Models
             set => this.RaiseAndSetIfChanged(ref _scores, value);
         }
 
+        
+
+
         public string Duration { get; set; }
 
         public int ObjectsCount => CirclesCount + SlidersCount + SpinnersCount;
 
         public List<string> TagsList { get; set; }
+
         public string FolderName { get; set; }
+
+        public Beatmap(int beatmapId, int beatmapSetId, int bytesOfBeatmapEntry, 
+            string artist, string artistUnicode, string title, string titleUnicode,
+            string creator, string difficulty, string audioFileName, string mD5Hash, 
+            string fileName, RankedStatus rankedStatus, ushort circlesCount, ushort slidersCount, 
+            ushort spinnersCount, DateTime lastModifiedTime, float approachRate, 
+            float circleSize, float hPDrain, float overallDifficulty, 
+            Dictionary<Mods, double> standardStarRating, List<Score> scores,
+            string duration, List<string> tagsList, string folderName)
+        {
+            BeatmapId = beatmapId;
+            BeatmapSetId = beatmapSetId;
+            BytesOfBeatmapEntry = bytesOfBeatmapEntry;
+            Artist = artist;
+            ArtistUnicode = artistUnicode;
+            Title = title;
+            TitleUnicode = titleUnicode;
+            Creator = creator;
+            Difficulty = difficulty;
+            AudioFileName = audioFileName;
+            MD5Hash = mD5Hash;
+            FileName = fileName;
+            RankedStatus = rankedStatus;
+            CirclesCount = circlesCount;
+            SlidersCount = slidersCount;
+            SpinnersCount = spinnersCount;
+            LastModifiedTime = lastModifiedTime;
+            ApproachRate = approachRate;
+            CircleSize = circleSize;
+            HPDrain = hPDrain;
+            OverallDifficulty = overallDifficulty;
+            StandardStarRating = standardStarRating;
+            Scores = scores;
+            Duration = duration;
+            TagsList = tagsList;
+            FolderName = folderName;
+        }
+
+        public Beatmap()
+        {
+
+        }
 
         // Метод создания Beatmap из DbBeatmap
         public static Beatmap FromDbBeatmap(DbBeatmap dbBeatmap)
@@ -233,6 +278,5 @@ namespace MapManager.GUI.Models
                  s.ScoreId               // ScoreId
              )).ToList();
         }
-
     }
 }

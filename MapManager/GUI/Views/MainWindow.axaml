@@ -50,14 +50,14 @@
             Grid.ColumnSpan="3"
             Opacity="0.1"
             Source="{Binding MapBackground}"
-            Stretch="UniformToFill" >
+            Stretch="UniformToFill">
 
             <Image.Effect>
                 <BlurEffect Radius="35" />
             </Image.Effect>
         </Image>
         <Grid Background="#0fffffff">
-            <TabControl>
+            <TabControl SelectedIndex="{Binding SelectedMainTab}">
                 <TabItem Header="Maps">
                     <Grid RowDefinitions="auto, *">
                         <sukiUi:GlassCard Padding="12,6" Classes="Primary">

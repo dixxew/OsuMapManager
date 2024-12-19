@@ -11,22 +11,22 @@ public class SettingsViewModel : ReactiveObject
 {
     private bool _isInitialized = false;
 
-    private string _osuClientSecret;
-    private int _osuClientId;
-    private string _osuDirPath = "D:\\osu!";
+    private string? _osuClientSecret;
+    private string? _osuClientId;
+    private string? _osuDirPath = "D:\\osu!";
     private readonly AppSettings _appSettings;
 
     public SettingsViewModel(AppSettings appSettings)
     {
         _appSettings = appSettings;
         OsuClientSecret = _appSettings.OsuClientSecret;
-        OsuClientId = _appSettings.OsuClientId;
+        OsuClientId = _appSettings.OsuClientId.ToString();
         OsuDirPath = _appSettings.OsuDirectory;
 
         _isInitialized = true;
     }
 
-    public string OsuClientSecret
+    public string? OsuClientSecret
     {
         get => _osuClientSecret;
         set
@@ -35,7 +35,7 @@ public class SettingsViewModel : ReactiveObject
             NotifySettingsChanged();
         }
     }
-    public int OsuClientId
+    public string? OsuClientId
     {
         get => _osuClientId;
         set
@@ -44,7 +44,7 @@ public class SettingsViewModel : ReactiveObject
             NotifySettingsChanged();
         }
     }
-    public string OsuDirPath
+    public string? OsuDirPath
     {
         get => _osuDirPath;
         set
@@ -82,7 +82,7 @@ public class SettingsViewModel : ReactiveObject
     {
         if (!_isInitialized) return;
 
-        _appSettings.OsuClientId = OsuClientId;
+        _appSettings.OsuClientId = int.TryParse(OsuClientId, out int value) ? value : 0;
         _appSettings.OsuClientSecret = OsuClientSecret;
         _appSettings.OsuDirectory = OsuDirPath;
         OnSettingsChanged?.Invoke();

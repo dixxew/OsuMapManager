@@ -10,9 +10,9 @@ using ReactiveUI;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace MapManager.GUI.ViewModels;
@@ -57,6 +57,30 @@ public class MainWindowViewModel : ViewModelBase
     #endregion
 
     private bool _isShowOnlyFavorites;
+    private int _selectedMainTab;
+    private ObservableCollection<Models.Collection> _selectedBeatmapCollections;
+    private int _selectedBeatmapCollectionsCount;
+
+    public string SelectedBeatmapCollectionsCount
+        => $"Collections {SelectedBeatmapCollections?.Count ?? 0}";
+
+    public ObservableCollection<Models.Collection> SelectedBeatmapCollections
+    {
+        get => _selectedBeatmapCollections;
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _selectedBeatmapCollections, value);
+            _selectedBeatmapCollections.CollectionChanged += OnBeatmapSelectedCollectionsChanges;
+            if (value != null)
+                this.RaisePropertyChanged(nameof(SelectedBeatmapCollectionsCount));
+        }
+    }
+
+    public int SelectedMainTab
+    {
+        get => _selectedMainTab;
+        set => this.RaiseAndSetIfChanged(ref _selectedMainTab, value);
+    }
 
     public bool IsShowOnlyFavorites
     {
@@ -334,15 +358,34 @@ public class MainWindowViewModel : ViewModelBase
     private void SelectedBeatmapSetChanged()
     {
         SelectedBeatmap = SelectedBeatmapSet.Beatmaps.FirstOrDefault();
+
+
         if (SelectedBeatmap != null)
         {
             _audioPlayerVM.SetSongAndPlay(Path.Combine(_settingsVM.OsuDirPath, "Songs", SelectedBeatmap.FolderName, SelectedBeatmap.AudioFileName));
             _audioPlayerVM.SetSelectedBeatmapData(SelectedBeatmapSet);
         }
     }
+
+    private void OnBeatmapSelectedCollectionsChanges(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        switch (e.Action)
+        {
+            case NotifyCollectionChangedAction.Add:
+                Collections.First(c => c == e.NewItems[0] as Models.Collection).Beatmaps.Add(SelectedBeatmap);
+                this.RaisePropertyChanged(nameof(SelectedBeatmapCollectionsCount));
+                break;
+            case NotifyCollectionChangedAction.Remove:
+                Collections.First(c => c == e.OldItems[0] as Models.Collection).Beatmaps.Remove(SelectedBeatmap);
+                this.RaisePropertyChanged(nameof(SelectedBeatmapCollectionsCount));
+                break;
+        }
+    }
+
     private void SelectedBeatmapChanged()
     {
         MapBackground = new Bitmap(OsuDataReader.GetBeatmapImage(SelectedBeatmap.FolderName, SelectedBeatmap.FileName));
+        SelectedBeatmapCollections = new(Collections.Where(c => c.Beatmaps.Contains(SelectedBeatmap)));
     }
 
     private void PerformSearch()
@@ -433,5 +476,15 @@ public class MainWindowViewModel : ViewModelBase
         if (FilteredBeatmaps != null || FilteredBeatmaps.Count != 0)
             SelectedBeatmapSet = FilteredBeatmaps.ElementAt(Random.Shared.Next(0, FilteredBeatmaps.Count));
     }
-
+    public void ToggleSelectionCommand(Models.Collection collection)
+    {
+        if (SelectedBeatmapCollections.Contains(collection))
+        {
+            SelectedBeatmapCollections.Remove(collection);
+        }
+        else
+        {
+            SelectedBeatmapCollections.Add(collection);
+        }
+    }
 }
