@@ -37,24 +37,39 @@
                     <StackPanel Orientation="Vertical" Spacing="4">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="MaxDuration" />
-                            <MaskedTextBox Mask="00:00" />
+                            <MaskedTextBox Mask="00:00" Text="{Binding MaxDuration}" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="MinDuration" />
-                            <MaskedTextBox Mask="00:00" />
+                            <MaskedTextBox Mask="00:00" Text="{Binding MinDuration}" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="StarRating" />
+                            <StackPanel VerticalAlignment="Center" Orientation="Vertical">
+                                <TextBlock
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Bottom"
+                                    FontSize="10"
+                                    Foreground="LightGray"
+                                    Text="{Binding MinStarRating, StringFormat={}{0:F2}}" />
+                                <TextBlock Text="StarRating" />
+                                <TextBlock
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Top"
+                                    FontSize="10"
+                                    Foreground="LightGray"
+                                    Text="{Binding MaxStarRating, StringFormat={}{0:F2}}" />
+                            </StackPanel>
                             <StackPanel Width="140" Orientation="Vertical">
                                 <Slider
-                                    Maximum="10"
+                                    Maximum="{Binding MaxStarRating}"
                                     Minimum="0"
-                                    TickFrequency="0.01" />
+                                    TickFrequency="0.01"
+                                    Value="{Binding MinStarRating}" />
                                 <Slider
                                     Maximum="10"
                                     Minimum="0"
                                     TickFrequency="0.01"
-                                    Value="10" />
+                                    Value="{Binding MaxStarRating}" />
                             </StackPanel>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
@@ -69,72 +84,144 @@
                             <StackPanel Orientation="Vertical" Spacing="8">
                                 <StackPanel Orientation="Horizontal">
                                     <StackPanel Width="140" Orientation="Vertical">
-                                        <TextBlock
+                                        <StackPanel
                                             HorizontalAlignment="Center"
-                                            FontSize="18"
-                                            Text="AR" />
+                                            Orientation="Horizontal"
+                                            Spacing="4">
+                                            <TextBlock
+                                                HorizontalAlignment="Right"
+                                                VerticalAlignment="Bottom"
+                                                FontSize="10"
+                                                Foreground="LightGray"
+                                                Text="{Binding MinAR, StringFormat={}{0:F2}}" />
+                                            <TextBlock
+                                                HorizontalAlignment="Center"
+                                                FontSize="18"
+                                                Text="AR" />
+                                            <TextBlock
+                                                HorizontalAlignment="Left"
+                                                VerticalAlignment="Bottom"
+                                                FontSize="10"
+                                                Foreground="LightGray"
+                                                Text="{Binding MaxAR, StringFormat={}{0:F2}}" />
+                                        </StackPanel>
                                         <Slider
-                                            Maximum="10"
+                                            Maximum="{Binding MaxAR}"
                                             Minimum="0"
-                                            TickFrequency="0.01" />
+                                            TickFrequency="0.01"
+                                            Value="{Binding MinAR}" />
                                         <Slider
                                             Maximum="10"
                                             Minimum="0"
                                             TickFrequency="0.01"
-                                            Value="10" />
+                                            Value="{Binding MaxAR}" />
                                     </StackPanel>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal">
                                     <StackPanel Width="140" Orientation="Vertical">
-                                        <TextBlock
+                                        <StackPanel
                                             HorizontalAlignment="Center"
-                                            FontSize="18"
-                                            Text="CS" />
+                                            Orientation="Horizontal"
+                                            Spacing="4">
+                                            <TextBlock
+                                                HorizontalAlignment="Right"
+                                                VerticalAlignment="Bottom"
+                                                FontSize="10"
+                                                Foreground="LightGray"
+                                                Text="{Binding MinCS, StringFormat={}{0:F2}}" />
+                                            <TextBlock
+                                                HorizontalAlignment="Center"
+                                                FontSize="18"
+                                                Text="CS" />
+                                            <TextBlock
+                                                HorizontalAlignment="Left"
+                                                VerticalAlignment="Bottom"
+                                                FontSize="10"
+                                                Foreground="LightGray"
+                                                Text="{Binding MaxCS, StringFormat={}{0:F2}}" />
+                                        </StackPanel>
                                         <Slider
-                                            Maximum="10"
+                                            Maximum="{Binding MaxCS}"
                                             Minimum="0"
-                                            TickFrequency="0.01" />
+                                            TickFrequency="0.01"
+                                            Value="{Binding MinCS}" />
                                         <Slider
                                             Maximum="10"
                                             Minimum="0"
                                             TickFrequency="0.01"
-                                            Value="10" />
+                                            Value="{Binding MaxCS}" />
                                     </StackPanel>
                                 </StackPanel>
                             </StackPanel>
                             <StackPanel Orientation="Vertical" Spacing="8">
                                 <StackPanel Orientation="Horizontal">
                                     <StackPanel Width="140" Orientation="Vertical">
-                                        <TextBlock
+                                        <StackPanel
                                             HorizontalAlignment="Center"
-                                            FontSize="18"
-                                            Text="OD" />
+                                            Orientation="Horizontal"
+                                            Spacing="4">
+                                            <TextBlock
+                                                HorizontalAlignment="Right"
+                                                VerticalAlignment="Bottom"
+                                                FontSize="10"
+                                                Foreground="LightGray"
+                                                Text="{Binding MinHP, StringFormat={}{0:F2}}" />
+                                            <TextBlock
+                                                HorizontalAlignment="Center"
+                                                FontSize="18"
+                                                Text="HP" />
+                                            <TextBlock
+                                                HorizontalAlignment="Left"
+                                                VerticalAlignment="Bottom"
+                                                FontSize="10"
+                                                Foreground="LightGray"
+                                                Text="{Binding MaxHP, StringFormat={}{0:F2}}" />
+                                        </StackPanel>
                                         <Slider
-                                            Maximum="10"
+                                            Maximum="{Binding MaxHP}"
                                             Minimum="0"
-                                            TickFrequency="0.01" />
+                                            TickFrequency="0.01"
+                                            Value="{Binding MinHP}" />
                                         <Slider
                                             Maximum="10"
                                             Minimum="0"
                                             TickFrequency="0.01"
-                                            Value="10" />
+                                            Value="{Binding MaxHP}" />
                                     </StackPanel>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal">
                                     <StackPanel Width="140" Orientation="Vertical">
-                                        <TextBlock
+                                        <StackPanel
                                             HorizontalAlignment="Center"
-                                            FontSize="18"
-                                            Text="HP" />
+                                            Orientation="Horizontal"
+                                            Spacing="4">
+                                            <TextBlock
+                                                HorizontalAlignment="Right"
+                                                VerticalAlignment="Bottom"
+                                                FontSize="10"
+                                                Foreground="LightGray"
+                                                Text="{Binding MinOD, StringFormat={}{0:F2}}" />
+                                            <TextBlock
+                                                HorizontalAlignment="Center"
+                                                FontSize="18"
+                                                Text="OD" />
+                                            <TextBlock
+                                                HorizontalAlignment="Left"
+                                                VerticalAlignment="Bottom"
+                                                FontSize="10"
+                                                Foreground="LightGray"
+                                                Text="{Binding MaxOD, StringFormat={}{0:F2}}" />
+                                        </StackPanel>
                                         <Slider
-                                            Maximum="10"
+                                            Maximum="{Binding MaxOD}"
                                             Minimum="0"
-                                            TickFrequency="0.01" />
+                                            TickFrequency="0.01"
+                                            Value="{Binding MinOD}" />
                                         <Slider
                                             Maximum="10"
                                             Minimum="0"
                                             TickFrequency="0.01"
-                                            Value="10" />
+                                            Value="{Binding MaxOD}" />
                                     </StackPanel>
                                 </StackPanel>
                             </StackPanel>

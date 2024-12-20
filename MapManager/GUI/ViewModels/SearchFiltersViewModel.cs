@@ -19,14 +19,14 @@ public class SearchFiltersViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _targetRankedStatus, value);
     }
 
-    private float _minStarRating;
+    private float _minStarRating = 0;
     public float MinStarRating
     {
         get => _minStarRating;
         set => this.RaiseAndSetIfChanged(ref _minStarRating, value);
     }
 
-    private float _maxStarRating;
+    private float _maxStarRating = 10;
     public float MaxStarRating
     {
         get => _maxStarRating;
@@ -40,28 +40,55 @@ public class SearchFiltersViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _minDuration, value);
     }
 
-    private float _maxAR;
+    private float _minAR = 0;
+    public float MinAR
+    {
+        get => _minAR;
+        set => this.RaiseAndSetIfChanged(ref _minAR, value);
+    }
+
+    private float _maxAR = 10;
     public float MaxAR
     {
         get => _maxAR;
         set => this.RaiseAndSetIfChanged(ref _maxAR, value);
     }
 
-    private float _maxCS;
+    private float _minCS = 0;
+    public float MinCS
+    {
+        get => _minCS;
+        set => this.RaiseAndSetIfChanged(ref _minCS, value);
+    }
+    private float _maxCS = 10;
     public float MaxCS
     {
         get => _maxCS;
         set => this.RaiseAndSetIfChanged(ref _maxCS, value);
     }
 
-    private float _maxOD;
+    private float _minOD = 0;
+    public float MinOD
+    {
+        get => _minOD;
+        set => this.RaiseAndSetIfChanged(ref _minOD, value);
+    }
+
+    private float _maxOD = 10;
     public float MaxOD
     {
         get => _maxOD;
         set => this.RaiseAndSetIfChanged(ref _maxOD, value);
     }
 
-    private float _maxHP;
+    private float _minHP = 0;
+    public float MinHP
+    {
+        get => _minHP;
+        set => this.RaiseAndSetIfChanged(ref _minHP, value);
+    }
+
+    private float _maxHP = 10;
     public float MaxHP
     {
         get => _maxHP;
