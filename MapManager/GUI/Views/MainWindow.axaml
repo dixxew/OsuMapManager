@@ -66,8 +66,11 @@
                                     FlowDirection="LeftToRight"
                                     Text="{Binding SearchBeatmapSetText}"
                                     Watermark="Search, ex: Sotarks We Are" />
-                                <DockPanel>
-                                    <DropDownButton Content="Filters" FontSize="14">
+                                <StackPanel Orientation="Horizontal" Spacing="12">
+                                    <DropDownButton
+                                        Padding="12,8"
+                                        Content="Filters"
+                                        FontSize="14">
                                         <DropDownButton.Flyout>
                                             <Flyout>
                                                 <Panel>
@@ -91,15 +94,6 @@
                                             </Flyout>
                                         </DropDownButton.Flyout>
                                     </DropDownButton>
-                                    <ComboBox
-                                        HorizontalAlignment="Left"
-                                        SelectedValue="{Binding SearchComboboxSelectedDestination}"
-                                        SelectedValueBinding="{Binding Text}">
-                                        <ComboBox.Items>
-                                            <TextBlock Foreground="White" Text="Local" />
-                                            <TextBlock Foreground="White" Text="Global" />
-                                        </ComboBox.Items>
-                                    </ComboBox>
                                     <TextBlock
                                         VerticalAlignment="Center"
                                         FontSize="16"
@@ -108,7 +102,7 @@
                                         <Run Text="Maps" />
                                     </TextBlock>
                                     <CheckBox Content="Only favorites" IsChecked="{Binding IsShowOnlyFavorites}" />
-                                </DockPanel>
+                                </StackPanel>
                             </StackPanel>
                         </sukiUi:GlassCard>
                         <ListBox

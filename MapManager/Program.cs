@@ -61,6 +61,7 @@ namespace MapManager
                     services.AddSingleton<SettingsViewModel>();
                     services.AddSingleton<OsuDataReader>();
                     services.AddSingleton<AudioPlayerViewModel>();
+                    services.AddSingleton<SearchFiltersViewModel>();
                     services.AddScoped<HttpClient>(); 
                     services.AddScoped<Mapper>(provider =>
                     {

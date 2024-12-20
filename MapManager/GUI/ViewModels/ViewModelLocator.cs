@@ -16,4 +16,8 @@ public class ViewModelLocator
 
     public SettingsViewModel SettingsViewModel =>
         App.AppHost.Services.GetRequiredService<SettingsViewModel>();
+
+    public SearchFiltersViewModel SearchFiltersViewModel =>
+        App.AppHost.Services.GetRequiredService<SearchFiltersViewModel>();
+
 }
