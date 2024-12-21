@@ -42,7 +42,7 @@ public class MainWindowViewModel : ViewModelBase
 
     #region private props
     private string _searchBeatmapSetText;
-    private ObservableCollection<BeatmapSet> filteredBeatmaps;
+    private ObservableCollection<BeatmapSet> _filteredBeatmapSets;
     private int _selectedRightTabIndex;
     private BeatmapSet _selectedBeatmapSet;
     private Bitmap _mapBackground;
@@ -142,16 +142,6 @@ public class MainWindowViewModel : ViewModelBase
 
     public long BeatmapsCount { get; set; } = 0;
 
-    public ObservableCollection<BeatmapSet> FilteredBeatmaps
-    {
-        get => filteredBeatmaps;
-        set
-        {
-            this.RaiseAndSetIfChanged(ref filteredBeatmaps, value);
-            BeatmapsCount = FilteredBeatmaps.Sum(set => set.Beatmaps?.Count ?? 0);
-            this.RaisePropertyChanged(nameof(BeatmapsCount));
-        }
-    }
     public string SearchBeatmapSetText
     {
         get => _searchBeatmapSetText;
@@ -194,7 +184,7 @@ public class MainWindowViewModel : ViewModelBase
         get => _selectedBeatmapSet;
         set
         {
-            if (value == null || (_selectedBeatmapSet != null && value.Id == _selectedBeatmapSet.Id && FilteredBeatmaps.Count > 1))
+            if (value == null || (_selectedBeatmapSet != null && value.Id == _selectedBeatmapSet.Id && FilteredBeatmapSets.Count > 1))
                 return;
 
             this.RaiseAndSetIfChanged(ref _selectedBeatmapSet, value);
@@ -202,6 +192,16 @@ public class MainWindowViewModel : ViewModelBase
         }
     }
     public ObservableCollection<BeatmapSet> BeatmapSets { get; set; } = new();
+    public ObservableCollection<BeatmapSet> FilteredBeatmapSets
+    {
+        get => _filteredBeatmapSets;
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _filteredBeatmapSets, value);
+            BeatmapsCount = FilteredBeatmapSets.Sum(set => set.Beatmaps?.Count ?? 0);
+            this.RaisePropertyChanged(nameof(BeatmapsCount));
+        }
+    }
     public ObservableCollection<GlobalScore> GlobalScores { get; set; } = new();
     public ObservableCollection<Models.Collection> Collections { get; set; } = new();
     #endregion
@@ -307,9 +307,9 @@ public class MainWindowViewModel : ViewModelBase
                 };
             }));
 
-            // Устанавливаем FilteredBeatmaps и случайно выбираем BeatmapSet
-            FilteredBeatmaps = BeatmapSets;
-            SelectedBeatmapSet = FilteredBeatmaps.ElementAt(Random.Shared.Next(0, FilteredBeatmaps.Count));
+            // Устанавливаем FilteredBeatmapSets и случайно выбираем BeatmapSet
+            FilteredBeatmapSets = BeatmapSets;
+            SelectedBeatmapSet = FilteredBeatmapSets.ElementAt(Random.Shared.Next(0, FilteredBeatmapSets.Count));
             LoadCollections();
         });
     }
@@ -401,7 +401,7 @@ public class MainWindowViewModel : ViewModelBase
         if (string.IsNullOrWhiteSpace(SearchBeatmapSetText))
         {
             // Если строка поиска пустая, показываем отфильтрованные BeatmapSets
-            FilteredBeatmaps = new ObservableCollection<BeatmapSet>(beatmapSets);
+            FilteredBeatmapSets = new ObservableCollection<BeatmapSet>(beatmapSets);
         }
         else
         {
@@ -417,7 +417,7 @@ public class MainWindowViewModel : ViewModelBase
                 .ToList();
 
             // Создаём новый ObservableCollection только с подходящими BeatmapSets
-            FilteredBeatmaps = new ObservableCollection<BeatmapSet>(results);
+            FilteredBeatmapSets = new ObservableCollection<BeatmapSet>(results);
         }
     }
 
@@ -437,44 +437,44 @@ public class MainWindowViewModel : ViewModelBase
 
     public void SelectNextBeatmapSet()
     {
-        if (FilteredBeatmaps == null || FilteredBeatmaps.Count == 0)
+        if (FilteredBeatmapSets == null || FilteredBeatmapSets.Count == 0)
             return;
 
-        var currIndex = FilteredBeatmaps.IndexOf(SelectedBeatmapSet);
+        var currIndex = FilteredBeatmapSets.IndexOf(SelectedBeatmapSet);
 
         // Если текущий элемент последний, выбираем первый
-        if (currIndex == FilteredBeatmaps.Count - 1)
+        if (currIndex == FilteredBeatmapSets.Count - 1)
         {
-            SelectedBeatmapSet = FilteredBeatmaps.First();
+            SelectedBeatmapSet = FilteredBeatmapSets.First();
         }
         else
         {
-            SelectedBeatmapSet = FilteredBeatmaps.ElementAt(currIndex + 1);
+            SelectedBeatmapSet = FilteredBeatmapSets.ElementAt(currIndex + 1);
         }
     }
 
     public void SelectPrevBeatmapSet()
     {
-        if (FilteredBeatmaps == null || FilteredBeatmaps.Count == 0)
+        if (FilteredBeatmapSets == null || FilteredBeatmapSets.Count == 0)
             return;
 
-        var currIndex = FilteredBeatmaps.IndexOf(SelectedBeatmapSet);
+        var currIndex = FilteredBeatmapSets.IndexOf(SelectedBeatmapSet);
 
         // Если текущий элемент первый, выбираем последний
         if (currIndex == 0 || currIndex == -1)
         {
-            SelectedBeatmapSet = FilteredBeatmaps.Last();
+            SelectedBeatmapSet = FilteredBeatmapSets.Last();
         }
         else
         {
-            SelectedBeatmapSet = FilteredBeatmaps.ElementAt(currIndex - 1);
+            SelectedBeatmapSet = FilteredBeatmapSets.ElementAt(currIndex - 1);
         }
     }
 
     public void SelectRandomBeatmapSet()
     {
-        if (FilteredBeatmaps != null || FilteredBeatmaps.Count != 0)
-            SelectedBeatmapSet = FilteredBeatmaps.ElementAt(Random.Shared.Next(0, FilteredBeatmaps.Count));
+        if (FilteredBeatmapSets != null || FilteredBeatmapSets.Count != 0)
+            SelectedBeatmapSet = FilteredBeatmapSets.ElementAt(Random.Shared.Next(0, FilteredBeatmapSets.Count));
     }
     public void ToggleSelectionCommand(Models.Collection collection)
     {

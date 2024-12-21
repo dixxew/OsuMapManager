@@ -136,7 +136,7 @@ public partial class AudioPlayerControl : UserControl
     {
         if (DataContext is AudioPlayerViewModel vm)
         {
-            vm.SongProgress = vm.HoveredPosition;
+            vm.SetSongPosition(vm.HoveredPosition);
         }
     }
     private async void GridReleased(object? sender, Avalonia.Input.PointerReleasedEventArgs e)

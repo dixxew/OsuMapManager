@@ -110,7 +110,7 @@
                             FontSize="16"
                             FontWeight="550"
                             Foreground="White"
-                            ItemsSource="{Binding FilteredBeatmaps}"
+                            ItemsSource="{Binding FilteredBeatmapSets}"
                             SelectedItem="{Binding SelectedBeatmapSet}">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
