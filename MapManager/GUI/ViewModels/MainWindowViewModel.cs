@@ -7,10 +7,12 @@ using MapManager.GUI.Services;
 using MapManager.OSU;
 using OsuParsers.Database.Objects;
 using ReactiveUI;
+using Splat;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -54,13 +56,16 @@ public class MainWindowViewModel : ViewModelBase
     private string _searchCollectionText;
     private long _collectionsCount;
     private ObservableCollection<int> _favoriteBeatmaps;
-    #endregion
-
     private bool _isShowOnlyFavorites;
     private int _selectedMainTab;
     private ObservableCollection<Models.Collection> _selectedBeatmapCollections;
     private int _selectedBeatmapCollectionsCount;
+    #endregion
 
+
+
+
+    #region public props
     public string SelectedBeatmapCollectionsCount
         => $"Collections {SelectedBeatmapCollections?.Count ?? 0}";
 
@@ -92,8 +97,6 @@ public class MainWindowViewModel : ViewModelBase
         }
     }
 
-
-    #region public props
     public ObservableCollection<int> FavoriteBeatmapSets
     {
         get => _favoriteBeatmaps;
@@ -191,7 +194,9 @@ public class MainWindowViewModel : ViewModelBase
             SelectedBeatmapSetChanged();
         }
     }
+
     public ObservableCollection<BeatmapSet> BeatmapSets { get; set; } = new();
+
     public ObservableCollection<BeatmapSet> FilteredBeatmapSets
     {
         get => _filteredBeatmapSets;
@@ -202,7 +207,9 @@ public class MainWindowViewModel : ViewModelBase
             this.RaisePropertyChanged(nameof(BeatmapsCount));
         }
     }
+
     public ObservableCollection<GlobalScore> GlobalScores { get; set; } = new();
+
     public ObservableCollection<Models.Collection> Collections { get; set; } = new();
     #endregion
 
@@ -421,20 +428,92 @@ public class MainWindowViewModel : ViewModelBase
         }
     }
 
-
     private void ToggleFavorite(bool value)
     {
         SelectedBeatmapSet.IsFavorite = value;
         UpdateFavoriteBeatmapSets(value);
     }
 
+    private void SubscribeSearchFiltersChangings()
+    {
+        var locator = new ViewModelLocator();
+        locator.SearchFiltersViewModel.FiltersChanged += FilterBeatmapSets;
+    }
+
+    private void FilterBeatmapSets()
+    {
+        if (BeatmapSets == null) return;
+
+        var locator = new ViewModelLocator();
+        var SearchFilters = locator.SearchFiltersViewModel;
+
+        // Если включён режим отображения только избранного
+        IEnumerable<BeatmapSet> beatmapSets = IsShowOnlyFavorites
+            ? BeatmapSets.Where(set => FavoriteBeatmapSets.Contains(set.Id))
+            : BeatmapSets;
+
+        // Создаём список отфильтрованных битмапсетов
+        var filtered = new List<BeatmapSet>();
+        foreach (var beatmapSet in beatmapSets)
+        {
+            // Проверяем, есть ли битмапы, соответствующие текущим фильтрам
+            var filteredBeatmaps = beatmapSet.Beatmaps.Where(b =>
+                b.StandardStarRating >= SearchFilters.MinStarRating &&
+                b.StandardStarRating <= SearchFilters.MaxStarRating &&
+                b.ApproachRate >= SearchFilters.MinAR &&
+                b.ApproachRate <= SearchFilters.MaxAR &&
+                b.CircleSize >= SearchFilters.MinCS &&
+                b.CircleSize <= SearchFilters.MaxCS &&
+                b.OverallDifficulty >= SearchFilters.MinOD &&
+                b.OverallDifficulty <= SearchFilters.MaxOD &&
+                b.HPDrain >= SearchFilters.MinHP &&
+                b.HPDrain <= SearchFilters.MaxHP
+            ).ToList();
+
+            // Если битмапы прошли фильтры, добавляем сет в результирующий список
+            if (filteredBeatmaps.Any())
+            {
+                filtered.Add(new BeatmapSet
+                {
+                    Id = beatmapSet.Id,
+                    Title = beatmapSet.Title,
+                    Artist = beatmapSet.Artist,
+                    FolderName = beatmapSet.FolderName,
+                    Beatmaps = filteredBeatmaps,
+                    IsFavorite = beatmapSet.IsFavorite,
+                });
+            }
+        }
+
+        // Обновляем только изменённые элементы
+        UpdateFilteredBeatmapSets(filtered);
+    }
+
+    private void UpdateFilteredBeatmapSets(List<BeatmapSet> updatedFiltered)
+    {
+        FilteredBeatmapSets = new(updatedFiltered);
+    }
+
+
+
+
     public void OnMainWindowLoaded()
     {
         var scores = LoadScores();
         LoadBeatmaps(scores);
         LoadFavoriteBeatmaps();
+        SubscribeSearchFiltersChangings();
     }
-
+    public void OpenBeatmapInOsu()
+    {
+        var processStartInfo = new ProcessStartInfo
+        {
+            FileName = $"{_settingsVM.OsuDirPath}\\osu!.exe",
+            Arguments = $"\"osu://b/{SelectedBeatmap.BeatmapId}\"",
+            UseShellExecute = false 
+        };
+        Process.Start(processStartInfo);
+    }
     public void SelectNextBeatmapSet()
     {
         if (FilteredBeatmapSets == null || FilteredBeatmapSets.Count == 0)
@@ -476,6 +555,7 @@ public class MainWindowViewModel : ViewModelBase
         if (FilteredBeatmapSets != null || FilteredBeatmapSets.Count != 0)
             SelectedBeatmapSet = FilteredBeatmapSets.ElementAt(Random.Shared.Next(0, FilteredBeatmapSets.Count));
     }
+
     public void ToggleSelectionCommand(Models.Collection collection)
     {
         if (SelectedBeatmapCollections.Contains(collection))

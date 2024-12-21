@@ -120,6 +120,7 @@
                         </Flyout>
                     </DropDownButton.Flyout>
                 </DropDownButton>
+                <Button Classes="Basic" Command="{Binding OpenBeatmapInOsu}" Content="Open in osu!" />
             </StackPanel>
 
             <ScrollViewer

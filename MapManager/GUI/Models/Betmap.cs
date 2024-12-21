@@ -155,8 +155,8 @@ namespace MapManager.GUI.Models
             set => this.RaiseAndSetIfChanged(ref _overallDifficulty, value);
         }
 
-        private Dictionary<Mods, double> _standardStarRating;
-        public Dictionary<Mods, double> StandardStarRating
+        private  double? _standardStarRating;
+        public double? StandardStarRating
         {
             get => _standardStarRating;
             set => this.RaiseAndSetIfChanged(ref _standardStarRating, value);
@@ -180,47 +180,6 @@ namespace MapManager.GUI.Models
 
         public string FolderName { get; set; }
 
-        public Beatmap(int beatmapId, int beatmapSetId, int bytesOfBeatmapEntry, 
-            string artist, string artistUnicode, string title, string titleUnicode,
-            string creator, string difficulty, string audioFileName, string mD5Hash, 
-            string fileName, RankedStatus rankedStatus, ushort circlesCount, ushort slidersCount, 
-            ushort spinnersCount, DateTime lastModifiedTime, float approachRate, 
-            float circleSize, float hPDrain, float overallDifficulty, 
-            Dictionary<Mods, double> standardStarRating, List<Score> scores,
-            string duration, List<string> tagsList, string folderName)
-        {
-            BeatmapId = beatmapId;
-            BeatmapSetId = beatmapSetId;
-            BytesOfBeatmapEntry = bytesOfBeatmapEntry;
-            Artist = artist;
-            ArtistUnicode = artistUnicode;
-            Title = title;
-            TitleUnicode = titleUnicode;
-            Creator = creator;
-            Difficulty = difficulty;
-            AudioFileName = audioFileName;
-            MD5Hash = mD5Hash;
-            FileName = fileName;
-            RankedStatus = rankedStatus;
-            CirclesCount = circlesCount;
-            SlidersCount = slidersCount;
-            SpinnersCount = spinnersCount;
-            LastModifiedTime = lastModifiedTime;
-            ApproachRate = approachRate;
-            CircleSize = circleSize;
-            HPDrain = hPDrain;
-            OverallDifficulty = overallDifficulty;
-            StandardStarRating = standardStarRating;
-            Scores = scores;
-            Duration = duration;
-            TagsList = tagsList;
-            FolderName = folderName;
-        }
-
-        public Beatmap()
-        {
-
-        }
 
         // Метод создания Beatmap из DbBeatmap
         public static Beatmap FromDbBeatmap(DbBeatmap dbBeatmap)
@@ -248,7 +207,7 @@ namespace MapManager.GUI.Models
                 CircleSize = dbBeatmap.CircleSize,
                 HPDrain = dbBeatmap.HPDrain,
                 OverallDifficulty = dbBeatmap.OverallDifficulty,
-                StandardStarRating = dbBeatmap.StandardStarRating ?? new Dictionary<Mods, double>(),
+                StandardStarRating = dbBeatmap.StandardStarRating.TryGetValue(Mods.None, out double stars) ? stars : 0,
                 TagsList = dbBeatmap.Tags.Split(' ').ToList(),
                 Duration = TimeSpan.FromMilliseconds(dbBeatmap.TotalTime).ToString(@"m\:ss"),
                 FolderName = dbBeatmap.FolderName,
