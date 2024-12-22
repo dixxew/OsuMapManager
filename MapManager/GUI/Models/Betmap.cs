@@ -169,7 +169,7 @@ namespace MapManager.GUI.Models
             set => this.RaiseAndSetIfChanged(ref _scores, value);
         }
 
-        
+        public TimeSpan TotalTime;
 
 
         public string Duration { get; set; }
@@ -210,6 +210,7 @@ namespace MapManager.GUI.Models
                 StandardStarRating = dbBeatmap.StandardStarRating.TryGetValue(Mods.None, out double stars) ? stars : 0,
                 TagsList = dbBeatmap.Tags.Split(' ').ToList(),
                 Duration = TimeSpan.FromMilliseconds(dbBeatmap.TotalTime).ToString(@"m\:ss"),
+                TotalTime = TimeSpan.FromMilliseconds(dbBeatmap.TotalTime),
                 FolderName = dbBeatmap.FolderName,
                 Scores = new List<Score>() // Пустой список на случай отсутствия скорингов
             };

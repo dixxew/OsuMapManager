@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Avalonia.Controls.Primitives;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using DynamicData;
@@ -467,7 +468,14 @@ public class MainWindowViewModel : ViewModelBase
                 b.OverallDifficulty >= SearchFilters.MinOD &&
                 b.OverallDifficulty <= SearchFilters.MaxOD &&
                 b.HPDrain >= SearchFilters.MinHP &&
-                b.HPDrain <= SearchFilters.MaxHP
+                b.HPDrain <= SearchFilters.MaxHP &&
+                (SearchFilters.MinDuration != null ? b.TotalTime >= SearchFilters.MinDuration : true) &&
+                (SearchFilters.MaxDuration != null ? b.TotalTime <= SearchFilters.MaxDuration : true) &&
+                (!string.IsNullOrEmpty(SearchFilters.Artist) ? b.Artist.Contains(SearchFilters.Artist) : true) &&
+                (!string.IsNullOrEmpty(SearchFilters.Title) ? b.Title.Contains(SearchFilters.Title) : true) &&
+                (!string.IsNullOrEmpty(SearchFilters.Mapper) ? b.Creator.Contains(SearchFilters.Mapper) : true) &&
+                ((SearchFilters.TagList != null && SearchFilters.TagList.Any()) ? SearchFilters.TagList.All(filterTag =>
+                    b.TagsList.Any(tag => tag.Contains(filterTag, StringComparison.OrdinalIgnoreCase))) : true)
             ).ToList();
 
             // Если битмапы прошли фильтры, добавляем сет в результирующий список

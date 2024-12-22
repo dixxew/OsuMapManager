@@ -121,7 +121,7 @@ public class AudioPlayerViewModel : ReactiveObject
         set => this.RaiseAndSetIfChanged(ref _audioFilePath, value);
     }
 
-    private float _volume = 0.01f;
+    private float _volume = 0.00f;
     public float Volume
     {
         get => _volume;

@@ -44,13 +44,24 @@ public class SearchFiltersViewModel : ViewModelBase
         }
     }
 
-    private TimeSpan _minDuration;
-    public TimeSpan MinDuration
+    private TimeSpan? _minDuration;
+    public TimeSpan? MinDuration
     {
         get => _minDuration;
         set
         {
             this.RaiseAndSetIfChanged(ref _minDuration, value);
+            OnFiltersChanged();
+        }
+    }
+
+    private TimeSpan? _maxDuration;
+    public TimeSpan? MaxDuration
+    {
+        get => _maxDuration;
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _maxDuration, value);
             OnFiltersChanged();
         }
     }

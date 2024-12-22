@@ -62,11 +62,15 @@
                     <Grid RowDefinitions="auto, *">
                         <sukiUi:GlassCard Padding="12,6" Classes="Primary">
                             <StackPanel Orientation="Vertical">
-                                <TextBox
-                                    FlowDirection="LeftToRight"
-                                    Text="{Binding SearchBeatmapSetText}"
-                                    Watermark="Search, ex: Sotarks We Are" />
+                                <DockPanel>
+                                    <RadioButton Margin="0,0,-3,0" />
+                                    <TextBox
+                                        FlowDirection="LeftToRight"
+                                        Text="{Binding SearchBeatmapSetText}"
+                                        Watermark="Search, ex: 'Sotarks We Are' or use Filters" />
+                                </DockPanel>
                                 <StackPanel Orientation="Horizontal" Spacing="12">
+                                    <RadioButton Margin="0,0,-10,0" />
                                     <DropDownButton
                                         Padding="12,8"
                                         Content="Filters"
