@@ -1,4 +1,5 @@
-﻿using OsuParsers.Enums.Database;
+﻿using MapManager.GUI.Services;
+using OsuParsers.Enums.Database;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
@@ -209,11 +210,12 @@ public class SearchFiltersViewModel : ViewModelBase
         }
     }
 
+    BeatmapDataService _beatmapDataService;
+
     public SearchFiltersViewModel()
     {
-
     }
 
-    public event Action FiltersChanged = null;
-    private void OnFiltersChanged() => FiltersChanged?.Invoke();
+    private void OnFiltersChanged() => 
+        _beatmapDataService.FilterBeatmapSets();
 }

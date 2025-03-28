@@ -27,15 +27,15 @@ namespace MapManager.GUI
             {
                 var settingsViewModel = AppHost.Services.GetRequiredService<SettingsViewModel>();
 
-                settingsViewModel.OnSettingsChanged += () =>
-                {
-                    var appSettings = AppHost.Services.GetRequiredService<AppSettings>();
-                    // Services that need runtime settings changing (Should implement UpdateSettings(AppSettings settings))
-                    var osuService = AppHost.Services.GetRequiredService<OsuService>();
+                //settingsViewModel.OnSettingsChanged += () =>
+                //{
+                //    var appSettings = AppHost.Services.GetRequiredService<AppSettings>();
+                //    // Services that need runtime settings changing (Should implement UpdateSettings(AppSettings settings))
+                //    var osuService = AppHost.Services.GetRequiredService<OsuService>();
 
-                    //Add here services for runtime settings changing
-                    osuService.UpdateSettings(appSettings);
-                };
+                //    //Add here services for runtime settings changing
+                //    osuService.UpdateSettings(appSettings);
+                //};
                 settingsViewModel.InitSettings();
                 var mainWindowVM = AppHost.Services.GetRequiredService<MainWindowViewModel>();
                 desktop.MainWindow = new MainWindow

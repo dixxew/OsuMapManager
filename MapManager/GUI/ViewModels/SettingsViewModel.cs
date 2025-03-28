@@ -1,27 +1,27 @@
 ﻿using ReactiveUI;
 using System.Diagnostics;
 using System;
-using DynamicData;
-using OsuSharp;
 using System.Threading.Tasks;
+using MapManager.GUI.Services;
 
 namespace MapManager.GUI.ViewModels;
 
 public class SettingsViewModel : ReactiveObject
 {
-    private bool _isInitialized = false;
+    private readonly SettingsService _settingsService;
+    private bool _isInitialized;
 
     private string? _osuClientSecret;
     private string? _osuClientId;
-    private string? _osuDirPath = "D:\\osu!";
-    private readonly AppSettings _appSettings;
+    private string? _osuDirPath;
 
-    public SettingsViewModel(AppSettings appSettings)
+    public SettingsViewModel(SettingsService settingsService)
     {
-        _appSettings = appSettings;
-        OsuClientSecret = _appSettings.OsuClientSecret;
-        OsuClientId = _appSettings.OsuClientId.ToString();
-        OsuDirPath = _appSettings.OsuDirectory;
+        _settingsService = settingsService;
+
+        OsuClientSecret = _settingsService.OsuClientSecret;
+        OsuClientId = _settingsService.OsuClientId;
+        OsuDirPath = _settingsService.OsuDirPath;
 
         _isInitialized = true;
     }
@@ -35,6 +35,7 @@ public class SettingsViewModel : ReactiveObject
             NotifySettingsChanged();
         }
     }
+
     public string? OsuClientId
     {
         get => _osuClientId;
@@ -44,6 +45,7 @@ public class SettingsViewModel : ReactiveObject
             NotifySettingsChanged();
         }
     }
+
     public string? OsuDirPath
     {
         get => _osuDirPath;
@@ -56,19 +58,7 @@ public class SettingsViewModel : ReactiveObject
 
     public void GoGetOsuApiKey()
     {
-        try
-        {
-            ProcessStartInfo psi = new()
-            {
-                FileName = "https://osu.ppy.sh/p/api",
-                UseShellExecute = true // Это важно для открытия URL через системный браузер
-            };
-            Process.Start(psi);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Не удалось открыть URL: {ex.Message}");
-        }
+        _settingsService.GoGetOsuApiKey();
     }
 
     public void InitSettings()
@@ -76,20 +66,10 @@ public class SettingsViewModel : ReactiveObject
         NotifySettingsChanged();
     }
 
-    public event Action OnSettingsChanged;
-
     private void NotifySettingsChanged()
     {
         if (!_isInitialized) return;
 
-        _appSettings.OsuClientId = int.TryParse(OsuClientId, out int value) ? value : 0;
-        _appSettings.OsuClientSecret = OsuClientSecret;
-        _appSettings.OsuDirectory = OsuDirPath;
-        OnSettingsChanged?.Invoke();
-        SaveAsync();
-    }
-    public async Task SaveAsync()
-    {
-        await AppSettingsManager.SaveSettingsAsync(_appSettings);
+        _settingsService.UpdateSettings(OsuClientId, OsuClientSecret, OsuDirPath);
     }
 }

@@ -12,6 +12,7 @@ using OsuSharp.Legacy;
 using MapManager.GUI.ViewModels;
 using System.Net.Http;
 using AutoMapper;
+using MapManager.GUI.Services;
 
 namespace MapManager
 {
@@ -54,6 +55,13 @@ namespace MapManager
                     services.AddSingleton(appSettings);
 
                     services.AddTransient<OsuService>();
+                    services.AddTransient<SettingsService>();
+                    services.AddTransient<AppInitializationService>();
+                    services.AddTransient<AuxiliaryService>();
+                    services.AddTransient<AudioPlayerService>();
+                    services.AddTransient<RankingService>();
+                    services.AddTransient<BeatmapDataService>();
+
                     services.AddSingleton(_ => new LegacyOsuClient(new LegacyOsuSharpConfiguration
                     {
                         ApiKey = "c9f024e60c2551bea39b507163405098ed8fbd85"

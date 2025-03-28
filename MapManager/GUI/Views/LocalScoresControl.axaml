@@ -1,0 +1,80 @@
+<UserControl
+	x:Class="MapManager.GUI.Views.LocalScoresControl"
+	xmlns="https://github.com/avaloniaui"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+	d:DesignHeight="450"
+	d:DesignWidth="800"
+	mc:Ignorable="d">
+	<ItemsControl ItemsSource="{Binding SelectedBeatmap.Scores}">
+		<ItemsControl.ItemTemplate>
+			<DataTemplate>
+				<sukiUi:GlassCard
+					Margin="0,0,0,8"
+					Padding="14,6"
+					IsInteractive="True">
+					<Grid>
+						<Grid.Styles>
+							<Style Selector="TextBlock">
+								<Setter Property="Foreground" Value="White" />
+							</Style>
+						</Grid.Styles>
+						<StackPanel Orientation="Horizontal" Spacing="8">
+
+							<TextBlock
+								HorizontalAlignment="Left"
+								VerticalAlignment="Top"
+								FontSize="20"
+								FontWeight="660"
+								Text="{Binding ReplayScore}" />
+
+							<ItemsControl ItemsSource="{Binding Mods}">
+								<ItemsControl.ItemsPanel>
+									<ItemsPanelTemplate>
+										<StackPanel Orientation="Horizontal" Spacing="4" />
+									</ItemsPanelTemplate>
+								</ItemsControl.ItemsPanel>
+								<ItemsControl.ItemTemplate>
+									<DataTemplate>
+										<TextBlock Text="{Binding}" />
+									</DataTemplate>
+								</ItemsControl.ItemTemplate>
+							</ItemsControl>
+						</StackPanel>
+						<TextBlock VerticalAlignment="Bottom" Text="{Binding Accuracy, StringFormat={}{0:P2}}" />
+						<StackPanel
+							HorizontalAlignment="Right"
+							VerticalAlignment="Center"
+							Orientation="Vertical"
+							Spacing="8">
+							<StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+								<TextBlock FontSize="16" Text="{Binding Combo}" />
+								<TextBlock Text="x" />
+							</StackPanel>
+							<StackPanel Orientation="Horizontal" Spacing="6">
+								<TextBlock
+									FontSize="12"
+									Foreground="#2ac2e9"
+									Text="{Binding Count300}" />
+								<TextBlock
+									FontSize="12"
+									Foreground="#5de30e"
+									Text="{Binding Count100}" />
+								<TextBlock
+									FontSize="12"
+									Foreground="#d3b23e"
+									Text="{Binding Count50}" />
+								<TextBlock
+									FontSize="12"
+									Foreground="Red"
+									Text="{Binding CountMiss}" />
+							</StackPanel>
+						</StackPanel>
+					</Grid>
+				</sukiUi:GlassCard>
+			</DataTemplate>
+		</ItemsControl.ItemTemplate>
+	</ItemsControl>
+</UserControl>

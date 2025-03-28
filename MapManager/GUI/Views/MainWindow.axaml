@@ -1,374 +1,119 @@
 <sukiUi:SukiWindow
-    x:Class="MapManager.GUI.Views.MainWindow"
-    xmlns="https://github.com/avaloniaui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:iconPacks="https://github.com/MahApps/IconPacks.Avalonia"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:model="using:MapManager.GUI.Models"
-    xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
-    xmlns:view="using:MapManager.GUI.Views"
-    xmlns:vm="using:MapManager.GUI.ViewModels"
-    Loaded="MainWindowLoaded">
-    <sukiUi:SukiWindow.RightWindowTitleBarControls>
-        <Button Classes="Basic Rounded WindowControlsButton">
-            <iconPacks:PackIconFontAwesome
-                Height="12"
-                Foreground="White"
-                Kind="GearSolid" />
-            <Button.Flyout>
-                <Flyout>
-                    <Panel>
-                        <Border
-                            Margin="20"
-                            BoxShadow="{DynamicResource SukiPopupShadow}"
-                            CornerRadius="20" />
-                        <Border
-                            MinWidth="350"
-                            Margin="20"
-                            Background="{DynamicResource SukiCardBackground}"
-                            BorderBrush="{DynamicResource SukiLightBorderBrush}"
-                            BorderThickness="1"
-                            ClipToBounds="True"
-                            CornerRadius="15">
-                            <Border Padding="15" Background="{DynamicResource PopupGradientBrush}">
-                                <view:SettingsControl />
-                            </Border>
-                        </Border>
-                    </Panel>
-                </Flyout>
-            </Button.Flyout>
-        </Button>
-    </sukiUi:SukiWindow.RightWindowTitleBarControls>
-    <Grid ColumnDefinitions="2*, 8, 6*">
-        <Grid.Styles>
-            <Style Selector="Grid">
-                <Setter Property="Background" Value="Transparent" />
-            </Style>
-        </Grid.Styles>
-        <Image
-            Grid.ColumnSpan="3"
-            Opacity="0.1"
-            Source="{Binding MapBackground}"
-            Stretch="UniformToFill">
+	x:Class="MapManager.GUI.Views.MainWindow"
+	xmlns="https://github.com/avaloniaui"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:iconPacks="https://github.com/MahApps/IconPacks.Avalonia"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:model="using:MapManager.GUI.Models"
+	xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+	xmlns:view="using:MapManager.GUI.Views"
+	xmlns:vm="using:MapManager.GUI.ViewModels"
+	Loaded="MainWindowLoaded">
+	<sukiUi:SukiWindow.RightWindowTitleBarControls>
+		<Button Classes="Basic Rounded WindowControlsButton">
+			<iconPacks:PackIconFontAwesome
+				Height="12"
+				Foreground="White"
+				Kind="GearSolid" />
+			<Button.Flyout>
+				<Flyout>
+					<Panel>
+						<Border
+							Margin="20"
+							BoxShadow="{DynamicResource SukiPopupShadow}"
+							CornerRadius="20" />
+						<Border
+							MinWidth="350"
+							Margin="20"
+							Background="{DynamicResource SukiCardBackground}"
+							BorderBrush="{DynamicResource SukiLightBorderBrush}"
+							BorderThickness="1"
+							ClipToBounds="True"
+							CornerRadius="15">
+							<Border Padding="15" Background="{DynamicResource PopupGradientBrush}">
+								<view:SettingsControl />
+							</Border>
+						</Border>
+					</Panel>
+				</Flyout>
+			</Button.Flyout>
+		</Button>
+	</sukiUi:SukiWindow.RightWindowTitleBarControls>
+	<Grid ColumnDefinitions="2*, 8, 6*">
+		<Grid.Styles>
+			<Style Selector="Grid">
+				<Setter Property="Background" Value="Transparent" />
+			</Style>
+		</Grid.Styles>
+		<Image
+			Grid.ColumnSpan="3"
+			Opacity="0.1"
+			Source="{Binding MapBackground}"
+			Stretch="UniformToFill">
 
-            <Image.Effect>
-                <BlurEffect Radius="35" />
-            </Image.Effect>
-        </Image>
-        <Grid Background="#0fffffff">
-            <TabControl SelectedIndex="{Binding SelectedMainTab}">
-                <TabItem Header="Maps">
-                    <Grid RowDefinitions="auto, *">
-                        <sukiUi:GlassCard Padding="12,6" Classes="Primary">
-                            <StackPanel Orientation="Vertical">
-                                <DockPanel>
-                                    <RadioButton Margin="0,0,-3,0" />
-                                    <TextBox
-                                        FlowDirection="LeftToRight"
-                                        Text="{Binding SearchBeatmapSetText}"
-                                        Watermark="Search, ex: 'Sotarks We Are' or use Filters" />
-                                </DockPanel>
-                                <StackPanel Orientation="Horizontal" Spacing="12">
-                                    <RadioButton Margin="0,0,-10,0" />
-                                    <DropDownButton
-                                        Padding="12,8"
-                                        Content="Filters"
-                                        FontSize="14">
-                                        <DropDownButton.Flyout>
-                                            <Flyout>
-                                                <Panel>
-                                                    <Border
-                                                        Margin="20"
-                                                        BoxShadow="{DynamicResource SukiPopupShadow}"
-                                                        CornerRadius="20" />
-                                                    <Border
-                                                        MinWidth="350"
-                                                        Margin="20"
-                                                        Background="{DynamicResource SukiCardBackground}"
-                                                        BorderBrush="{DynamicResource SukiLightBorderBrush}"
-                                                        BorderThickness="1"
-                                                        ClipToBounds="True"
-                                                        CornerRadius="15">
-                                                        <Border Padding="15" Background="{DynamicResource PopupGradientBrush}">
-                                                            <view:SearchFiltersControl />
-                                                        </Border>
-                                                    </Border>
-                                                </Panel>
-                                            </Flyout>
-                                        </DropDownButton.Flyout>
-                                    </DropDownButton>
-                                    <TextBlock
-                                        VerticalAlignment="Center"
-                                        FontSize="16"
-                                        FontWeight="550">
-                                        <Run Text="{Binding BeatmapsCount}" />
-                                        <Run Text="Maps" />
-                                    </TextBlock>
-                                    <CheckBox Content="Only favorites" IsChecked="{Binding IsShowOnlyFavorites}" />
-                                </StackPanel>
-                            </StackPanel>
-                        </sukiUi:GlassCard>
-                        <ListBox
-                            Grid.Row="1"
-                            FontSize="16"
-                            FontWeight="550"
-                            Foreground="White"
-                            ItemsSource="{Binding FilteredBeatmapSets}"
-                            SelectedItem="{Binding SelectedBeatmapSet}">
-                            <ListBox.ItemTemplate>
-                                <DataTemplate>
-                                    <Grid>
-                                        <StackPanel
-                                            Grid.Column="1"
-                                            Margin="0,0,20,0"
-                                            Orientation="Horizontal"
-                                            Spacing="8">
-                                            <TextBlock Width="{Binding $parent.Bounds.Width}">
-                                                <Run Text="{Binding Artist}" />
-                                                <Run Text=" - " />
-                                                <Run Text="{Binding Title}" />
-                                            </TextBlock>
-                                        </StackPanel>
-                                    </Grid>
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>
-                        </ListBox>
-                    </Grid>
-                </TabItem>
-                <TabItem Header="Collections">
-                    <Grid RowDefinitions="auto, *">
-                        <sukiUi:GlassCard Padding="12,6" Classes="Primary">
-                            <StackPanel Orientation="Vertical">
-                                <TextBox
-                                    FlowDirection="LeftToRight"
-                                    Text="{Binding SearchCollectionText}"
-                                    Watermark="Search" />
-                                <DockPanel>
-                                    <TextBlock
-                                        VerticalAlignment="Center"
-                                        FontSize="16"
-                                        FontWeight="550">
-                                        <Run Text="{Binding CollectionsCount}" />
-                                        <Run Text="Collections" />
-                                    </TextBlock>
-                                </DockPanel>
-                            </StackPanel>
-                        </sukiUi:GlassCard>
-                        <TreeView Grid.Row="1" ItemsSource="{Binding Collections}">
-                            <TreeView.DataTemplates>
-                                <TreeDataTemplate DataType="model:Collection" ItemsSource="{Binding Beatmaps}">
-                                    <TextBlock Text="{Binding Name}" />
-                                </TreeDataTemplate>
-                                <DataTemplate DataType="model:Beatmap">
-                                    <TextBlock>
-                                        <Run Text="{Binding Artist}" />
-                                        <Run Text=" - " />
-                                        <Run Text="{Binding Title}" />
-                                    </TextBlock>
-                                </DataTemplate>
-                            </TreeView.DataTemplates>
-                        </TreeView>
-                    </Grid>
-                </TabItem>
-            </TabControl>
-        </Grid>
-        <Grid Grid.Column="2">
-            <Grid
-                Grid.Row="1"
-                Margin="4"
-                RowDefinitions="*, auto">
-                <Grid Margin="4" ColumnDefinitions="7*,3*">
-                    <Grid RowDefinitions="*,auto">
-                        <sukiUi:GlassCard Margin="4">
-                            <Border ClipToBounds="True" CornerRadius="16">
-                                <Image Source="{Binding MapBackground}" Stretch="UniformToFill" />
-                            </Border>
-                        </sukiUi:GlassCard>
-                        <sukiUi:GlassCard Grid.Row="1" Margin="4">
-                            <view:BetmapInfoControl />
-                        </sukiUi:GlassCard>
-                    </Grid>
-                    <sukiUi:GlassCard Grid.Column="1" Margin="4">
-                        <TabControl
-                            Margin="0,0,0,-12"
-                            SelectedIndex="{Binding SelectedRightTabIndex}"
-                            TabStripPlacement="Bottom">
-                            <TabItem Header="Local">
-                                <ItemsControl ItemsSource="{Binding SelectedBeatmap.Scores}">
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <sukiUi:GlassCard
-                                                Margin="0,0,0,8"
-                                                Padding="14,6"
-                                                IsInteractive="True">
-                                                <Grid>
-                                                    <Grid.Styles>
-                                                        <Style Selector="TextBlock">
-                                                            <Setter Property="Foreground" Value="White" />
-                                                        </Style>
-                                                    </Grid.Styles>
-                                                    <StackPanel Orientation="Horizontal" Spacing="8">
+			<Image.Effect>
+				<BlurEffect Radius="35" />
+			</Image.Effect>
+		</Image>
 
-                                                        <TextBlock
-                                                            HorizontalAlignment="Left"
-                                                            VerticalAlignment="Top"
-                                                            FontSize="20"
-                                                            FontWeight="660"
-                                                            Text="{Binding ReplayScore}" />
+		<Grid Background="#0fffffff">
+			<TabControl SelectedIndex="{Binding SelectedMainTab}">
+				<TabItem Header="Maps">
+					<Grid RowDefinitions="auto, *">
+						<view:BeatmapsSearchControl />
+						<Grid Grid.Row="1">
+							<view:BeatmapsControl />
+						</Grid>
+					</Grid>
+				</TabItem>
+				<TabItem Header="Collections">
+					<Grid RowDefinitions="auto, *">
+						<view:CollectionsSearchControl />
+						<Grid Grid.Row="1">
+							<view:CollectionsControl/>
+						</Grid>
+					</Grid>
+				</TabItem>
+			</TabControl>
+		</Grid>
 
-                                                        <ItemsControl ItemsSource="{Binding Mods}">
-                                                            <ItemsControl.ItemsPanel>
-                                                                <ItemsPanelTemplate>
-                                                                    <StackPanel Orientation="Horizontal" Spacing="4" />
-                                                                </ItemsPanelTemplate>
-                                                            </ItemsControl.ItemsPanel>
-                                                            <ItemsControl.ItemTemplate>
-                                                                <DataTemplate>
-                                                                    <TextBlock Text="{Binding}" />
-                                                                </DataTemplate>
-                                                            </ItemsControl.ItemTemplate>
-                                                        </ItemsControl>
-                                                    </StackPanel>
-                                                    <TextBlock VerticalAlignment="Bottom" Text="{Binding Accuracy, StringFormat={}{0:P2}}" />
-                                                    <StackPanel
-                                                        HorizontalAlignment="Right"
-                                                        VerticalAlignment="Center"
-                                                        Orientation="Vertical"
-                                                        Spacing="8">
-                                                        <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                                                            <TextBlock FontSize="16" Text="{Binding Combo}" />
-                                                            <TextBlock Text="x" />
-                                                        </StackPanel>
-                                                        <StackPanel Orientation="Horizontal" Spacing="6">
-                                                            <TextBlock
-                                                                FontSize="12"
-                                                                Foreground="#2ac2e9"
-                                                                Text="{Binding Count300}" />
-                                                            <TextBlock
-                                                                FontSize="12"
-                                                                Foreground="#5de30e"
-                                                                Text="{Binding Count100}" />
-                                                            <TextBlock
-                                                                FontSize="12"
-                                                                Foreground="#d3b23e"
-                                                                Text="{Binding Count50}" />
-                                                            <TextBlock
-                                                                FontSize="12"
-                                                                Foreground="Red"
-                                                                Text="{Binding CountMiss}" />
-                                                        </StackPanel>
-                                                    </StackPanel>
-                                                </Grid>
-                                            </sukiUi:GlassCard>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                            </TabItem>
-                            <TabItem Header="Global">
-                                <Grid>
-                                    <sukiUi:Loading
-                                        HorizontalAlignment="Center"
-                                        VerticalAlignment="Center"
-                                        IsVisible="{Binding IsGlobalRankingsLoadingVisible}" />
-                                    <ScrollViewer IsVisible="{Binding !IsGlobalRankingsLoadingVisible}">
-                                        <ItemsControl ItemsSource="{Binding GlobalScores}">
-                                            <ItemsControl.ItemTemplate>
-                                                <DataTemplate>
-                                                    <sukiUi:GlassCard
-                                                        Margin="0,0,0,8"
-                                                        Padding="12,6"
-                                                        IsInteractive="True">
-                                                        <Grid>
-                                                            <Grid.Styles>
-                                                                <Style Selector="TextBlock">
-                                                                    <Setter Property="Foreground" Value="White" />
-                                                                </Style>
-                                                            </Grid.Styles>
-                                                            <Border
-                                                                Width="52"
-                                                                Height="52"
-                                                                HorizontalAlignment="Left"
-                                                                ClipToBounds="True"
-                                                                CornerRadius="52">
-                                                                <Image Source="{Binding User.Avatar}" Stretch="UniformToFill" />
-                                                            </Border>
-                                                            <StackPanel
-                                                                Margin="60,0,0,0"
-                                                                HorizontalAlignment="Left"
-                                                                VerticalAlignment="Top"
-                                                                Orientation="Vertical">
-                                                                <TextBlock
-                                                                    FontSize="20"
-                                                                    FontWeight="660"
-                                                                    Text="{Binding TotalScore}" />
-                                                                <TextBlock
-                                                                    Margin="0,-4,0,0"
-                                                                    VerticalAlignment="Top"
-                                                                    FontSize="12"
-                                                                    FontWeight="600"
-                                                                    Text="{Binding User.Username}" />
-                                                            </StackPanel>
-                                                            <StackPanel
-                                                                Margin="60,0,0,0"
-                                                                Orientation="Horizontal"
-                                                                Spacing="8">
-                                                                <TextBlock VerticalAlignment="Bottom" Text="{Binding Accuracy, StringFormat={}{0:P2}}" />
-                                                                <TextBlock VerticalAlignment="Bottom" Text="{Binding ModsString}" />
-                                                            </StackPanel>
-                                                            <StackPanel
-                                                                HorizontalAlignment="Right"
-                                                                VerticalAlignment="Center"
-                                                                Orientation="Vertical"
-                                                                Spacing="8">
-                                                                <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                                                                    <TextBlock FontSize="16" Text="{Binding MaxCombo}" />
-                                                                    <TextBlock Text="x" />
-                                                                </StackPanel>
-                                                                <StackPanel Orientation="Horizontal" Spacing="6">
-                                                                    <TextBlock
-                                                                        FontSize="12"
-                                                                        Foreground="#2ac2e9"
-                                                                        Text="{Binding Statistics.Count300}" />
-                                                                    <TextBlock
-                                                                        FontSize="12"
-                                                                        Foreground="#5de30e"
-                                                                        Text="{Binding Statistics.Count100}" />
-                                                                    <TextBlock
-                                                                        FontSize="12"
-                                                                        Foreground="#d3b23e"
-                                                                        Text="{Binding Statistics.Count50}" />
-                                                                    <TextBlock
-                                                                        FontSize="12"
-                                                                        Foreground="Red"
-                                                                        Text="{Binding Statistics.CountMiss}" />
-                                                                </StackPanel>
-                                                            </StackPanel>
-                                                        </Grid>
-                                                    </sukiUi:GlassCard>
-                                                </DataTemplate>
-                                            </ItemsControl.ItemTemplate>
-                                        </ItemsControl>
-                                    </ScrollViewer>
-                                </Grid>
-                            </TabItem>
-                            <TabItem Header="Comments">
+		<Grid Grid.Column="2">
+			<Grid
+				Grid.Row="1"
+				Margin="4"
+				RowDefinitions="*, auto">
+				<Grid Margin="4" ColumnDefinitions="7*,3*">
+					<view:BetmapInfoControl />
 
-                                <TextBlock
-                                    HorizontalAlignment="Center"
-                                    VerticalAlignment="Center"
-                                    FontSize="50"
-                                    Foreground="LightGray"
-                                    Text="Not realized" />
-                            </TabItem>
-                        </TabControl>
-                    </sukiUi:GlassCard>
-                </Grid>
-                <view:AudioPlayerControl
-                    Grid.Row="1"
-                    Margin="4"
-                    VerticalAlignment="Bottom" />
-            </Grid>
-        </Grid>
-    </Grid>
+					<sukiUi:GlassCard Grid.Column="1" Margin="4">
+						<TabControl
+							Margin="0,0,0,-12"
+							SelectedIndex="{Binding SelectedRightTabIndex}"
+							TabStripPlacement="Bottom">
+							<TabItem Header="Local">
+								<view:LocalScoresControl />
+							</TabItem>
+							<TabItem Header="Global">
+								<view:GlobalScoresControl />
+							</TabItem>
+							<TabItem Header="Comments">
+
+								<TextBlock
+									HorizontalAlignment="Center"
+									VerticalAlignment="Center"
+									FontSize="50"
+									Foreground="LightGray"
+									Text="Not realized" />
+							</TabItem>
+						</TabControl>
+					</sukiUi:GlassCard>
+				</Grid>
+				<view:AudioPlayerControl
+					Grid.Row="1"
+					Margin="4"
+					VerticalAlignment="Bottom" />
+			</Grid>
+		</Grid>
+	</Grid>
 </sukiUi:SukiWindow>

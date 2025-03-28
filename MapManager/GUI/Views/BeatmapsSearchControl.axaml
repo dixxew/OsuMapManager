@@ -1,0 +1,61 @@
+<UserControl
+	x:Class="MapManager.GUI.Views.BeatmapsSearchControl"
+	xmlns="https://github.com/avaloniaui"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+	xmlns:view="using:MapManager.GUI.Views"
+	d:DesignHeight="450"
+	d:DesignWidth="800"
+	mc:Ignorable="d">
+	<sukiUi:GlassCard Padding="12,6" Classes="Primary">
+		<StackPanel Orientation="Vertical">
+			<DockPanel>
+				<RadioButton Margin="0,0,-3,0" />
+				<TextBox
+					FlowDirection="LeftToRight"
+					Text="{Binding SearchBeatmapSetText}"
+					Watermark="Search, ex: 'Sotarks We Are' or use Filters" />
+			</DockPanel>
+			<StackPanel Orientation="Horizontal" Spacing="12">
+				<RadioButton Margin="0,0,-10,0" />
+				<DropDownButton
+					Padding="12,8"
+					Content="Filters"
+					FontSize="14">
+					<DropDownButton.Flyout>
+						<Flyout>
+							<Panel>
+								<Border
+									Margin="20"
+									BoxShadow="{DynamicResource SukiPopupShadow}"
+									CornerRadius="20" />
+								<Border
+									MinWidth="350"
+									Margin="20"
+									Background="{DynamicResource SukiCardBackground}"
+									BorderBrush="{DynamicResource SukiLightBorderBrush}"
+									BorderThickness="1"
+									ClipToBounds="True"
+									CornerRadius="15">
+									<Border Padding="15" Background="{DynamicResource PopupGradientBrush}">
+										<view:SearchFiltersControl />
+									</Border>
+								</Border>
+							</Panel>
+						</Flyout>
+					</DropDownButton.Flyout>
+				</DropDownButton>
+				<TextBlock
+					VerticalAlignment="Center"
+					FontSize="16"
+					FontWeight="550">
+					<Run Text="{Binding BeatmapsCount}" />
+					<Run Text="Maps" />
+				</TextBlock>
+				<CheckBox Content="Only favorites" IsChecked="{Binding IsShowOnlyFavorites}" />
+			</StackPanel>
+		</StackPanel>
+	</sukiUi:GlassCard>
+</UserControl>
