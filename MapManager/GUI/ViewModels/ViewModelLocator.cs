@@ -20,4 +20,25 @@ public class ViewModelLocator
     public SearchFiltersViewModel SearchFiltersViewModel =>
         App.AppHost.Services.GetRequiredService<SearchFiltersViewModel>();
 
+    public BeatmapsSearchViewModel BeatmapsSearchViewModel =>
+        App.AppHost.Services.GetRequiredService<BeatmapsSearchViewModel>();
+
+    public BeatmapsViewModel BeatmapsViewModel =>
+        App.AppHost.Services.GetRequiredService<BeatmapsViewModel>();
+
+    public CollectionsSearchViewModel CollectionsSearchViewModel =>
+        App.AppHost.Services.GetRequiredService<CollectionsSearchViewModel>();
+
+    public CollectionsViewModel CollectionsViewModel =>
+        App.AppHost.Services.GetRequiredService<CollectionsViewModel>();
+
+    public BetmapInfoViewModel BetmapInfoViewModel =>
+        App.AppHost.Services.GetRequiredService<BetmapInfoViewModel>();
+
+    public LocalScoresViewModel LocalScoresViewModel =>
+        App.AppHost.Services.GetRequiredService<LocalScoresViewModel>();
+
+    public GlobalScoresViewModel GlobalScoresViewModel =>
+        App.AppHost.Services.GetRequiredService<GlobalScoresViewModel>();
+
 }

@@ -26,8 +26,6 @@ public class MainWindowViewModel : ViewModelBase
     #endregion
 
 
-
-
     #region public props
     public bool IsGlobalBeatmapsVisible
     {
@@ -59,7 +57,7 @@ public class MainWindowViewModel : ViewModelBase
             UpdateRightTab();
         }
     }
-    
+
     #endregion
 
     private async void UpdateRightTab()
@@ -69,16 +67,14 @@ public class MainWindowViewModel : ViewModelBase
             case 0: //LocalRanks
                 break;
             case 1: //GlobalRanks
-                
+
                 break;
             case 2: //MapComments
-                
+
                 break;
         }
     }
 
-    public void OnMainWindowLoaded()
-        => _appInitializationService.InitializeApplicationData();
 
     public void OpenBeatmapInOsu()
         => _auxiliaryService.OpenBeatmapInOsu();

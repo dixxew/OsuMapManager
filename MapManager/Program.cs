@@ -13,6 +13,7 @@ using MapManager.GUI.ViewModels;
 using System.Net.Http;
 using AutoMapper;
 using MapManager.GUI.Services;
+using System.Threading;
 
 namespace MapManager
 {
@@ -26,8 +27,6 @@ namespace MapManager
         {
             BuildAvaloniaApp()
                 .StartWithClassicDesktopLifetime(args);
-
-            BuildHost(args).Run();
         }
 
         // Avalonia configuration, don't remove; also used by visual designer.
@@ -50,32 +49,47 @@ namespace MapManager
                     ClientId = 36783,
                     ClientSecret = "XnR2bWHI4f3qEeCN0jsAdMA54jixORj40s7x43Rd"
                 })
-                .ConfigureServices(async (context, services) =>
+                .ConfigureServices((context, services) =>
                 {
+
                     services.AddSingleton(appSettings);
 
-                    services.AddTransient<OsuService>();
-                    services.AddTransient<SettingsService>();
-                    services.AddTransient<AppInitializationService>();
-                    services.AddTransient<AuxiliaryService>();
-                    services.AddTransient<AudioPlayerService>();
-                    services.AddTransient<RankingService>();
-                    services.AddTransient<BeatmapDataService>();
+                    services.AddSingleton<OsuService>();
+                    services.AddSingleton<SettingsService>();
+                    services.AddSingleton<AppInitializationService>();
+                    services.AddSingleton<AuxiliaryService>();
+                    services.AddSingleton<AudioPlayerService>();
+                    services.AddSingleton<RankingService>();
+                    services.AddSingleton<BeatmapDataService>();
 
-                    services.AddSingleton(_ => new LegacyOsuClient(new LegacyOsuSharpConfiguration
-                    {
-                        ApiKey = "c9f024e60c2551bea39b507163405098ed8fbd85"
-                    })); 
+
+
+                    services.AddHostedService<AppInitializationService>();
+
                     services.AddSingleton<SettingsViewModel>();
                     services.AddSingleton<OsuDataReader>();
                     services.AddSingleton<AudioPlayerViewModel>();
                     services.AddSingleton<SearchFiltersViewModel>();
-                    services.AddScoped<HttpClient>(); 
+                    services.AddSingleton<BeatmapsSearchViewModel>();
+                    services.AddSingleton<BeatmapsViewModel>();
+                    services.AddSingleton<CollectionsSearchViewModel>();
+                    services.AddSingleton<CollectionsViewModel>();
+                    services.AddSingleton<BetmapInfoViewModel>();
+                    services.AddSingleton<LocalScoresViewModel>();
+                    services.AddSingleton<GlobalScoresViewModel>();
+
+
+                    services.AddSingleton(_ => new LegacyOsuClient(new LegacyOsuSharpConfiguration
+                        {
+                            ApiKey = "c9f024e60c2551bea39b507163405098ed8fbd85"
+                        }));
+                    services.AddScoped<HttpClient>();
                     services.AddScoped<Mapper>(provider =>
                     {
                         var configuration = new MapperConfig().MapperConfiguration;
                         return new Mapper(configuration);
                     });
+
                     services.AddSingleton<MainWindowViewModel>();
                 })
                 .Build();

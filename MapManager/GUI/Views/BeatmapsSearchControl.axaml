@@ -9,6 +9,9 @@
 	d:DesignHeight="450"
 	d:DesignWidth="800"
 	mc:Ignorable="d">
+	<UserControl.DataContext>
+		<Binding Path="BeatmapsSearchViewModel" Source="{StaticResource Locator}" />
+	</UserControl.DataContext>
 	<sukiUi:GlassCard Padding="12,6" Classes="Primary">
 		<StackPanel Orientation="Vertical">
 			<DockPanel>

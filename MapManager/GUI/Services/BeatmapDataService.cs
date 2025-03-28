@@ -14,7 +14,17 @@ public class BeatmapDataService : ReactiveObject
 {
     private readonly OsuDataReader _osuDataReader;
 
-    private Beatmap _selectedBeatmap;
+
+    public BeatmapDataService(OsuDataReader osuDataReader)
+    {
+        _osuDataReader = osuDataReader;
+    }
+
+
+    private BeatmapSet _selectedBeatmapSet = new();
+    private Beatmap _selectedBeatmap = new();
+
+
     public Beatmap SelectedBeatmap
     {
         get => _selectedBeatmap;
@@ -24,8 +34,6 @@ public class BeatmapDataService : ReactiveObject
             SelectedBeatmapChanged();
         }
     }
-
-    private BeatmapSet _selectedBeatmapSet;
     public BeatmapSet SelectedBeatmapSet
     {
         get => _selectedBeatmapSet;
@@ -39,51 +47,14 @@ public class BeatmapDataService : ReactiveObject
         }
     }
 
-    private ObservableCollection<int> _favoriteBeatmaps = new();
-
-    public ObservableCollection<int> FavoriteBeatmapSets
-    {
-        get => _favoriteBeatmaps;
-        set => this.RaiseAndSetIfChanged(ref _favoriteBeatmaps, value);
-    }
+    public ObservableCollection<int> FavoriteBeatmapSets { get; set; } = new();
     public ObservableCollection<BeatmapSet> BeatmapSets { get; } = new();
-    public ObservableCollection<BeatmapSet> FilteredBeatmapSets { get; private set; } = new();
+    public ObservableCollection<BeatmapSet> FilteredBeatmapSets { get; set; } = new();
     public ObservableCollection<Models.Collection> SelectedBeatmapCollections { get; } = new();
     public ObservableCollection<Models.Collection> Collections { get; set; } = new();
 
 
-    public BeatmapDataService(OsuDataReader osuDataReader)
-    {
-        _osuDataReader = osuDataReader;
-    }
 
-    public void LoadBeatmaps()
-    {
-        Task.Run(() =>
-        {
-            var dbBeatmaps = _osuDataReader.GetBeatmapList();
-            var grouped = dbBeatmaps.GroupBy(b => b.BeatmapSetId);
-
-            var newBeatmapSets = new ObservableCollection<BeatmapSet>(
-                grouped.Select(g => new BeatmapSet
-                {
-                    Id = g.Key,
-                    Title = g.First().Title,
-                    Artist = g.First().Artist,
-                    FolderName = g.First().FolderName,
-                    Beatmaps = g.Select(b => Beatmap.FromDbBeatmap(b)).ToList()
-                })
-            );
-
-            // Перенос данных в UI-поток
-            Dispatcher.UIThread.Invoke(() =>
-            {
-                BeatmapSets.Clear();
-                foreach (var set in newBeatmapSets) BeatmapSets.Add(set);
-                FilteredBeatmapSets = BeatmapSets;
-            });
-        });
-    }
 
     public void FilterBeatmaps(string searchText, bool showOnlyFavorites)
     {
@@ -117,7 +88,7 @@ public class BeatmapDataService : ReactiveObject
         // Если включён режим отображения только избранного
         IEnumerable<BeatmapSet> beatmapSets = /*IsShowOnlyFavorites
             ?*/ BeatmapSets.Where(set => FavoriteBeatmapSets.Contains(set.Id));
-            //: BeatmapSets;
+        //: BeatmapSets;
 
         // Создаём список отфильтрованных битмапсетов
         var filtered = new List<BeatmapSet>();
@@ -164,7 +135,8 @@ public class BeatmapDataService : ReactiveObject
     }
     private void UpdateFilteredBeatmapSets(List<BeatmapSet> updatedFiltered)
     {
-        FilteredBeatmapSets = new(updatedFiltered);
+        FilteredBeatmapSets.Clear();
+        FilteredBeatmapSets.AddRange(updatedFiltered);
     }
     public void PerformSearch(string input, bool isOnlyFav)
     {
@@ -216,6 +188,7 @@ public class BeatmapDataService : ReactiveObject
         }
     }
     #endregion
+
 
 
     public Action OnSelectedBeatmapSetChanged;

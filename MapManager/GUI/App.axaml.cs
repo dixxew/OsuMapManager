@@ -7,6 +7,7 @@ using MapManager.OSU;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
+using System.Threading;
 
 namespace MapManager.GUI
 {
@@ -43,7 +44,10 @@ namespace MapManager.GUI
                     DataContext = mainWindowVM,
                 };
             }
-
+            ThreadPool.QueueUserWorkItem(_ =>
+            {
+                AppHost.Run();
+            });
             base.OnFrameworkInitializationCompleted();
         }
 

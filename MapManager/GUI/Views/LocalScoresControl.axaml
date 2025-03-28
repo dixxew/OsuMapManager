@@ -8,6 +8,9 @@
 	d:DesignHeight="450"
 	d:DesignWidth="800"
 	mc:Ignorable="d">
+	<UserControl.DataContext>
+		<Binding Path="LocalScoresViewModel" Source="{StaticResource Locator}" />
+	</UserControl.DataContext>
 	<ItemsControl ItemsSource="{Binding SelectedBeatmap.Scores}">
 		<ItemsControl.ItemTemplate>
 			<DataTemplate>

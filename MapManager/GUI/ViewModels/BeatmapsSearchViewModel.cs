@@ -7,11 +7,11 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace MapManager.GUI.ViewModels;
-public class BetamapsSerachViewModel : ViewModelBase
+public class BeatmapsSearchViewModel : ViewModelBase
 {
     private readonly BeatmapDataService _beatmapDataService;
 
-    public BetamapsSerachViewModel(BeatmapDataService beatmapDataService)
+    public BeatmapsSearchViewModel(BeatmapDataService beatmapDataService)
     {
         _beatmapDataService = beatmapDataService;
     }

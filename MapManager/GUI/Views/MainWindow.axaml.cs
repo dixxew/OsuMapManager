@@ -10,10 +10,4 @@ public partial class MainWindow : SukiWindow
     {
         InitializeComponent();
     }
-
-    private void MainWindowLoaded(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
-    {
-        var viewModel = DataContext as MainWindowViewModel;
-        viewModel.OnMainWindowLoaded(); 
-    }
 }

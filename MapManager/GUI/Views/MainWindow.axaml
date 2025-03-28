@@ -8,8 +8,7 @@
 	xmlns:model="using:MapManager.GUI.Models"
 	xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
 	xmlns:view="using:MapManager.GUI.Views"
-	xmlns:vm="using:MapManager.GUI.ViewModels"
-	Loaded="MainWindowLoaded">
+	xmlns:vm="using:MapManager.GUI.ViewModels">
 	<sukiUi:SukiWindow.RightWindowTitleBarControls>
 		<Button Classes="Basic Rounded WindowControlsButton">
 			<iconPacks:PackIconFontAwesome
@@ -32,7 +31,7 @@
 							ClipToBounds="True"
 							CornerRadius="15">
 							<Border Padding="15" Background="{DynamicResource PopupGradientBrush}">
-								<view:SettingsControl />
+								<view:SettingsControl/>
 							</Border>
 						</Border>
 					</Panel>
@@ -61,15 +60,15 @@
 			<TabControl SelectedIndex="{Binding SelectedMainTab}">
 				<TabItem Header="Maps">
 					<Grid RowDefinitions="auto, *">
-						<view:BeatmapsSearchControl />
+						<view:BeatmapsSearchControl/>
 						<Grid Grid.Row="1">
-							<view:BeatmapsControl />
+							<view:BeatmapsControl/>
 						</Grid>
 					</Grid>
 				</TabItem>
 				<TabItem Header="Collections">
 					<Grid RowDefinitions="auto, *">
-						<view:CollectionsSearchControl />
+						<view:CollectionsSearchControl/>
 						<Grid Grid.Row="1">
 							<view:CollectionsControl/>
 						</Grid>
@@ -84,7 +83,7 @@
 				Margin="4"
 				RowDefinitions="*, auto">
 				<Grid Margin="4" ColumnDefinitions="7*,3*">
-					<view:BetmapInfoControl />
+					<view:BetmapInfoControl/>
 
 					<sukiUi:GlassCard Grid.Column="1" Margin="4">
 						<TabControl
@@ -92,10 +91,10 @@
 							SelectedIndex="{Binding SelectedRightTabIndex}"
 							TabStripPlacement="Bottom">
 							<TabItem Header="Local">
-								<view:LocalScoresControl />
+								<view:LocalScoresControl/>
 							</TabItem>
 							<TabItem Header="Global">
-								<view:GlobalScoresControl />
+								<view:GlobalScoresControl/>
 							</TabItem>
 							<TabItem Header="Comments">
 
@@ -112,7 +111,7 @@
 				<view:AudioPlayerControl
 					Grid.Row="1"
 					Margin="4"
-					VerticalAlignment="Bottom" />
+					VerticalAlignment="Bottom"/>
 			</Grid>
 		</Grid>
 	</Grid>
