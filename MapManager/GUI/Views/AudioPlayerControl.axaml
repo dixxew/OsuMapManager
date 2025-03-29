@@ -129,7 +129,7 @@
 						<Button
 							HorizontalAlignment="Center"
 							VerticalAlignment="Center"
-							Command="{Binding ToggleFavoriteCommand}"
+							Command="{Binding ToggleFavorite}"
 							PointerPressed="HeartPressed">
 							<Button.RenderTransform>
 								<ScaleTransform ScaleX="1" ScaleY="1" />
@@ -143,7 +143,7 @@
 						<Button
 							HorizontalAlignment="Center"
 							VerticalAlignment="Center"
-							Command="{Binding RandomCommand}"
+							Command="{Binding ToggleRandom}"
 							PointerPressed="RandomPressed">
 							<Button.RenderTransform>
 								<ScaleTransform ScaleX="1" ScaleY="1" />
@@ -158,7 +158,7 @@
 						<Button
 							HorizontalAlignment="Center"
 							VerticalAlignment="Center"
-							Command="{Binding RepeatCommand}"
+							Command="{Binding ToggleRepeat}"
 							PointerPressed="RepeatPressed">
 							<Button.RenderTransform>
 								<ScaleTransform ScaleX="1" ScaleY="1" />

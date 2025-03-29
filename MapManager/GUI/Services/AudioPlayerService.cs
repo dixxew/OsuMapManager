@@ -27,13 +27,33 @@ public class AudioPlayerService
     private AudioFileReader _audioFileReader;
     private SoundTouchWaveProvider _soundTouchProvider;
     private float _playbackRate = 1.0f;
-
+    private float _volume = 0.05f;
+    private Stack<BeatmapSet> RandomBeatmapsHistory = new();
+    private bool _isRandomEnabled = false;
 
     public double SongProgress => _audioFileReader?.CurrentTime.TotalSeconds ?? 0;
     public double SongDuration => _audioFileReader?.TotalTime.TotalSeconds ?? 0;
     public bool HasFile => _audioFileReader != null;
-
-    public bool IsRandomEnabled;
+    public float Volume
+    {
+        get => _volume;
+        set
+        {
+            _volume = value;
+            if (_wavePlayer != null)
+                _wavePlayer.Volume = value;
+        }
+    }
+    public bool IsRandomEnabled
+    {
+        get => _isRandomEnabled;
+        set
+        {
+            _isRandomEnabled = value;
+            if (!value)
+                RandomBeatmapsHistory.Clear();
+        }
+    }
     public bool IsRepeatEnabled;
     public bool IsFavorite;
 
@@ -84,12 +104,26 @@ public class AudioPlayerService
     }
     public void PlayPrev()
     {
-        throw new NotImplementedException();
+        if (!IsRandomEnabled || RandomBeatmapsHistory.Count == 0)
+            _beatmapDataService.SelectPrevBeatmapSet();
+        else
+        {
+            _beatmapDataService.SelectBeatmapSet(RandomBeatmapsHistory.Pop());
+        }
     }
     public void PlayNext()
     {
-        throw new NotImplementedException();
+        if (!IsRandomEnabled)
+            _beatmapDataService.SelectNextBeatmapSet();
+        else
+        {
+            RandomBeatmapsHistory.Push(_beatmapDataService.SelectedBeatmapSet);
+            _beatmapDataService.SelectRandomBeatmapSet();
+        }
+
     }
+
+
 
 
     private void OnSelectedBeatmapChanged()
@@ -106,7 +140,7 @@ public class AudioPlayerService
         OnSongChanged?.Invoke(isFavorite, songDuration, isPlaying);
     }
     public event Action<double> OnSongProgressChanged;
-   
+
     private void SongProgressChanged(double songProgress)
     {
         OnSongProgressChanged?.Invoke(songProgress);

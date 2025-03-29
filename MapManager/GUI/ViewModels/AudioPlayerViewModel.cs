@@ -1,4 +1,5 @@
 ﻿using Avalonia.Controls;
+using Avalonia.Threading;
 using MapManager.GUI.Models;
 using MapManager.GUI.Services;
 using NAudio.Wave;
@@ -125,6 +126,15 @@ public class AudioPlayerViewModel : ReactiveObject
         set => this.RaiseAndSetIfChanged(ref _hoveredPosition, value);
     }
 
+    public float Volume
+    {
+        get => _audioPlayerService.Volume;
+        set
+        {
+            _audioPlayerService.Volume = value;
+            this.RaisePropertyChanged();
+        }
+    }
 
 
 
@@ -185,9 +195,12 @@ public class AudioPlayerViewModel : ReactiveObject
 
 
 
-    private void OnSongProgressChanged(double songProgress)
+    private async void OnSongProgressChanged(double songProgress)
     {
-        SongProgress = songProgress;
+        await Dispatcher.UIThread.InvokeAsync(new Action(() =>
+        {
+            SongProgress = songProgress;
+        }));
     }
 
     private void OnSongChanged(bool isFavorite, double songDuration, bool isPlaying)
