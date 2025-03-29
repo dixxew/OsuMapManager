@@ -1,18 +1,24 @@
 ﻿using MapManager.GUI.Models;
 using NAudio.Wave;
+using OsuSharp.Domain;
+using ReactiveUI;
 using SoundTouch.Net.NAudioSupport;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
+using Timer = System.Timers.Timer;
 
 namespace MapManager.GUI.Services;
 public class AudioPlayerService
 {
     private readonly SettingsService _settingsService;
     private readonly BeatmapDataService _beatmapDataService;
+    private Timer _progressTimer;
 
     public AudioPlayerService(SettingsService settingsService, BeatmapDataService beatmapDataService)
     {
@@ -20,6 +26,10 @@ public class AudioPlayerService
         _beatmapDataService = beatmapDataService;
 
         _beatmapDataService.OnSelectedBeatmapChanged += OnSelectedBeatmapChanged;
+
+
+        _progressTimer = new Timer(200);
+        _progressTimer.Elapsed += (s, e) => SongProgressChanged(SongProgress);
     }
 
 
@@ -30,6 +40,7 @@ public class AudioPlayerService
     private float _volume = 0.05f;
     private Stack<BeatmapSet> RandomBeatmapsHistory = new();
     private bool _isRandomEnabled = false;
+    private bool _isFavorite;
 
     public double SongProgress => _audioFileReader?.CurrentTime.TotalSeconds ?? 0;
     public double SongDuration => _audioFileReader?.TotalTime.TotalSeconds ?? 0;
@@ -55,23 +66,31 @@ public class AudioPlayerService
         }
     }
     public bool IsRepeatEnabled;
-    public bool IsFavorite;
-
+    public bool IsFavorite
+    {
+        get => _isFavorite;
+        set
+        {
+            _isFavorite = value;
+            SetCurrentSongFavorite(value);
+        }
+    }
 
 
     public void SetSongAndPlay(BeatmapSet beatmapSet, int selectedBeatmapId)
     {
         var audioFilePath = Path.Combine(_settingsService.OsuDirPath, "Songs", beatmapSet.FolderName,
             beatmapSet.Beatmaps.First(b => b.BeatmapId == selectedBeatmapId).AudioFileName);
-        SongChanged(beatmapSet.IsFavorite, SongDuration, true);
         if (!audioFilePath.Contains(".ogg"))
         {
             Play(audioFilePath);
         }
+        SongChanged(beatmapSet.IsFavorite, SongDuration, true);
     }
     public void Play(string filePath)
     {
         Stop();
+        _progressTimer.Start();
 
         _wavePlayer = new WaveOutEvent();
         _audioFileReader = new AudioFileReader(filePath);
@@ -82,16 +101,32 @@ public class AudioPlayerService
 
         _wavePlayer.Init(_soundTouchProvider);
         _wavePlayer.Play();
+        _wavePlayer.PlaybackStopped += PlaybackStopped;
     }
+
+
+
     public void Pause() => _wavePlayer?.Pause();
     public void Resume() => _wavePlayer?.Play();
     public void Stop()
     {
+        if (_wavePlayer != null)
+        {
+            _wavePlayer.PlaybackStopped -= PlaybackStopped;
+            _wavePlayer.Stop();
+            _wavePlayer.Dispose();
+            _wavePlayer = null;
+        }
+        _progressTimer.Stop();
         _wavePlayer?.Stop();
         _audioFileReader?.Dispose();
         _audioFileReader = null;
         _wavePlayer?.Dispose();
         _wavePlayer = null;
+    }
+    public void SetSongProgress(double positionInSeconds)
+    {
+        _audioFileReader.CurrentTime = TimeSpan.FromSeconds(positionInSeconds);
     }
     public void SetPlaybackRate(float rate)
     {
@@ -125,15 +160,19 @@ public class AudioPlayerService
 
 
 
-
+    private void SetCurrentSongFavorite(bool value)
+    {
+        _beatmapDataService.ToggleSelectedBeatmapSetFavorite(value);
+    }
+    private void PlaybackStopped(object? sender, StoppedEventArgs e)
+    {
+        if (e.Exception is null)
+            PlayNext();
+    }
     private void OnSelectedBeatmapChanged()
     {
         SetSongAndPlay(_beatmapDataService.SelectedBeatmapSet, _beatmapDataService.SelectedBeatmap.BeatmapId);
     }
-
-
-
-
     public event Action<bool, double, bool> OnSongChanged;
     private void SongChanged(bool isFavorite, double songDuration, bool isPlaying)
     {

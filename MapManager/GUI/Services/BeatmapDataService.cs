@@ -21,7 +21,7 @@ public class BeatmapDataService
     }
 
 
-    private BeatmapSet _selectedBeatmapSet = new();
+    private BeatmapSet _selectedBeatmapSet;
     private Beatmap _selectedBeatmap = new();
 
 
@@ -30,6 +30,8 @@ public class BeatmapDataService
         get => _selectedBeatmap;
         set
         {
+            if (value is null)
+                return;
             _selectedBeatmap = value;
             SelectedBeatmapChanged();
         }
@@ -42,14 +44,14 @@ public class BeatmapDataService
             if (value == null || (_selectedBeatmapSet != null && value.Id == _selectedBeatmapSet.Id && FilteredBeatmapSets.Count > 1))
                 return;
             _selectedBeatmapSet = value;
-            SelectBeatmap();
             SelectedBeatmapSetChanged();
+            SelectBeatmap();
         }
     }
 
 
     public ObservableCollection<int> FavoriteBeatmapSets { get; set; } = new();
-    public ObservableCollection<BeatmapSet> BeatmapSets { get; } = new();
+    public List<BeatmapSet> BeatmapSets { get; } = new();
     public ObservableCollection<BeatmapSet> FilteredBeatmapSets { get; set; } = new();
     public ObservableCollection<Models.Collection> SelectedBeatmapCollections { get; } = new();
     public ObservableCollection<Models.Collection> Collections { get; set; } = new();
@@ -151,24 +153,23 @@ public class BeatmapDataService
 
         // Оптимизированное обновление коллекции
         UpdateCollection(FilteredBeatmapSets, beatmapSets);
+        if (SelectedBeatmapSet is null)
+            SelectBeatmapSet();
     }
     public void LoadFavoriteBeatmaps()
     {
         var list = FavoriteBeatmapManager.Load();
         FavoriteBeatmapSets.AddRange(list);
+        var favorites = new HashSet<int>(FavoriteBeatmapSets);
+        foreach (var bs in BeatmapSets)
+        {
+            bs.IsFavorite = favorites.Contains(bs.Id);
+        }
     }
-    public void UpdateFavoriteBeatmapSets(bool isAdded, int beatmapid)
+    public void ToggleSelectedBeatmapSetFavorite(bool value)
     {
-        if (isAdded)
-        {
-            FavoriteBeatmapSets.Add(beatmapid);
-            FavoriteBeatmapManager.Add(beatmapid);
-        }
-        else
-        {
-            FavoriteBeatmapSets.Remove(beatmapid);
-            FavoriteBeatmapManager.Remove(beatmapid);
-        }
+        SelectedBeatmapSet.IsFavorite = value;
+        UpdateFavoriteBeatmapSets(value);
     }
     public void SelectNextBeatmapSet()
     {
@@ -209,14 +210,29 @@ public class BeatmapDataService
         if (FilteredBeatmapSets != null || FilteredBeatmapSets.Count != 0)
             SelectedBeatmapSet = FilteredBeatmapSets.ElementAt(Random.Shared.Next(0, FilteredBeatmapSets.Count));
     }
-    public void SelectBeatmapSet(BeatmapSet bs)
+    public void SelectBeatmapSet(BeatmapSet bs = null)
     {
-        SelectedBeatmapSet = bs;
+        if (bs is not null)
+            SelectedBeatmapSet = bs;
+        else
+            SelectRandomBeatmapSet();
     }
 
 
 
-
+    private void UpdateFavoriteBeatmapSets(bool isAdded)
+    {
+        if (isAdded)
+        {
+            FavoriteBeatmapSets.Add(SelectedBeatmapSet.Id);
+            FavoriteBeatmapManager.Add(SelectedBeatmapSet.Id);
+        }
+        else
+        {
+            FavoriteBeatmapSets.Remove(SelectedBeatmapSet.Id);
+            FavoriteBeatmapManager.Remove(SelectedBeatmapSet.Id);
+        }
+    }
     private void SelectBeatmap()
     {
         SelectedBeatmap = SelectedBeatmapSet.Beatmaps.First();
@@ -226,14 +242,10 @@ public class BeatmapDataService
         FilteredBeatmapSets.Clear();
         FilteredBeatmapSets.AddRange(updatedFiltered);
     }
-    // Метод обновляет существующую коллекцию, не пересоздавая её
     private void UpdateCollection(ObservableCollection<BeatmapSet> target, IEnumerable<BeatmapSet> source)
     {
         target.Clear();
-        foreach (var item in source)
-        {
-            target.Add(item);
-        }
+        target.AddRange(source);
     }
 
 

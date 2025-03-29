@@ -24,12 +24,15 @@ public class AppInitializationService : IHostedService
         _rankingService = rankingService;
         _beatmapDataService = beatmapDataService;
     }
-    public Task StartAsync(CancellationToken cancellationToken)
+    public async Task StartAsync(CancellationToken cancellationToken)
     {
         var scores = LoadScores();
-        LoadBeatmaps(scores);
+        await LoadBeatmaps(scores);
         _beatmapDataService.LoadFavoriteBeatmaps();
-        return Task.CompletedTask;
+        await Dispatcher.UIThread.InvokeAsync(() =>
+        {
+            _beatmapDataService.PerformSearch("", false);
+        });
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
@@ -57,7 +60,7 @@ public class AppInitializationService : IHostedService
         }).ToList());
     }
 
-    private async void LoadBeatmaps(List<Tuple<string, List<OsuParsers.Database.Objects.Score>>> scores)
+    private async Task LoadBeatmaps(List<Tuple<string, List<OsuParsers.Database.Objects.Score>>> scores)
     {
         // Преобразуем список скорингов в словарь для быстрого поиска
         var scoresDictionary = scores.ToDictionary(s => s.Item1, s => s.Item2);
@@ -93,16 +96,9 @@ public class AppInitializationService : IHostedService
                 }).ToList()
             };
         }).ToList();
+        _beatmapDataService.BeatmapSets.AddRange(list);
+        LoadCollections();
 
-        await Dispatcher.UIThread.InvokeAsync(() =>
-        {
-                _beatmapDataService.BeatmapSets.AddRange(list);
-                _beatmapDataService.FilteredBeatmapSets.AddRange(list);
-            
-        });
-        _beatmapDataService.SelectedBeatmapSet = _beatmapDataService.FilteredBeatmapSets.ElementAt(Random.Shared.Next(0, _beatmapDataService.FilteredBeatmapSets.Count));
-            LoadCollections();
-        
     }
 
 }

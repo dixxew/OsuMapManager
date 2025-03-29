@@ -70,8 +70,6 @@ public class BeatmapInfoViewModel : ViewModelBase
     }
     private void SelectedBeatmapChanged()
     {
-        if (SelectedBeatmap is null)
-            return;
         this.RaisePropertyChanged(nameof(SelectedBeatmap));
 
         var beatmapData = _beatmapService.GetBeatmapPresentationData(SelectedBeatmap);

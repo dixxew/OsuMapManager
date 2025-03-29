@@ -33,8 +33,6 @@ public class AudioPlayerViewModel : ReactiveObject
         _audioPlayerService.OnSongChanged += OnSongChanged;
         _audioPlayerService.OnSongProgressChanged += OnSongProgressChanged;
 
-        _progressTimer = new Timer(200);
-        _progressTimer.Elapsed += (s, e) => SongProgress = _audioPlayerService.SongProgress;
     }
 
 
@@ -72,8 +70,6 @@ public class AudioPlayerViewModel : ReactiveObject
         private set
         {
             this.RaiseAndSetIfChanged(ref _isPlaying, value);
-            if (_isPlaying) _progressTimer.Start();
-            else _progressTimer.Stop();
         }
     }
 
@@ -183,14 +179,13 @@ public class AudioPlayerViewModel : ReactiveObject
     }
     public void SetSongPosition(double positionInSeconds)
     {
-        throw new NotImplementedException();
+        _audioPlayerService.SetSongProgress(positionInSeconds);
     }
     public void UpdatePopupState(double relativePosition, double progressBarWidth, double progressBarMinimum, double progressBarMaximum)
     {
         HoveredPosition = progressBarMinimum + relativePosition * (progressBarMaximum - progressBarMinimum);
         PopupTime = TimeSpan.FromSeconds(HoveredPosition).ToString(@"m\:ss");
     }
-
 
 
 
@@ -203,10 +198,13 @@ public class AudioPlayerViewModel : ReactiveObject
         }));
     }
 
-    private void OnSongChanged(bool isFavorite, double songDuration, bool isPlaying)
+    private async void OnSongChanged(bool isFavorite, double songDuration, bool isPlaying)
     {
-        IsFavorite = isFavorite;
-        SongDuration = songDuration;
-        IsPlaying = isPlaying;
+        await Dispatcher.UIThread.InvokeAsync(() =>
+        {
+            IsFavorite = isFavorite;
+            SongDuration = songDuration;
+            IsPlaying = isPlaying;
+        });
     }
 }
