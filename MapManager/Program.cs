@@ -61,6 +61,7 @@ namespace MapManager
                     services.AddSingleton<AudioPlayerService>();
                     services.AddSingleton<RankingService>();
                     services.AddSingleton<BeatmapDataService>();
+                    services.AddSingleton<BeatmapService>();
 
 
 
@@ -74,7 +75,7 @@ namespace MapManager
                     services.AddSingleton<BeatmapsViewModel>();
                     services.AddSingleton<CollectionsSearchViewModel>();
                     services.AddSingleton<CollectionsViewModel>();
-                    services.AddSingleton<BetmapInfoViewModel>();
+                    services.AddSingleton<BeatmapInfoViewModel>();
                     services.AddSingleton<LocalScoresViewModel>();
                     services.AddSingleton<GlobalScoresViewModel>();
 

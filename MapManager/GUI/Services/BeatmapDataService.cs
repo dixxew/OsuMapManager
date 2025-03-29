@@ -10,7 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace MapManager.GUI.Services;
-public class BeatmapDataService : ReactiveObject
+public class BeatmapDataService
 {
     private readonly OsuDataReader _osuDataReader;
 
@@ -30,7 +30,7 @@ public class BeatmapDataService : ReactiveObject
         get => _selectedBeatmap;
         set
         {
-            this.RaiseAndSetIfChanged(ref _selectedBeatmap, value);
+            _selectedBeatmap = value;
             SelectedBeatmapChanged();
         }
     }
@@ -41,11 +41,12 @@ public class BeatmapDataService : ReactiveObject
         {
             if (value == null || (_selectedBeatmapSet != null && value.Id == _selectedBeatmapSet.Id && FilteredBeatmapSets.Count > 1))
                 return;
-
-            this.RaiseAndSetIfChanged(ref _selectedBeatmapSet, value);
+            _selectedBeatmapSet = value;
+            SelectBeatmap();
             SelectedBeatmapSetChanged();
         }
     }
+
 
     public ObservableCollection<int> FavoriteBeatmapSets { get; set; } = new();
     public ObservableCollection<BeatmapSet> BeatmapSets { get; } = new();
@@ -133,11 +134,7 @@ public class BeatmapDataService : ReactiveObject
         // Обновляем только изменённые элементы
         UpdateFilteredBeatmapSets(filtered);
     }
-    private void UpdateFilteredBeatmapSets(List<BeatmapSet> updatedFiltered)
-    {
-        FilteredBeatmapSets.Clear();
-        FilteredBeatmapSets.AddRange(updatedFiltered);
-    }
+    
     public void PerformSearch(string input, bool isOnlyFav)
     {
         var query = input?.ToLower();
@@ -158,17 +155,8 @@ public class BeatmapDataService : ReactiveObject
         UpdateCollection(FilteredBeatmapSets, beatmapSets);
     }
 
-    // Метод обновляет существующую коллекцию, не пересоздавая её
-    private void UpdateCollection(ObservableCollection<BeatmapSet> target, IEnumerable<BeatmapSet> source)
-    {
-        target.Clear();
-        foreach (var item in source)
-        {
-            target.Add(item);
-        }
-    }
+    
 
-    #region favorite
     public void LoadFavoriteBeatmaps()
     {
         var list = FavoriteBeatmapManager.Load();
@@ -187,7 +175,30 @@ public class BeatmapDataService : ReactiveObject
             FavoriteBeatmapManager.Remove(beatmapid);
         }
     }
-    #endregion
+
+
+
+    private void SelectBeatmap()
+    {
+        SelectedBeatmap = SelectedBeatmapSet.Beatmaps.First();
+    }
+    private void UpdateFilteredBeatmapSets(List<BeatmapSet> updatedFiltered)
+    {
+        FilteredBeatmapSets.Clear();
+        FilteredBeatmapSets.AddRange(updatedFiltered);
+    }
+// Метод обновляет существующую коллекцию, не пересоздавая её
+    private void UpdateCollection(ObservableCollection<BeatmapSet> target, IEnumerable<BeatmapSet> source)
+    {
+        target.Clear();
+        foreach (var item in source)
+        {
+            target.Add(item);
+        }
+    }
+
+
+
 
 
 

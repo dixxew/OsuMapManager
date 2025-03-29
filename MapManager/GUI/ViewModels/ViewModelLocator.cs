@@ -32,8 +32,8 @@ public class ViewModelLocator
     public CollectionsViewModel CollectionsViewModel =>
         App.AppHost.Services.GetRequiredService<CollectionsViewModel>();
 
-    public BetmapInfoViewModel BetmapInfoViewModel =>
-        App.AppHost.Services.GetRequiredService<BetmapInfoViewModel>();
+    public BeatmapInfoViewModel BeatmapInfoViewModel =>
+        App.AppHost.Services.GetRequiredService<BeatmapInfoViewModel>();
 
     public LocalScoresViewModel LocalScoresViewModel =>
         App.AppHost.Services.GetRequiredService<LocalScoresViewModel>();

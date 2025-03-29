@@ -20,15 +20,25 @@ public class BeatmapInfoViewModel : ViewModelBase
     public BeatmapInfoViewModel(BeatmapDataService beatmapDataService, BeatmapService beatmapService)
     {
         _beatmapDataService = beatmapDataService;
+        _beatmapService = beatmapService;
+
+
         _beatmapDataService.OnSelectedBeatmapSetChanged += OnSelectedBeatmapSetChanged;
         _beatmapDataService.OnSelectedBeatmapChanged += OnSelectedBeatmapChanged;
-        _beatmapService = beatmapService;
     }
 
 
 
     public BeatmapSet SelectedBeatmapSet => _beatmapDataService.SelectedBeatmapSet;
-    public Beatmap SelectedBeatmap => _beatmapDataService.SelectedBeatmap;
+    public Beatmap SelectedBeatmap
+    {
+        get => _beatmapDataService.SelectedBeatmap;
+        set
+        {
+            _beatmapDataService.SelectedBeatmap = value;
+            this.RaisePropertyChanged();
+        }
+    }
 
     private Bitmap _mapBackground;
     public Bitmap MapBackground
@@ -53,11 +63,21 @@ public class BeatmapInfoViewModel : ViewModelBase
         }
     }
 
+    private void SelectedBeatmapSetChanged()
+    {
+        this.RaisePropertyChanged(nameof(SelectedBeatmapSet));
+
+    }
     private void SelectedBeatmapChanged()
     {
+        if (SelectedBeatmap is null)
+            return;
+        this.RaisePropertyChanged(nameof(SelectedBeatmap));
+
         var beatmapData = _beatmapService.GetBeatmapPresentationData(SelectedBeatmap);
         MapBackground = beatmapData.bitmap;
         SelectedBeatmapCollections = beatmapData.collections;
+
     }
 
 
@@ -76,7 +96,9 @@ public class BeatmapInfoViewModel : ViewModelBase
         }
     }
     private void OnSelectedBeatmapSetChanged()
-        => this.RaisePropertyChanged(nameof(SelectedBeatmapSet));
+        => SelectedBeatmapSetChanged();
+
     private void OnSelectedBeatmapChanged()
-        => this.RaisePropertyChanged(nameof(SelectedBeatmap));
+        => SelectedBeatmapChanged();
+
 }

@@ -4,9 +4,9 @@ using Avalonia.Markup.Xaml;
 
 namespace MapManager.GUI.Views;
 
-public partial class BetmapInfoControl : UserControl
+public partial class BeatmapInfoControl : UserControl
 {
-    public BetmapInfoControl()
+    public BeatmapInfoControl()
     {
         InitializeComponent();
     }

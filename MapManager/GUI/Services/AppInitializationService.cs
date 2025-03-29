@@ -45,16 +45,16 @@ public class AppInitializationService : IHostedService
 
     private void LoadCollections()
     {
-        //var collections = OsuDataReader.GeCollectionsList();
-        //_beatmapDataService.Collections.AddRange(collections.Select(c => new Models.Collection
-        //{
-        //    Beatmaps = new(_beatmapDataService.BeatmapSets
-        //        .SelectMany(bs => bs.Beatmaps)
-        //        .Where(b => c.MD5Hashes.Contains(b.MD5Hash))
-        //        .ToList()),
-        //    Name = c.Name,
-        //    Count = c.Count
-        //}).ToList());
+        var collections = OsuDataReader.GeCollectionsList();
+        _beatmapDataService.Collections.AddRange(collections.Select(c => new Models.Collection
+        {
+            Beatmaps = new(_beatmapDataService.BeatmapSets
+                .SelectMany(bs => bs.Beatmaps)
+                .Where(b => c.MD5Hashes.Contains(b.MD5Hash))
+                .ToList()),
+            Name = c.Name,
+            Count = c.Count
+        }).ToList());
     }
 
     private async void LoadBeatmaps(List<Tuple<string, List<OsuParsers.Database.Objects.Score>>> scores)

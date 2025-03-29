@@ -21,8 +21,15 @@ public class BeatmapsViewModel : ViewModelBase
         _beatmapDataService.OnSelectedBeatmapSetChanged += OnSelectedBeatmapSetChanged;
     }
 
-
-    public BeatmapSet SelectedBeatmapSet => _beatmapDataService.SelectedBeatmapSet;
+    public BeatmapSet SelectedBeatmapSet
+    {
+        get => _beatmapDataService.SelectedBeatmapSet;
+        set
+        {
+            _beatmapDataService.SelectedBeatmapSet = value;
+            this.RaisePropertyChanged();
+        }
+    }
 
     public ObservableCollection<BeatmapSet> FilteredBeatmapSets => _beatmapDataService.FilteredBeatmapSets;
 

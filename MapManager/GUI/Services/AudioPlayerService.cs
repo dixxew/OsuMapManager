@@ -11,11 +11,23 @@ using System.Threading.Tasks;
 namespace MapManager.GUI.Services;
 public class AudioPlayerService
 {
+    private readonly SettingsService _settingsService;
+    private readonly BeatmapDataService _beatmapDataService;
+
+    public AudioPlayerService(SettingsService settingsService, BeatmapDataService beatmapDataService)
+    {
+        _settingsService = settingsService;
+        _beatmapDataService = beatmapDataService;
+
+        _beatmapDataService.OnSelectedBeatmapChanged += OnSelectedBeatmapChanged;
+    }
+
+
     private IWavePlayer _wavePlayer;
     private AudioFileReader _audioFileReader;
     private SoundTouchWaveProvider _soundTouchProvider;
     private float _playbackRate = 1.0f;
-    private readonly SettingsService _settingsService;
+
 
     public double SongProgress => _audioFileReader?.CurrentTime.TotalSeconds ?? 0;
     public double SongDuration => _audioFileReader?.TotalTime.TotalSeconds ?? 0;
@@ -24,6 +36,8 @@ public class AudioPlayerService
     public bool IsRandomEnabled;
     public bool IsRepeatEnabled;
     public bool IsFavorite;
+
+
 
     public void SetSongAndPlay(BeatmapSet beatmapSet, int selectedBeatmapId)
     {
@@ -34,17 +48,6 @@ public class AudioPlayerService
         {
             Play(audioFilePath);
         }
-    }
-
-    public event Action<bool, double, bool> OnSongChanged;
-    private void SongChanged(bool isFavorite, double songDuration, bool isPlaying)
-    {
-        OnSongChanged?.Invoke(isFavorite, songDuration, isPlaying);
-    }
-    public event Action<double> OnSongProgressChanged;
-    private void SongProgressChanged(double songProgress)
-    {
-        OnSongProgressChanged?.Invoke(songProgress);
     }
     public void Play(string filePath)
     {
@@ -60,7 +63,6 @@ public class AudioPlayerService
         _wavePlayer.Init(_soundTouchProvider);
         _wavePlayer.Play();
     }
-
     public void Pause() => _wavePlayer?.Pause();
     public void Resume() => _wavePlayer?.Play();
     public void Stop()
@@ -71,7 +73,6 @@ public class AudioPlayerService
         _wavePlayer?.Dispose();
         _wavePlayer = null;
     }
-
     public void SetPlaybackRate(float rate)
     {
         if (rate < 0.5f || rate > 2.0f) return;
@@ -81,14 +82,33 @@ public class AudioPlayerService
             _soundTouchProvider.Tempo = _playbackRate;
         }
     }
-
     public void PlayPrev()
     {
         throw new NotImplementedException();
     }
-
     public void PlayNext()
     {
         throw new NotImplementedException();
+    }
+
+
+    private void OnSelectedBeatmapChanged()
+    {
+        SetSongAndPlay(_beatmapDataService.SelectedBeatmapSet, _beatmapDataService.SelectedBeatmap.BeatmapId);
+    }
+
+
+
+
+    public event Action<bool, double, bool> OnSongChanged;
+    private void SongChanged(bool isFavorite, double songDuration, bool isPlaying)
+    {
+        OnSongChanged?.Invoke(isFavorite, songDuration, isPlaying);
+    }
+    public event Action<double> OnSongProgressChanged;
+   
+    private void SongProgressChanged(double songProgress)
+    {
+        OnSongProgressChanged?.Invoke(songProgress);
     }
 }

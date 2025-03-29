@@ -67,6 +67,9 @@
     <Compile Update="GUI\Views\BeatmapsControl.axaml.cs">
       <DependentUpon>BeatmapsControl.axaml</DependentUpon>
     </Compile>
+    <Compile Update="GUI\Views\BeatmapInfoControl.axaml.cs">
+      <DependentUpon>BeatmapInfoControl.axaml</DependentUpon>
+    </Compile>
     <Compile Update="GUI\Views\GlobalScoresControl.axaml.cs">
       <DependentUpon>GlobalScoresControl.axaml</DependentUpon>
     </Compile>
