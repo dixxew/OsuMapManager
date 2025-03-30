@@ -146,11 +146,11 @@ public class BeatmapDataService
         // Если текущий элемент последний, выбираем первый
         if (currIndex == FilteredBeatmapSets.Count - 1)
         {
-            SelectedBeatmapSet = FilteredBeatmapSets.First();
+            SelectBeatmapSetAndBeatmap(FilteredBeatmapSets.First());
         }
         else
         {
-            SelectedBeatmapSet = FilteredBeatmapSets.ElementAt(currIndex + 1);
+            SelectBeatmapSetAndBeatmap(FilteredBeatmapSets.ElementAt(currIndex + 1));
         }
     }
     public void SelectPrevBeatmapSet()
@@ -163,17 +163,17 @@ public class BeatmapDataService
         // Если текущий элемент первый, выбираем последний
         if (currIndex == 0 || currIndex == -1)
         {
-            SelectedBeatmapSet = FilteredBeatmapSets.Last();
+            SelectBeatmapSetAndBeatmap(FilteredBeatmapSets.Last());
         }
         else
         {
-            SelectedBeatmapSet = FilteredBeatmapSets.ElementAt(currIndex - 1);
+            SelectBeatmapSetAndBeatmap(FilteredBeatmapSets.ElementAt(currIndex - 1));
         }
     }
     public void SelectRandomBeatmapSet()
     {
         if (FilteredBeatmapSets != null || FilteredBeatmapSets.Count != 0)
-            SelectedBeatmapSet = FilteredBeatmapSets.ElementAt(Random.Shared.Next(0, FilteredBeatmapSets.Count));
+            SelectBeatmapSetAndBeatmap(FilteredBeatmapSets.ElementAt(Random.Shared.Next(0, FilteredBeatmapSets.Count)));
     }
     public void SelectBeatmapSetAndBeatmap(BeatmapSet bs = null, Beatmap b = null)
     {
