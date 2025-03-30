@@ -10,6 +10,7 @@ namespace MapManager.GUI.Models;
 
 public class Score : ReactiveObject
 {
+    public int Index { get; set; }
     public Ruleset Ruleset { get; set; }
 
     public int OsuVersion { get; set; }
@@ -53,14 +54,16 @@ public class Score : ReactiveObject
     }
 
     public Score(
-        Ruleset ruleset, int osuVersion, 
-        string beatmapMD5Hash, string playerName, 
-        string replayMD5Hash, ushort count300, ushort count100, 
-        ushort count50, ushort countGeki, ushort countKatu, 
-        ushort countMiss, int replayScore, ushort combo, 
-        bool perfectCombo, OsuParsers.Enums.Mods mods, 
+        int index,
+        Ruleset ruleset, int osuVersion,
+        string beatmapMD5Hash, string playerName,
+        string replayMD5Hash, ushort count300, ushort count100,
+        ushort count50, ushort countGeki, ushort countKatu,
+        ushort countMiss, int replayScore, ushort combo,
+        bool perfectCombo, OsuParsers.Enums.Mods mods,
         DateTime scoreTimestamp, long scoreId)
     {
+        Index = index;
         Ruleset = ruleset;
         OsuVersion = osuVersion;
         BeatmapMD5Hash = beatmapMD5Hash;

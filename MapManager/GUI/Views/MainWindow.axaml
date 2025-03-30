@@ -47,7 +47,7 @@
 		</Grid.Styles>
 		<Image
 			Grid.ColumnSpan="3"
-			Opacity="0.17"
+			Opacity="0.27"
 			Source="{Binding MapBackground}"
 			Stretch="UniformToFill">
 			<Image.DataContext>

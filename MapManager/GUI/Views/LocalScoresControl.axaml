@@ -11,73 +11,83 @@
 	<UserControl.DataContext>
 		<Binding Path="LocalScoresViewModel" Source="{StaticResource Locator}" />
 	</UserControl.DataContext>
-	<ItemsControl ItemsSource="{Binding SelectedBeatmap.Scores}">
-		<ItemsControl.ItemTemplate>
-			<DataTemplate>
-				<sukiUi:GlassCard
-					Margin="0,0,0,8"
-					Padding="14,6"
-					IsInteractive="True">
-					<Grid>
-						<Grid.Styles>
-							<Style Selector="TextBlock">
-								<Setter Property="Foreground" Value="White" />
-							</Style>
-						</Grid.Styles>
-						<StackPanel Orientation="Horizontal" Spacing="8">
+	<ScrollViewer>
+		<ItemsControl ItemsSource="{Binding SelectedBeatmap.Scores}">
+			<ItemsControl.ItemTemplate>
+				<DataTemplate>
+					<sukiUi:GlassCard
+						Margin="0,0,0,8"
+						Padding="14,6"
+						IsInteractive="True">
+						<Grid>
+							<Grid.Styles>
+								<Style Selector="TextBlock">
+									<Setter Property="Foreground" Value="White" />
+								</Style>
+							</Grid.Styles>
+							<StackPanel Orientation="Horizontal" Spacing="14">
+								<TextBlock>
+									<Run FontSize="18" Text="#" BaselineAlignment="Top"/>
+									<Run FontSize="36" Text="{Binding Index}"/>
+								</TextBlock>
+								<StackPanel Orientation="Vertical">
+									<StackPanel Orientation="Horizontal" Spacing="8">
 
-							<TextBlock
-								HorizontalAlignment="Left"
-								VerticalAlignment="Top"
-								FontSize="20"
-								FontWeight="660"
-								Text="{Binding ReplayScore}" />
+										<TextBlock
+											HorizontalAlignment="Left"
+											VerticalAlignment="Top"
+											FontSize="20"
+											FontWeight="660"
+											Text="{Binding ReplayScore, StringFormat={}{0:N0}}" />
 
-							<ItemsControl ItemsSource="{Binding Mods}">
-								<ItemsControl.ItemsPanel>
-									<ItemsPanelTemplate>
-										<StackPanel Orientation="Horizontal" Spacing="4" />
-									</ItemsPanelTemplate>
-								</ItemsControl.ItemsPanel>
-								<ItemsControl.ItemTemplate>
-									<DataTemplate>
-										<TextBlock Text="{Binding}" />
-									</DataTemplate>
-								</ItemsControl.ItemTemplate>
-							</ItemsControl>
-						</StackPanel>
-						<TextBlock VerticalAlignment="Bottom" Text="{Binding Accuracy, StringFormat={}{0:P2}}" />
-						<StackPanel
-							HorizontalAlignment="Right"
-							VerticalAlignment="Center"
-							Orientation="Vertical"
-							Spacing="8">
-							<StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-								<TextBlock FontSize="16" Text="{Binding Combo}" />
-								<TextBlock Text="x" />
+										<ItemsControl ItemsSource="{Binding Mods}">
+											<ItemsControl.ItemsPanel>
+												<ItemsPanelTemplate>
+													<StackPanel Orientation="Horizontal" Spacing="4" />
+												</ItemsPanelTemplate>
+											</ItemsControl.ItemsPanel>
+											<ItemsControl.ItemTemplate>
+												<DataTemplate>
+													<TextBlock Text="{Binding}" />
+												</DataTemplate>
+											</ItemsControl.ItemTemplate>
+										</ItemsControl>
+									</StackPanel>
+									<TextBlock VerticalAlignment="Bottom" Text="{Binding Accuracy, StringFormat={}{0:P2}}" />
+								</StackPanel>
 							</StackPanel>
-							<StackPanel Orientation="Horizontal" Spacing="6">
-								<TextBlock
-									FontSize="12"
-									Foreground="#2ac2e9"
-									Text="{Binding Count300}" />
-								<TextBlock
-									FontSize="12"
-									Foreground="#5de30e"
-									Text="{Binding Count100}" />
-								<TextBlock
-									FontSize="12"
-									Foreground="#d3b23e"
-									Text="{Binding Count50}" />
-								<TextBlock
-									FontSize="12"
-									Foreground="Red"
-									Text="{Binding CountMiss}" />
+							<StackPanel
+								HorizontalAlignment="Right"
+								VerticalAlignment="Center"
+								Orientation="Vertical"
+								Spacing="8">
+								<StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+									<TextBlock FontSize="16" Text="{Binding Combo}" />
+									<TextBlock Text="x" />
+								</StackPanel>
+								<StackPanel Orientation="Horizontal" Spacing="6">
+									<TextBlock
+										FontSize="12"
+										Foreground="#2ac2e9"
+										Text="{Binding Count300}" />
+									<TextBlock
+										FontSize="12"
+										Foreground="#5de30e"
+										Text="{Binding Count100}" />
+									<TextBlock
+										FontSize="12"
+										Foreground="#d3b23e"
+										Text="{Binding Count50}" />
+									<TextBlock
+										FontSize="12"
+										Foreground="Red"
+										Text="{Binding CountMiss}" />
+								</StackPanel>
 							</StackPanel>
-						</StackPanel>
-					</Grid>
-				</sukiUi:GlassCard>
-			</DataTemplate>
-		</ItemsControl.ItemTemplate>
-	</ItemsControl>
+						</Grid>
+					</sukiUi:GlassCard>
+				</DataTemplate>
+			</ItemsControl.ItemTemplate>
+		</ItemsControl>
+	</ScrollViewer>
 </UserControl>

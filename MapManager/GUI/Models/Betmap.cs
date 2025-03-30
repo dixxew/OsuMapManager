@@ -155,7 +155,7 @@ namespace MapManager.GUI.Models
             set => this.RaiseAndSetIfChanged(ref _overallDifficulty, value);
         }
 
-        private  double? _standardStarRating;
+        private double? _standardStarRating;
         public double? StandardStarRating
         {
             get => _standardStarRating;
@@ -218,7 +218,8 @@ namespace MapManager.GUI.Models
 
         public static void AddScores(Beatmap beatmap, List<OsuParsers.Database.Objects.Score> scores)
         {
-            beatmap.Scores = scores.Select(s => new Score(
+            beatmap.Scores = scores.Select((s, i) => new Score(
+                 i,
                  s.Ruleset,               // Ruleset
                  s.OsuVersion,           // OsuVersion
                  beatmap.MD5Hash,        // BeatmapMD5Hash (берём MD5Hash из текущего Beatmap)
