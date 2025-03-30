@@ -1,40 +1,40 @@
 <UserControl
-    x:Class="MapManager.GUI.Views.SearchFiltersControl"
-    xmlns="https://github.com/avaloniaui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
-    d:DesignHeight="450"
-    d:DesignWidth="800"
-    mc:Ignorable="d">
-    <UserControl.DataContext>
-        <Binding Path="SearchFiltersViewModel" Source="{StaticResource Locator}" />
-    </UserControl.DataContext>
-    <Grid>
-        <StackPanel Orientation="Vertical" Spacing="4">
-            <TextBlock
-                Margin="0,6"
-                HorizontalAlignment="Center"
-                FontSize="18"
-                Foreground="White"
-                Text="Search filters" />
-            <StackPanel Orientation="Horizontal" Spacing="6">
-                <StackPanel.Styles>
-                    <Style Selector="TextBlock">
-                        <Setter Property="Foreground" Value="White" />
-                        <Setter Property="FontSize" Value="16" />
-                        <Setter Property="VerticalAlignment" Value="Center" />
-                    </Style>
-                    <Style Selector="TextBox">
-                        <Setter Property="Foreground" Value="White" />
-                        <Setter Property="FontSize" Value="16" />
-                        <Setter Property="VerticalAlignment" Value="Center" />
-                        <Setter Property="Padding" Value="0 -2 6 0" />
-                    </Style>
-                </StackPanel.Styles>
-                <sukiUi:GlassCard>
-                    <StackPanel Orientation="Vertical" Spacing="4">
+	x:Class="MapManager.GUI.Views.SearchFiltersControl"
+	xmlns="https://github.com/avaloniaui"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+	d:DesignHeight="450"
+	d:DesignWidth="800"
+	mc:Ignorable="d">
+	<UserControl.DataContext>
+		<Binding Path="SearchFiltersViewModel" Source="{StaticResource Locator}" />
+	</UserControl.DataContext>
+	<Grid>
+		<StackPanel Orientation="Vertical" Spacing="4">
+			<TextBlock
+				Margin="0,6"
+				HorizontalAlignment="Center"
+				FontSize="18"
+				Foreground="White"
+				Text="Search filters" />
+			<StackPanel Orientation="Horizontal" Spacing="6">
+				<StackPanel.Styles>
+					<Style Selector="TextBlock">
+						<Setter Property="Foreground" Value="White" />
+						<Setter Property="FontSize" Value="16" />
+						<Setter Property="VerticalAlignment" Value="Center" />
+					</Style>
+					<Style Selector="TextBox">
+						<Setter Property="Foreground" Value="White" />
+						<Setter Property="FontSize" Value="16" />
+						<Setter Property="VerticalAlignment" Value="Center" />
+						<Setter Property="Padding" Value="0 -2 6 0" />
+					</Style>
+				</StackPanel.Styles>
+				<sukiUi:GlassCard>
+					<StackPanel Orientation="Vertical" Spacing="4">
 						<StackPanel Orientation="Horizontal">
 							<TextBlock Text="MaxDuration" />
 							<MaskedTextBox Mask="00:00" Text="{Binding MaxDuration, Converter={StaticResource TimeSpanToStringConverter}}" />
@@ -43,215 +43,225 @@
 							<TextBlock Text="MinDuration" />
 							<MaskedTextBox Mask="00:00" Text="{Binding MinDuration, Converter={StaticResource TimeSpanToStringConverter}}" />
 						</StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <StackPanel VerticalAlignment="Center" Orientation="Vertical">
-                                <TextBlock
-                                    HorizontalAlignment="Right"
-                                    VerticalAlignment="Bottom"
-                                    FontSize="10"
-                                    Foreground="LightGray"
-                                    Text="{Binding MinStarRating, StringFormat={}{0:F2}}" />
-                                <TextBlock Text="StarRating" />
-                                <TextBlock
-                                    HorizontalAlignment="Right"
-                                    VerticalAlignment="Top"
-                                    FontSize="10"
-                                    Foreground="LightGray"
-                                    Text="{Binding MaxStarRating, StringFormat={}{0:F2}}" />
-                            </StackPanel>
-                            <StackPanel Width="140" Orientation="Vertical">
-                                <Slider
-                                    Maximum="{Binding MaxStarRating}"
-                                    Minimum="0"
-                                    TickFrequency="0.01"
-                                    Value="{Binding MinStarRating}" />
-                                <Slider
-                                    Maximum="10"
-                                    Minimum="0"
-                                    TickFrequency="0.01"
-                                    Value="{Binding MaxStarRating}" />
-                            </StackPanel>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Status" />
-                            <ComboBox ItemsSource="{Binding TargetRankedStatusesList}" SelectedItem="{Binding TargetRankedStatus}" />
-                        </StackPanel>
-                    </StackPanel>
-                </sukiUi:GlassCard>
-                <sukiUi:GlassCard>
-                    <StackPanel Orientation="Vertical" Spacing="4">
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <StackPanel Orientation="Vertical" Spacing="8">
-                                <StackPanel Orientation="Horizontal">
-                                    <StackPanel Width="140" Orientation="Vertical">
-                                        <StackPanel
-                                            HorizontalAlignment="Center"
-                                            Orientation="Horizontal"
-                                            Spacing="4">
-                                            <TextBlock
-                                                HorizontalAlignment="Right"
-                                                VerticalAlignment="Bottom"
-                                                FontSize="10"
-                                                Foreground="LightGray"
-                                                Text="{Binding MinAR, StringFormat={}{0:F2}}" />
-                                            <TextBlock
-                                                HorizontalAlignment="Center"
-                                                FontSize="18"
-                                                Text="AR" />
-                                            <TextBlock
-                                                HorizontalAlignment="Left"
-                                                VerticalAlignment="Bottom"
-                                                FontSize="10"
-                                                Foreground="LightGray"
-                                                Text="{Binding MaxAR, StringFormat={}{0:F2}}" />
-                                        </StackPanel>
-                                        <Slider
-                                            Maximum="{Binding MaxAR}"
-                                            Minimum="0"
-                                            TickFrequency="0.01"
-                                            Value="{Binding MinAR}" />
-                                        <Slider
-                                            Maximum="10"
-                                            Minimum="0"
-                                            TickFrequency="0.01"
-                                            Value="{Binding MaxAR}" />
-                                    </StackPanel>
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal">
-                                    <StackPanel Width="140" Orientation="Vertical">
-                                        <StackPanel
-                                            HorizontalAlignment="Center"
-                                            Orientation="Horizontal"
-                                            Spacing="4">
-                                            <TextBlock
-                                                HorizontalAlignment="Right"
-                                                VerticalAlignment="Bottom"
-                                                FontSize="10"
-                                                Foreground="LightGray"
-                                                Text="{Binding MinCS, StringFormat={}{0:F2}}" />
-                                            <TextBlock
-                                                HorizontalAlignment="Center"
-                                                FontSize="18"
-                                                Text="CS" />
-                                            <TextBlock
-                                                HorizontalAlignment="Left"
-                                                VerticalAlignment="Bottom"
-                                                FontSize="10"
-                                                Foreground="LightGray"
-                                                Text="{Binding MaxCS, StringFormat={}{0:F2}}" />
-                                        </StackPanel>
-                                        <Slider
-                                            Maximum="{Binding MaxCS}"
-                                            Minimum="0"
-                                            TickFrequency="0.01"
-                                            Value="{Binding MinCS}" />
-                                        <Slider
-                                            Maximum="10"
-                                            Minimum="0"
-                                            TickFrequency="0.01"
-                                            Value="{Binding MaxCS}" />
-                                    </StackPanel>
-                                </StackPanel>
-                            </StackPanel>
-                            <StackPanel Orientation="Vertical" Spacing="8">
-                                <StackPanel Orientation="Horizontal">
-                                    <StackPanel Width="140" Orientation="Vertical">
-                                        <StackPanel
-                                            HorizontalAlignment="Center"
-                                            Orientation="Horizontal"
-                                            Spacing="4">
-                                            <TextBlock
-                                                HorizontalAlignment="Right"
-                                                VerticalAlignment="Bottom"
-                                                FontSize="10"
-                                                Foreground="LightGray"
-                                                Text="{Binding MinHP, StringFormat={}{0:F2}}" />
-                                            <TextBlock
-                                                HorizontalAlignment="Center"
-                                                FontSize="18"
-                                                Text="HP" />
-                                            <TextBlock
-                                                HorizontalAlignment="Left"
-                                                VerticalAlignment="Bottom"
-                                                FontSize="10"
-                                                Foreground="LightGray"
-                                                Text="{Binding MaxHP, StringFormat={}{0:F2}}" />
-                                        </StackPanel>
-                                        <Slider
-                                            Maximum="{Binding MaxHP}"
-                                            Minimum="0"
-                                            TickFrequency="0.01"
-                                            Value="{Binding MinHP}" />
-                                        <Slider
-                                            Maximum="10"
-                                            Minimum="0"
-                                            TickFrequency="0.01"
-                                            Value="{Binding MaxHP}" />
-                                    </StackPanel>
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal">
-                                    <StackPanel Width="140" Orientation="Vertical">
-                                        <StackPanel
-                                            HorizontalAlignment="Center"
-                                            Orientation="Horizontal"
-                                            Spacing="4">
-                                            <TextBlock
-                                                HorizontalAlignment="Right"
-                                                VerticalAlignment="Bottom"
-                                                FontSize="10"
-                                                Foreground="LightGray"
-                                                Text="{Binding MinOD, StringFormat={}{0:F2}}" />
-                                            <TextBlock
-                                                HorizontalAlignment="Center"
-                                                FontSize="18"
-                                                Text="OD" />
-                                            <TextBlock
-                                                HorizontalAlignment="Left"
-                                                VerticalAlignment="Bottom"
-                                                FontSize="10"
-                                                Foreground="LightGray"
-                                                Text="{Binding MaxOD, StringFormat={}{0:F2}}" />
-                                        </StackPanel>
-                                        <Slider
-                                            Maximum="{Binding MaxOD}"
-                                            Minimum="0"
-                                            TickFrequency="0.01"
-                                            Value="{Binding MinOD}" />
-                                        <Slider
-                                            Maximum="10"
-                                            Minimum="0"
-                                            TickFrequency="0.01"
-                                            Value="{Binding MaxOD}" />
-                                    </StackPanel>
-                                </StackPanel>
-                            </StackPanel>
-                        </StackPanel>
+						<StackPanel Orientation="Horizontal">
+							<StackPanel VerticalAlignment="Center" Orientation="Vertical">
+								<TextBlock
+									HorizontalAlignment="Right"
+									VerticalAlignment="Bottom"
+									FontSize="10"
+									Foreground="LightGray"
+									Text="{Binding MinStarRating, StringFormat={}{0:F2}}" />
+								<TextBlock Text="StarRating" />
+								<TextBlock
+									HorizontalAlignment="Right"
+									VerticalAlignment="Top"
+									FontSize="10"
+									Foreground="LightGray"
+									Text="{Binding MaxStarRating, StringFormat={}{0:F2}}" />
+							</StackPanel>
+							<StackPanel Width="140" Orientation="Vertical">
+								<Slider
+									Maximum="{Binding MaxStarRating}"
+									Minimum="0"
+									TickFrequency="0.01"
+									Value="{Binding MinStarRating}" />
+								<Slider
+									Maximum="10"
+									Minimum="0"
+									TickFrequency="0.01"
+									Value="{Binding MaxStarRating}" />
+							</StackPanel>
+						</StackPanel>
+						<StackPanel Orientation="Horizontal">
+							<TextBlock Text="Status" />
+							<ComboBox ItemsSource="{Binding TargetRankedStatusesList}" SelectedItem="{Binding TargetRankedStatus}" />
+						</StackPanel>
+					</StackPanel>
+				</sukiUi:GlassCard>
+				<sukiUi:GlassCard>
+					<StackPanel
+						VerticalAlignment="Center"
+						Orientation="Vertical"
+						Spacing="4">
+						<StackPanel Orientation="Horizontal" Spacing="14">
+							<StackPanel Orientation="Vertical" Spacing="14">
+								<StackPanel Orientation="Horizontal">
+									<StackPanel Width="140" Orientation="Vertical">
+										<StackPanel
+											HorizontalAlignment="Center"
+											Orientation="Horizontal"
+											Spacing="4">
+											<TextBlock
+												HorizontalAlignment="Right"
+												VerticalAlignment="Bottom"
+												FontSize="10"
+												Foreground="LightGray"
+												Text="{Binding MinAR, StringFormat={}{0:F2}}" />
+											<TextBlock
+												HorizontalAlignment="Center"
+												FontSize="18"
+												Text="AR" />
+											<TextBlock
+												HorizontalAlignment="Left"
+												VerticalAlignment="Bottom"
+												FontSize="10"
+												Foreground="LightGray"
+												Text="{Binding MaxAR, StringFormat={}{0:F2}}" />
+										</StackPanel>
+										<Slider
+											Maximum="{Binding MaxAR}"
+											Minimum="0"
+											TickFrequency="0.01"
+											Value="{Binding MinAR}" />
+										<Slider
+											Maximum="10"
+											Minimum="0"
+											TickFrequency="0.01"
+											Value="{Binding MaxAR}" />
+									</StackPanel>
+								</StackPanel>
+								<StackPanel Orientation="Horizontal">
+									<StackPanel Width="140" Orientation="Vertical">
+										<StackPanel
+											HorizontalAlignment="Center"
+											Orientation="Horizontal"
+											Spacing="4">
+											<TextBlock
+												HorizontalAlignment="Right"
+												VerticalAlignment="Bottom"
+												FontSize="10"
+												Foreground="LightGray"
+												Text="{Binding MinCS, StringFormat={}{0:F2}}" />
+											<TextBlock
+												HorizontalAlignment="Center"
+												FontSize="18"
+												Text="CS" />
+											<TextBlock
+												HorizontalAlignment="Left"
+												VerticalAlignment="Bottom"
+												FontSize="10"
+												Foreground="LightGray"
+												Text="{Binding MaxCS, StringFormat={}{0:F2}}" />
+										</StackPanel>
+										<Slider
+											Maximum="{Binding MaxCS}"
+											Minimum="0"
+											TickFrequency="0.01"
+											Value="{Binding MinCS}" />
+										<Slider
+											Maximum="10"
+											Minimum="0"
+											TickFrequency="0.01"
+											Value="{Binding MaxCS}" />
+									</StackPanel>
+								</StackPanel>
+							</StackPanel>
+							<StackPanel Orientation="Vertical" Spacing="14">
+								<StackPanel Orientation="Horizontal">
+									<StackPanel Width="140" Orientation="Vertical">
+										<StackPanel
+											HorizontalAlignment="Center"
+											Orientation="Horizontal"
+											Spacing="4">
+											<TextBlock
+												HorizontalAlignment="Right"
+												VerticalAlignment="Bottom"
+												FontSize="10"
+												Foreground="LightGray"
+												Text="{Binding MinHP, StringFormat={}{0:F2}}" />
+											<TextBlock
+												HorizontalAlignment="Center"
+												FontSize="18"
+												Text="HP" />
+											<TextBlock
+												HorizontalAlignment="Left"
+												VerticalAlignment="Bottom"
+												FontSize="10"
+												Foreground="LightGray"
+												Text="{Binding MaxHP, StringFormat={}{0:F2}}" />
+										</StackPanel>
+										<Slider
+											Maximum="{Binding MaxHP}"
+											Minimum="0"
+											TickFrequency="0.01"
+											Value="{Binding MinHP}" />
+										<Slider
+											Maximum="10"
+											Minimum="0"
+											TickFrequency="0.01"
+											Value="{Binding MaxHP}" />
+									</StackPanel>
+								</StackPanel>
+								<StackPanel Orientation="Horizontal">
+									<StackPanel Width="140" Orientation="Vertical">
+										<StackPanel
+											HorizontalAlignment="Center"
+											Orientation="Horizontal"
+											Spacing="4">
+											<TextBlock
+												HorizontalAlignment="Right"
+												VerticalAlignment="Bottom"
+												FontSize="10"
+												Foreground="LightGray"
+												Text="{Binding MinOD, StringFormat={}{0:F2}}" />
+											<TextBlock
+												HorizontalAlignment="Center"
+												FontSize="18"
+												Text="OD" />
+											<TextBlock
+												HorizontalAlignment="Left"
+												VerticalAlignment="Bottom"
+												FontSize="10"
+												Foreground="LightGray"
+												Text="{Binding MaxOD, StringFormat={}{0:F2}}" />
+										</StackPanel>
+										<Slider
+											Maximum="{Binding MaxOD}"
+											Minimum="0"
+											TickFrequency="0.01"
+											Value="{Binding MinOD}" />
+										<Slider
+											Maximum="10"
+											Minimum="0"
+											TickFrequency="0.01"
+											Value="{Binding MaxOD}" />
+									</StackPanel>
+								</StackPanel>
+							</StackPanel>
+						</StackPanel>
 
-                    </StackPanel>
-                </sukiUi:GlassCard>
-            </StackPanel>
-            <sukiUi:GlassCard>
-                <StackPanel Orientation="Vertical" Spacing="4">
-                    <Grid ColumnDefinitions="*,*,*">
-                        <StackPanel Grid.Column="0" Orientation="Vertical">
-                            <TextBlock HorizontalAlignment="Center" Text="Artist" />
-                            <TextBox />
-                        </StackPanel>
-                        <StackPanel Grid.Column="1" Orientation="Vertical">
-                            <TextBlock HorizontalAlignment="Center" Text="Title" />
-                            <TextBox />
-                        </StackPanel>
-                        <StackPanel Grid.Column="2" Orientation="Vertical">
-                            <TextBlock HorizontalAlignment="Center" Text="Mapper" />
-                            <TextBox />
-                        </StackPanel>
-                    </Grid>
-                    <StackPanel Orientation="Vertical">
-                        <TextBlock HorizontalAlignment="Center" Text="Tags" />
-                        <TextBox Text="{Binding Tags}" Watermark="ex: bass, dnb, tv size..." />
-                    </StackPanel>
-                </StackPanel>
-            </sukiUi:GlassCard>
-        </StackPanel>
-    </Grid>
+					</StackPanel>
+				</sukiUi:GlassCard>
+			</StackPanel>
+			<sukiUi:GlassCard>
+				<StackPanel Orientation="Vertical" Spacing="4">
+					<Grid ColumnDefinitions="*,*,*">
+						<StackPanel Grid.Column="0" Orientation="Vertical">
+							<TextBlock HorizontalAlignment="Center" Text="Artist" />
+							<TextBox />
+						</StackPanel>
+						<StackPanel Grid.Column="1" Orientation="Vertical">
+							<TextBlock HorizontalAlignment="Center" Text="Title" />
+							<TextBox />
+						</StackPanel>
+						<StackPanel Grid.Column="2" Orientation="Vertical">
+							<TextBlock HorizontalAlignment="Center" Text="Mapper" />
+							<TextBox />
+						</StackPanel>
+					</Grid>
+					<StackPanel Orientation="Vertical">
+						<TextBlock HorizontalAlignment="Center" Text="Tags" />
+						<TextBox Text="{Binding Tags}" Watermark="ex: bass, dnb, tv size..." />
+					</StackPanel>
+				</StackPanel>
+			</sukiUi:GlassCard>
+			<sukiUi:GlassCard>
+				<StackPanel>
+
+					<CheckBox Content="Have scores" IsChecked="{Binding IsHaveScores}" />
+					<CheckBox Content="Unplayed" IsChecked="{Binding IsUnplayed}" />
+				</StackPanel>
+			</sukiUi:GlassCard>
+		</StackPanel>
+	</Grid>
 </UserControl>

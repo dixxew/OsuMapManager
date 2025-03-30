@@ -19,7 +19,7 @@ public class SearchFiltersViewModel : ViewModelBase
     public List<RankedStatus> TargetRankedStatusesList =>
         Enum.GetValues(typeof(RankedStatus)).Cast<RankedStatus>().ToList();
 
-    
+
     private RankedStatus _targetRankedStatus;
     public RankedStatus TargetRankedStatus
     {
@@ -218,8 +218,31 @@ public class SearchFiltersViewModel : ViewModelBase
         }
     }
 
-    
+    private bool _isHaveScores;
 
-    private void OnFiltersChanged() => 
+    public bool IsHaveScores
+    {
+        get => _isHaveScores;
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _isHaveScores, value);
+            OnFiltersChanged();
+        }
+    }
+
+    private bool _isUnplayed;
+
+    public bool IsUnplayed
+    {
+        get => _isUnplayed;
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _isUnplayed, value);
+            OnFiltersChanged();
+        }
+    }
+
+
+    private void OnFiltersChanged() =>
         _beatmapDataService.Search();
 }

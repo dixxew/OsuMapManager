@@ -169,6 +169,14 @@ namespace MapManager.GUI.Models
             set => this.RaiseAndSetIfChanged(ref _scores, value);
         }
 
+        private bool _isUnplayed;
+        public bool IsUnplayed
+        {
+            get => _isUnplayed;
+            set =>
+                this.RaiseAndSetIfChanged(ref _isUnplayed, value);
+        }
+
         public TimeSpan TotalTime;
 
 
@@ -206,6 +214,7 @@ namespace MapManager.GUI.Models
                 ApproachRate = dbBeatmap.ApproachRate,
                 CircleSize = dbBeatmap.CircleSize,
                 HPDrain = dbBeatmap.HPDrain,
+                IsUnplayed = dbBeatmap.IsUnplayed,
                 OverallDifficulty = dbBeatmap.OverallDifficulty,
                 StandardStarRating = dbBeatmap.StandardStarRating.TryGetValue(Mods.None, out double stars) ? stars : 0,
                 TagsList = dbBeatmap.Tags.Split(' ').ToList(),
@@ -219,7 +228,7 @@ namespace MapManager.GUI.Models
         public static void AddScores(Beatmap beatmap, List<OsuParsers.Database.Objects.Score> scores)
         {
             beatmap.Scores = scores.Select((s, i) => new Score(
-                 i,
+                 i + 1,
                  s.Ruleset,               // Ruleset
                  s.OsuVersion,           // OsuVersion
                  beatmap.MD5Hash,        // BeatmapMD5Hash (берём MD5Hash из текущего Beatmap)

@@ -239,6 +239,8 @@ public class BeatmapDataService
                 b.OverallDifficulty <= SearchFilters.MaxOD &&
                 b.HPDrain >= SearchFilters.MinHP &&
                 b.HPDrain <= SearchFilters.MaxHP &&
+                (SearchFilters.IsHaveScores ? b.Scores.Count > 0 : true) &&
+                (SearchFilters.IsUnplayed ? b.IsUnplayed : true) &&
                 (SearchFilters.MinDuration != null ? b.TotalTime >= SearchFilters.MinDuration : true) &&
                 (SearchFilters.MaxDuration != null ? b.TotalTime <= SearchFilters.MaxDuration : true) &&
                 (!string.IsNullOrEmpty(SearchFilters.Artist) ? b.Artist.Contains(SearchFilters.Artist) : true) &&
