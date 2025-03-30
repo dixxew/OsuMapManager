@@ -15,14 +15,15 @@
 	<sukiUi:GlassCard Padding="12,6" Classes="Primary">
 		<StackPanel Orientation="Vertical">
 			<DockPanel>
-				<RadioButton Margin="0,0,-3,0" />
+				<RadioButton Margin="0,0,-3,0" IsChecked="{Binding SearchMode, Converter={StaticResource BeatmapsSearchModeToBoolConverter}, ConverterParameter=QUERY}"/>
 				<TextBox
 					FlowDirection="LeftToRight"
 					Text="{Binding SearchBeatmapSetText}"
 					Watermark="Search, ex: 'Sotarks We Are' or use Filters" />
 			</DockPanel>
 			<StackPanel Orientation="Horizontal" Spacing="12">
-				<RadioButton Margin="0,0,-10,0" />
+				<RadioButton Margin="0,0,-10,0" IsChecked="{Binding SearchMode, Converter={StaticResource BeatmapsSearchModeToBoolConverter}, ConverterParameter=FILTERS}"/>
+
 				<DropDownButton
 					Padding="12,8"
 					Content="Filters"

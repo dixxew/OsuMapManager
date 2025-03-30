@@ -26,8 +26,8 @@ public class BeatmapsViewModel : ViewModelBase
         get => _beatmapDataService.SelectedBeatmapSet;
         set
         {
-            _beatmapDataService.SelectedBeatmapSet = value;
-            this.RaisePropertyChanged();
+            if (value is not null)
+                _beatmapDataService.SelectBeatmapSetAndBeatmap(value);
         }
     }
 

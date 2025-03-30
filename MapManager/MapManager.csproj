@@ -30,6 +30,7 @@
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.1" />
     <PackageReference Include="NAudio" Version="2.2.1" />
     <PackageReference Include="NAudio.Core" Version="2.2.1" />
+    <PackageReference Include="NAudio.Vorbis" Version="1.5.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="OsuParsers" Version="1.7.2" />
     <!--<PackageReference Include="OsuSharp" Version="6.4.1" />
@@ -49,10 +50,6 @@
 
   <ItemGroup>
     <None Include="C:\Users\ayrat\source\repos\MapManager\MapManager\.editorconfig" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="GUI\Converters\" />
   </ItemGroup>
 
   <ItemGroup>

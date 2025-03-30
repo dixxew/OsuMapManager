@@ -1,6 +1,7 @@
 ﻿using Avalonia.Threading;
 using DynamicData;
 using MapManager.GUI.Models;
+using MapManager.GUI.Models.Enums;
 using MapManager.GUI.ViewModels;
 using ReactiveUI;
 using System;
@@ -23,8 +24,38 @@ public class BeatmapDataService
 
     private BeatmapSet _selectedBeatmapSet;
     private Beatmap _selectedBeatmap = new();
+    private bool _isOnlyfavorite;
+    private string _queryText;
+    private BeatmapsSearchModeEnum _searchMode;
 
+    public string QueryText
+    {
+        get => _queryText;
+        set
+        {
+            _queryText = value;
+            Search();
+        }
+    }
 
+    public bool IsOnlyFavorite
+    {
+        get => _isOnlyfavorite;
+        set
+        {
+            _isOnlyfavorite = value;
+            Search();
+        }
+    }
+    public BeatmapsSearchModeEnum SearchMode
+    {
+        get => _searchMode;
+        set
+        {
+            _searchMode = value;
+            Search();
+        }
+    }
     public Beatmap SelectedBeatmap
     {
         get => _selectedBeatmap;
@@ -45,7 +76,6 @@ public class BeatmapDataService
                 return;
             _selectedBeatmapSet = value;
             SelectedBeatmapSetChanged();
-            SelectBeatmap();
         }
     }
 
@@ -57,8 +87,18 @@ public class BeatmapDataService
     public ObservableCollection<Models.Collection> Collections { get; set; } = new();
 
 
-
-
+    public void Search()
+    {
+        switch (SearchMode)
+        {
+        case BeatmapsSearchModeEnum.QUERY:
+                PerformSearch(QueryText, IsOnlyFavorite);
+                break;
+        case BeatmapsSearchModeEnum.FILTERS:
+                FilterBeatmapSets();
+                break;
+        }
+    }
     public void FilterBeatmaps(string searchText, bool showOnlyFavorites)
     {
         //var filtered = BeatmapSets.AsQueryable();
@@ -80,7 +120,98 @@ public class BeatmapDataService
         //    FilteredBeatmapSets = new ObservableCollection<BeatmapSet>(filtered.ToList());
         //});
     }
-    public void FilterBeatmapSets()
+    public void LoadFavoriteBeatmaps()
+    {
+        var list = FavoriteBeatmapManager.Load();
+        FavoriteBeatmapSets.AddRange(list);
+        var favorites = new HashSet<int>(FavoriteBeatmapSets);
+        foreach (var bs in BeatmapSets)
+        {
+            bs.IsFavorite = favorites.Contains(bs.Id);
+        }
+    }
+    public void ToggleSelectedBeatmapSetFavorite(bool value)
+    {
+        SelectedBeatmapSet.IsFavorite = value;
+        UpdateFavoriteBeatmapSets(value);
+        Search();
+    }
+    public void SelectNextBeatmapSet()
+    {
+        if (FilteredBeatmapSets == null || FilteredBeatmapSets.Count == 0)
+            return;
+
+        var currIndex = FilteredBeatmapSets.IndexOf(SelectedBeatmapSet);
+
+        // Если текущий элемент последний, выбираем первый
+        if (currIndex == FilteredBeatmapSets.Count - 1)
+        {
+            SelectedBeatmapSet = FilteredBeatmapSets.First();
+        }
+        else
+        {
+            SelectedBeatmapSet = FilteredBeatmapSets.ElementAt(currIndex + 1);
+        }
+    }
+    public void SelectPrevBeatmapSet()
+    {
+        if (FilteredBeatmapSets == null || FilteredBeatmapSets.Count == 0)
+            return;
+
+        var currIndex = FilteredBeatmapSets.IndexOf(SelectedBeatmapSet);
+
+        // Если текущий элемент первый, выбираем последний
+        if (currIndex == 0 || currIndex == -1)
+        {
+            SelectedBeatmapSet = FilteredBeatmapSets.Last();
+        }
+        else
+        {
+            SelectedBeatmapSet = FilteredBeatmapSets.ElementAt(currIndex - 1);
+        }
+    }
+    public void SelectRandomBeatmapSet()
+    {
+        if (FilteredBeatmapSets != null || FilteredBeatmapSets.Count != 0)
+            SelectedBeatmapSet = FilteredBeatmapSets.ElementAt(Random.Shared.Next(0, FilteredBeatmapSets.Count));
+    }
+    public void SelectBeatmapSetAndBeatmap(BeatmapSet bs = null, Beatmap b = null)
+    {
+        if (bs is not null)
+        {
+            SelectedBeatmapSet = bs;
+            if (b is not null)
+                SelectBeatmap(b);
+            else
+            {
+                SelectBeatmap();
+            }
+        }
+        else
+        {
+            SelectRandomBeatmapSet();
+            SelectBeatmap();
+        }
+    }
+    public void SelectBeatmapAndFindBeatmapSet(Beatmap beatmap)
+    {
+        var targetId = "someId";
+
+        var result = BeatmapSets
+            .SelectMany(set => set.Beatmaps, (set, beatmap) => new { BeatmapSet = set, Beatmap = beatmap })
+            .FirstOrDefault(x => x.Beatmap.BeatmapId == beatmap.BeatmapId);
+
+        if (result != null)
+        {
+            SelectedBeatmapSet = result.BeatmapSet;
+            SelectedBeatmap = result.Beatmap;
+        }
+
+    }
+
+
+
+    private void FilterBeatmapSets()
     {
         if (BeatmapSets == null) return;
 
@@ -88,9 +219,9 @@ public class BeatmapDataService
         var SearchFilters = locator.SearchFiltersViewModel;
 
         // Если включён режим отображения только избранного
-        IEnumerable<BeatmapSet> beatmapSets = /*IsShowOnlyFavorites
-            ?*/ BeatmapSets.Where(set => FavoriteBeatmapSets.Contains(set.Id));
-        //: BeatmapSets;
+        IEnumerable<BeatmapSet> beatmapSets = IsOnlyFavorite ?
+            BeatmapSets.Where(set => FavoriteBeatmapSets.Contains(set.Id))
+            : BeatmapSets;
 
         // Создаём список отфильтрованных битмапсетов
         var filtered = new List<BeatmapSet>();
@@ -133,9 +264,9 @@ public class BeatmapDataService
         }
 
         // Обновляем только изменённые элементы
-        UpdateFilteredBeatmapSets(filtered);
+        UpdateCollection(FilteredBeatmapSets, filtered);
     }
-    public void PerformSearch(string input, bool isOnlyFav)
+    private void PerformSearch(string input, bool isOnlyFav)
     {
         var query = input?.ToLower();
         var beatmapSets = isOnlyFav
@@ -154,72 +285,8 @@ public class BeatmapDataService
         // Оптимизированное обновление коллекции
         UpdateCollection(FilteredBeatmapSets, beatmapSets);
         if (SelectedBeatmapSet is null)
-            SelectBeatmapSet();
+            SelectBeatmapSetAndBeatmap();
     }
-    public void LoadFavoriteBeatmaps()
-    {
-        var list = FavoriteBeatmapManager.Load();
-        FavoriteBeatmapSets.AddRange(list);
-        var favorites = new HashSet<int>(FavoriteBeatmapSets);
-        foreach (var bs in BeatmapSets)
-        {
-            bs.IsFavorite = favorites.Contains(bs.Id);
-        }
-    }
-    public void ToggleSelectedBeatmapSetFavorite(bool value)
-    {
-        SelectedBeatmapSet.IsFavorite = value;
-        UpdateFavoriteBeatmapSets(value);
-    }
-    public void SelectNextBeatmapSet()
-    {
-        if (FilteredBeatmapSets == null || FilteredBeatmapSets.Count == 0)
-            return;
-
-        var currIndex = FilteredBeatmapSets.IndexOf(SelectedBeatmapSet);
-
-        // Если текущий элемент последний, выбираем первый
-        if (currIndex == FilteredBeatmapSets.Count - 1)
-        {
-            SelectedBeatmapSet = FilteredBeatmapSets.First();
-        }
-        else
-        {
-            SelectedBeatmapSet = FilteredBeatmapSets.ElementAt(currIndex + 1);
-        }
-    }
-    public void SelectPrevBeatmapSet()
-    {
-        if (FilteredBeatmapSets == null || FilteredBeatmapSets.Count == 0)
-            return;
-
-        var currIndex = FilteredBeatmapSets.IndexOf(SelectedBeatmapSet);
-
-        // Если текущий элемент первый, выбираем последний
-        if (currIndex == 0 || currIndex == -1)
-        {
-            SelectedBeatmapSet = FilteredBeatmapSets.Last();
-        }
-        else
-        {
-            SelectedBeatmapSet = FilteredBeatmapSets.ElementAt(currIndex - 1);
-        }
-    }
-    public void SelectRandomBeatmapSet()
-    {
-        if (FilteredBeatmapSets != null || FilteredBeatmapSets.Count != 0)
-            SelectedBeatmapSet = FilteredBeatmapSets.ElementAt(Random.Shared.Next(0, FilteredBeatmapSets.Count));
-    }
-    public void SelectBeatmapSet(BeatmapSet bs = null)
-    {
-        if (bs is not null)
-            SelectedBeatmapSet = bs;
-        else
-            SelectRandomBeatmapSet();
-    }
-
-
-
     private void UpdateFavoriteBeatmapSets(bool isAdded)
     {
         if (isAdded)
@@ -233,14 +300,12 @@ public class BeatmapDataService
             FavoriteBeatmapManager.Remove(SelectedBeatmapSet.Id);
         }
     }
-    private void SelectBeatmap()
+    private void SelectBeatmap(Beatmap b = null)
     {
-        SelectedBeatmap = SelectedBeatmapSet.Beatmaps.First();
-    }
-    private void UpdateFilteredBeatmapSets(List<BeatmapSet> updatedFiltered)
-    {
-        FilteredBeatmapSets.Clear();
-        FilteredBeatmapSets.AddRange(updatedFiltered);
+        if (b is not null)
+            SelectedBeatmap = b;
+        else
+            SelectedBeatmap = SelectedBeatmapSet.Beatmaps.First();
     }
     private void UpdateCollection(ObservableCollection<BeatmapSet> target, IEnumerable<BeatmapSet> source)
     {

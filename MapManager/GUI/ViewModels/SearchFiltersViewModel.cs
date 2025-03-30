@@ -8,6 +8,14 @@ using System.Linq;
 namespace MapManager.GUI.ViewModels;
 public class SearchFiltersViewModel : ViewModelBase
 {
+    BeatmapDataService _beatmapDataService;
+
+    public SearchFiltersViewModel(BeatmapDataService beatmapDataService)
+    {
+        _beatmapDataService = beatmapDataService;
+    }
+
+
     public List<RankedStatus> TargetRankedStatusesList =>
         Enum.GetValues(typeof(RankedStatus)).Cast<RankedStatus>().ToList();
 
@@ -210,12 +218,8 @@ public class SearchFiltersViewModel : ViewModelBase
         }
     }
 
-    BeatmapDataService _beatmapDataService;
-
-    public SearchFiltersViewModel()
-    {
-    }
+    
 
     private void OnFiltersChanged() => 
-        _beatmapDataService.FilterBeatmapSets();
+        _beatmapDataService.Search();
 }

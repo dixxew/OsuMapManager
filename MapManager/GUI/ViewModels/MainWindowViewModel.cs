@@ -75,9 +75,4 @@ public class MainWindowViewModel : ViewModelBase
         }
     }
 
-
-    public void OpenBeatmapInOsu()
-        => _auxiliaryService.OpenBeatmapInOsu();
-
-
 }

@@ -8,15 +8,21 @@ using System.Threading.Tasks;
 namespace MapManager.GUI.Services;
 public class AuxiliaryService
 {
-public void OpenBeatmapInOsu()
+    private readonly SettingsService _settingsService;
+
+    public AuxiliaryService(SettingsService settingsService)
     {
-    throw new NotImplementedException();
-        //var processStartInfo = new ProcessStartInfo
-        //{
-        //    FileName = $"{_settingsVM.OsuDirPath}\\osu!.exe",
-        //    Arguments = $"\"osu://b/{SelectedBeatmap.BeatmapId}\"",
-        //    UseShellExecute = false
-        //};
-        //Process.Start(processStartInfo);
+        _settingsService = settingsService;
+    }
+
+    public void OpenBeatmapInOsu(int beatmapId)
+    {
+        var processStartInfo = new ProcessStartInfo
+        {
+            FileName = $"{_settingsService.OsuDirPath}\\osu!.exe",
+            Arguments = $"\"osu://b/{beatmapId}\"",
+            UseShellExecute = false
+        };
+        Process.Start(processStartInfo);
     }
 }

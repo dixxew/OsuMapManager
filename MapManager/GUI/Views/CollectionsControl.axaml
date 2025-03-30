@@ -11,13 +11,18 @@
 	<UserControl.DataContext>
 		<Binding Path="CollectionsViewModel" Source="{StaticResource Locator}" />
 	</UserControl.DataContext>
-	<TreeView Grid.Row="1" ItemsSource="{Binding Collections}">
+	<UserControl.Styles>
+		<Style Selector="TextBlock">
+			<Setter Property="FontSize" Value="18" />
+		</Style>
+	</UserControl.Styles>
+	<TreeView Grid.Row="1" ItemsSource="{Binding Collections}" SelectedItem="{Binding SelectedTreeViewCollection}" SelectionMode="Single">
 		<TreeView.DataTemplates>
 			<TreeDataTemplate DataType="model:Collection" ItemsSource="{Binding Beatmaps}">
-				<TextBlock Text="{Binding Name}" />
+				<TextBlock HorizontalAlignment="Stretch" Text="{Binding Name}" />
 			</TreeDataTemplate>
 			<DataTemplate DataType="model:Beatmap">
-				<TextBlock>
+				<TextBlock Width="{Binding $parent.Bounds.Width, Converter={StaticResource TreeViewWidthByParentConveter}}" Margin="-26,0,0,0">
 					<Run Text="{Binding Artist}" />
 					<Run Text=" - " />
 					<Run Text="{Binding Title}" />

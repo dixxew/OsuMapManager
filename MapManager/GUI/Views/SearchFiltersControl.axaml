@@ -35,14 +35,14 @@
                 </StackPanel.Styles>
                 <sukiUi:GlassCard>
                     <StackPanel Orientation="Vertical" Spacing="4">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="MaxDuration" />
-                            <MaskedTextBox Mask="00:00" Text="{Binding MaxDuration}" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="MinDuration" />
-                            <MaskedTextBox Mask="00:00" Text="{Binding MinDuration}" />
-                        </StackPanel>
+						<StackPanel Orientation="Horizontal">
+							<TextBlock Text="MaxDuration" />
+							<MaskedTextBox Mask="00:00" Text="{Binding MaxDuration, Converter={StaticResource TimeSpanToStringConverter}}" />
+						</StackPanel>
+						<StackPanel Orientation="Horizontal">
+							<TextBlock Text="MinDuration" />
+							<MaskedTextBox Mask="00:00" Text="{Binding MinDuration, Converter={StaticResource TimeSpanToStringConverter}}" />
+						</StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <StackPanel VerticalAlignment="Center" Orientation="Vertical">
                                 <TextBlock

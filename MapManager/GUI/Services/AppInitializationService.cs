@@ -31,7 +31,7 @@ public class AppInitializationService : IHostedService
         _beatmapDataService.LoadFavoriteBeatmaps();
         await Dispatcher.UIThread.InvokeAsync(() =>
         {
-            _beatmapDataService.PerformSearch("", false);
+            _beatmapDataService.Search();
         });
     }
 
@@ -46,18 +46,22 @@ public class AppInitializationService : IHostedService
         return _rankingService.GetAllLocalScores();
     }
 
-    private void LoadCollections()
+    private async Task LoadCollections()
     {
-        var collections = OsuDataReader.GeCollectionsList();
-        _beatmapDataService.Collections.AddRange(collections.Select(c => new Models.Collection
+        var collectionList = OsuDataReader.GeCollectionsList();
+        var collections = collectionList.Select(c => new Models.Collection
         {
             Beatmaps = new(_beatmapDataService.BeatmapSets
-                .SelectMany(bs => bs.Beatmaps)
-                .Where(b => c.MD5Hashes.Contains(b.MD5Hash))
-                .ToList()),
+                    .SelectMany(bs => bs.Beatmaps)
+                    .Where(b => c.MD5Hashes.Contains(b.MD5Hash))
+                    .ToList()),
             Name = c.Name,
             Count = c.Count
-        }).ToList());
+        }).ToList();
+        await Dispatcher.UIThread.InvokeAsync(() =>
+        {
+            _beatmapDataService.Collections.AddRange(collections);
+        });
     }
 
     private async Task LoadBeatmaps(List<Tuple<string, List<OsuParsers.Database.Objects.Score>>> scores)

@@ -16,8 +16,9 @@ public class BeatmapInfoViewModel : ViewModelBase
 
     private readonly BeatmapDataService _beatmapDataService;
     private readonly BeatmapService _beatmapService;
+    private readonly AuxiliaryService _auxiliaryService;
 
-    public BeatmapInfoViewModel(BeatmapDataService beatmapDataService, BeatmapService beatmapService)
+    public BeatmapInfoViewModel(BeatmapDataService beatmapDataService, BeatmapService beatmapService, AuxiliaryService auxiliaryService)
     {
         _beatmapDataService = beatmapDataService;
         _beatmapService = beatmapService;
@@ -25,6 +26,7 @@ public class BeatmapInfoViewModel : ViewModelBase
 
         _beatmapDataService.OnSelectedBeatmapSetChanged += OnSelectedBeatmapSetChanged;
         _beatmapDataService.OnSelectedBeatmapChanged += OnSelectedBeatmapChanged;
+        _auxiliaryService = auxiliaryService;
     }
 
 
@@ -35,8 +37,9 @@ public class BeatmapInfoViewModel : ViewModelBase
         get => _beatmapDataService.SelectedBeatmap;
         set
         {
+            if (value is null)
+                return;
             _beatmapDataService.SelectedBeatmap = value;
-            this.RaisePropertyChanged();
         }
     }
 
@@ -62,6 +65,15 @@ public class BeatmapInfoViewModel : ViewModelBase
                 this.RaisePropertyChanged(nameof(SelectedBeatmapCollectionsCount));
         }
     }
+
+
+    public void OpenBeatmapInOsu()
+    {
+        _auxiliaryService.OpenBeatmapInOsu(SelectedBeatmap.BeatmapId);
+    }
+
+
+
 
     private void SelectedBeatmapSetChanged()
     {

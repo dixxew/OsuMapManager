@@ -34,7 +34,7 @@ public class AudioPlayerService
 
 
     private IWavePlayer _wavePlayer;
-    private AudioFileReader _audioFileReader;
+    private WaveStream _waveStream;
     private SoundTouchWaveProvider _soundTouchProvider;
     private float _playbackRate = 1.0f;
     private float _volume = 0.05f;
@@ -42,9 +42,9 @@ public class AudioPlayerService
     private bool _isRandomEnabled = false;
     private bool _isFavorite;
 
-    public double SongProgress => _audioFileReader?.CurrentTime.TotalSeconds ?? 0;
-    public double SongDuration => _audioFileReader?.TotalTime.TotalSeconds ?? 0;
-    public bool HasFile => _audioFileReader != null;
+    public double SongProgress => _waveStream?.CurrentTime.TotalSeconds ?? 0;
+    public double SongDuration => _waveStream?.TotalTime.TotalSeconds ?? 0;
+    public bool HasFile => _waveStream != null;
     public float Volume
     {
         get => _volume;
@@ -81,20 +81,25 @@ public class AudioPlayerService
     {
         var audioFilePath = Path.Combine(_settingsService.OsuDirPath, "Songs", beatmapSet.FolderName,
             beatmapSet.Beatmaps.First(b => b.BeatmapId == selectedBeatmapId).AudioFileName);
-        if (!audioFilePath.Contains(".ogg"))
-        {
-            Play(audioFilePath);
-        }
+
+        Play(audioFilePath);
+        _isFavorite = beatmapSet.IsFavorite;
         SongChanged(beatmapSet.IsFavorite, SongDuration, true);
     }
     public void Play(string filePath)
     {
         Stop();
         _progressTimer.Start();
-
         _wavePlayer = new WaveOutEvent();
-        _audioFileReader = new AudioFileReader(filePath);
-        _soundTouchProvider = new SoundTouchWaveProvider(_audioFileReader.ToWaveProvider())
+
+        IWaveProvider waveProvider;
+        if (filePath.EndsWith(".ogg", StringComparison.OrdinalIgnoreCase))
+            _waveStream = new NAudio.Vorbis.VorbisWaveReader(filePath);
+        else
+            _waveStream = new AudioFileReader(filePath);
+
+
+        _soundTouchProvider = new SoundTouchWaveProvider(_waveStream)
         {
             Tempo = _playbackRate
         };
@@ -103,6 +108,7 @@ public class AudioPlayerService
         _wavePlayer.Play();
         _wavePlayer.PlaybackStopped += PlaybackStopped;
     }
+
 
 
 
@@ -119,14 +125,14 @@ public class AudioPlayerService
         }
         _progressTimer.Stop();
         _wavePlayer?.Stop();
-        _audioFileReader?.Dispose();
-        _audioFileReader = null;
+        _waveStream?.Dispose();
+        _waveStream = null;
         _wavePlayer?.Dispose();
         _wavePlayer = null;
     }
     public void SetSongProgress(double positionInSeconds)
     {
-        _audioFileReader.CurrentTime = TimeSpan.FromSeconds(positionInSeconds);
+        _waveStream.CurrentTime = TimeSpan.FromSeconds(positionInSeconds);
     }
     public void SetPlaybackRate(float rate)
     {
@@ -143,7 +149,7 @@ public class AudioPlayerService
             _beatmapDataService.SelectPrevBeatmapSet();
         else
         {
-            _beatmapDataService.SelectBeatmapSet(RandomBeatmapsHistory.Pop());
+            _beatmapDataService.SelectBeatmapSetAndBeatmap(RandomBeatmapsHistory.Pop());
         }
     }
     public void PlayNext()

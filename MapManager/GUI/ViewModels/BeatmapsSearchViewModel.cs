@@ -1,4 +1,5 @@
-﻿using MapManager.GUI.Services;
+﻿using MapManager.GUI.Models.Enums;
+using MapManager.GUI.Services;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
@@ -16,30 +17,37 @@ public class BeatmapsSearchViewModel : ViewModelBase
         _beatmapDataService = beatmapDataService;
     }
 
-    private string _searchBeatmapSetText;
-    public string SearchBeatmapSetText
+    private BeatmapsSearchModeEnum _searchMode;
+    public BeatmapsSearchModeEnum SearchMode
     {
-        get => _searchBeatmapSetText;
+        get => _beatmapDataService.SearchMode;
         set
         {
-            this.RaiseAndSetIfChanged(ref _searchBeatmapSetText, value);
-            PerformSearch();
+            _beatmapDataService.SearchMode = value;
+            this.RaisePropertyChanged();
         }
     }
 
-    private bool _isShowOnlyFavorites;
-    public bool IsShowOnlyFavorites
+
+    public string SearchBeatmapSetText
     {
-        get => _isShowOnlyFavorites;
+        get => _beatmapDataService.QueryText;
         set
         {
-            this.RaiseAndSetIfChanged(ref _isShowOnlyFavorites, value);
-            PerformSearch();
+            _beatmapDataService.QueryText = value;
+            this.RaisePropertyChanged();
+        }
+    }
+
+    public bool IsShowOnlyFavorites
+    {
+        get => _beatmapDataService.IsOnlyFavorite;
+        set
+        {
+            _beatmapDataService.IsOnlyFavorite = value;
+            this.RaisePropertyChanged();
         }
     }
 
     public long BeatmapsCount { get; set; } = 0;
-
-    private void PerformSearch()
-        => _beatmapDataService.PerformSearch(SearchBeatmapSetText, IsShowOnlyFavorites);
 }

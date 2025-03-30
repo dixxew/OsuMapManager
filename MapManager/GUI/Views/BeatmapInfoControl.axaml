@@ -22,20 +22,18 @@
 		<sukiUi:GlassCard Grid.Row="1" Margin="4">
 			<Grid MinHeight="160" RowDefinitions="auto, *">
 				<Border
-					Padding="2,0"
+					Padding="0,0,0,4"
 					BorderBrush="Gray"
 					BorderThickness="0,0,0,1">
 					<Grid>
-						<StackPanel Orientation="Horizontal">
+						<StackPanel Margin="0,-6,0,0" Orientation="Vertical">
+							<TextBlock Text="{Binding SelectedBeatmapSet.Artist}" />
 							<TextBlock
 								VerticalAlignment="Center"
 								FontSize="26"
 								FontWeight="600"
-								Foreground="White">
-								<Run Text="{Binding SelectedBeatmapSet.Artist}" />
-								<Run Text=" - " />
-								<Run Text="{Binding SelectedBeatmapSet.Title}" />
-							</TextBlock>
+								Foreground="White"
+								Text="{Binding SelectedBeatmapSet.Title}" />
 						</StackPanel>
 						<StackPanel
 							HorizontalAlignment="Right"
@@ -46,8 +44,11 @@
 								FontSize="16"
 								FontWeight="600"
 								Text="{Binding SelectedBeatmap.Creator}" />
-							<ComboBox ItemsSource="{Binding SelectedBeatmapSet.Beatmaps}" SelectedItem="{Binding SelectedBeatmap, Mode=TwoWay}">
-								<ComboBox.ItemTemplate>
+							<ComboBox
+								Margin="0,0,-4,0"
+								ItemsSource="{Binding SelectedBeatmapSet.Beatmaps}"
+								SelectedItem="{Binding SelectedBeatmap, Mode=TwoWay}">
+								<ComboBox.ItemTemplate>	
 									<DataTemplate>
 										<TextBlock Text="{Binding Difficulty}" />
 									</DataTemplate>
@@ -134,6 +135,7 @@
 							Classes="Basic"
 							Command="{Binding OpenBeatmapInOsu}"
 							Content="Open in osu!" />
+						<Button Classes="Basic" Content="Look similar" />
 					</StackPanel>
 
 					<ScrollViewer
