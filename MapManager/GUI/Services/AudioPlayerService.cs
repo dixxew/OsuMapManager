@@ -173,8 +173,17 @@ public class AudioPlayerService
     private void PlaybackStopped(object? sender, StoppedEventArgs e)
     {
         if (e.Exception is null)
-            PlayNext();
+            if (IsRepeatEnabled)
+                Repeat();
+            else
+                PlayNext();
     }
+    private void Repeat()
+    {
+        _waveStream.Position = 0;
+        _wavePlayer.Play();
+    }
+
     private void OnSelectedBeatmapChanged()
     {
         SetSongAndPlay(_beatmapDataService.SelectedBeatmapSet, _beatmapDataService.SelectedBeatmap.BeatmapId);
