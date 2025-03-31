@@ -1,9 +1,5 @@
-﻿using AutoMapper;
-using MapManager.GUI.Models;
-using MapManager.GUI.Services;
-using MapManager.OSU;
+﻿using MapManager.GUI.Services;
 using ReactiveUI;
-using System.Collections.ObjectModel;
 
 namespace MapManager.GUI.ViewModels;
 
@@ -62,17 +58,6 @@ public class MainWindowViewModel : ViewModelBase
 
     private async void UpdateRightTab()
     {
-        switch (SelectedRightTabIndex)
-        {
-            case 0: //LocalRanks
-                break;
-            case 1: //GlobalRanks
-
-                break;
-            case 2: //MapComments
-
-                break;
-        }
     }
 
 }

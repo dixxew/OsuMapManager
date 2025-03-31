@@ -1,11 +1,13 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using Avalonia.Media;
 using MapManager.GUI.ViewModels;
 using MapManager.GUI.Views;
-using MapManager.OSU;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SukiUI.Models;
+using SukiUI;
 using System;
 using System.Threading;
 
@@ -26,18 +28,6 @@ namespace MapManager.GUI
 
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
-                var settingsViewModel = AppHost.Services.GetRequiredService<SettingsViewModel>();
-
-                //settingsViewModel.OnSettingsChanged += () =>
-                //{
-                //    var appSettings = AppHost.Services.GetRequiredService<AppSettings>();
-                //    // Services that need runtime settings changing (Should implement UpdateSettings(AppSettings settings))
-                //    var osuService = AppHost.Services.GetRequiredService<OsuService>();
-
-                //    //Add here services for runtime settings changing
-                //    osuService.UpdateSettings(appSettings);
-                //};
-                settingsViewModel.InitSettings();
                 var mainWindowVM = AppHost.Services.GetRequiredService<MainWindowViewModel>();
                 desktop.MainWindow = new MainWindow
                 {
@@ -49,6 +39,10 @@ namespace MapManager.GUI
                 AppHost.Run();
             });
             base.OnFrameworkInitializationCompleted();
+
+            var PurpleTheme = new SukiColorTheme("Purple", Colors.MediumPurple, Colors.DarkBlue);
+            SukiTheme.GetInstance().AddColorTheme(PurpleTheme);
+            SukiTheme.GetInstance().ChangeColorTheme(PurpleTheme);
         }
 
     }

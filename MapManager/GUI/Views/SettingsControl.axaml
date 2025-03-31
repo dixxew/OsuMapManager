@@ -14,15 +14,15 @@
 	</UserControl.DataContext>
 	<Grid>
 		<ScrollViewer>
-			<Grid ColumnDefinitions="*, 8,*">
-				<Grid.Styles>
+			<StackPanel Spacing="9">
+				<StackPanel.Styles>
 					<Style Selector="TextBlock">
 						<Setter Property="FontSize" Value="18" />
 						<Setter Property="VerticalAlignment" Value="Center" />
 						<Setter Property="FontWeight" Value="550" />
 					</Style>
-				</Grid.Styles>
-				<sukiUi:GlassCard Grid.Column="0">
+				</StackPanel.Styles>
+				<sukiUi:GlassCard>
 					<StackPanel FlowDirection="LeftToRight" Orientation="Horizontal">
 						<TextBlock Text="Osu path:" />
 						<TextBox
@@ -31,7 +31,7 @@
 							Watermark="D:\osu!" />
 					</StackPanel>
 				</sukiUi:GlassCard>
-				<sukiUi:GlassCard Grid.Column="2">
+				<sukiUi:GlassCard>
 					<StackPanel FlowDirection="LeftToRight" Orientation="Horizontal">
 						<TextBlock Text="Osu api key:" />
 						<TextBox
@@ -45,7 +45,7 @@
 						<Button
 							Margin="8,5"
 							Classes="Standard Icon"
-							Command="{Binding GoGetOsuApiKey}">
+							Command="{Binding OpenWebPageOsuApiKey}">
 							<StackPanel Orientation="Horizontal">
 								<TextBlock Text="Get" />
 								<iconPacks:PackIconForkAwesome
@@ -56,7 +56,28 @@
 						</Button>
 					</StackPanel>
 				</sukiUi:GlassCard>
-			</Grid>
+				<sukiUi:GlassCard>
+					<ItemsControl ItemsSource="{Binding ThemeColors}" Margin="-6">
+						<ItemsControl.ItemsPanel>
+							<ItemsPanelTemplate>
+								<WrapPanel Orientation="Horizontal" />
+							</ItemsPanelTemplate>
+						</ItemsControl.ItemsPanel>
+						<ItemsControl.ItemTemplate>
+							<DataTemplate>
+								<Button
+									Width="24"
+									Height="24"
+									Margin="2 0"
+									Background="{Binding Converter={StaticResource ColorToBrushConverter}}"
+									Command="{Binding $parent[UserControl].DataContext.SetThemeColor}"
+									CommandParameter="{Binding}" />
+							</DataTemplate>
+						</ItemsControl.ItemTemplate>
+					</ItemsControl>
+
+				</sukiUi:GlassCard>
+			</StackPanel>
 		</ScrollViewer>
 	</Grid>
 </UserControl>

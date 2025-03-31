@@ -8,7 +8,7 @@ public static class AppSettingsManager
 {
     private static readonly string SettingsFilePath = "appsettings.json";
 
-    public static async Task<AppSettings> LoadSettingsAsync()
+    public static AppSettings LoadSettingsAsync()
     {
         if (File.Exists(SettingsFilePath))
         {

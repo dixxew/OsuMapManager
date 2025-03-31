@@ -12,21 +12,52 @@ public class SettingsService
     public SettingsService(AppSettings appSettings)
     {
         _appSettings = appSettings;
+
+        OsuClientId = _appSettings.OsuClientId.ToString();
+        OsuClientSecret = _appSettings.OsuClientSecret;
+        OsuDirPath = _appSettings.OsuDirectory;
     }
 
-    public string? OsuClientSecret => _appSettings.OsuClientSecret;
-    public string? OsuClientId => _appSettings.OsuClientId.ToString();
-    public string? OsuDirPath => _appSettings.OsuDirectory;
 
-    public void UpdateSettings(string? clientId, string? clientSecret, string? dirPath)
+    public string? OsuClientSecret
     {
-        _appSettings.OsuClientId = int.TryParse(clientId, out int value) ? value : 0;
-        _appSettings.OsuClientSecret = clientSecret;
-        _appSettings.OsuDirectory = dirPath;
-        SaveAsync();
+        get => _appSettings.OsuClientSecret;
+        set
+        {
+            _appSettings.OsuClientSecret = value;
+            OsuApiSettingsChanged();
+        }
+    }
+    public string? OsuClientId
+    {
+        get => _appSettings.OsuClientId.ToString();
+        set
+        {
+            _appSettings.OsuClientId = long.TryParse(value, out var parsed) ? parsed : _appSettings.OsuClientId;
+            OsuApiSettingsChanged();
+        }
+    }
+    public string? OsuDirPath
+    {
+        get => _appSettings.OsuDirectory;
+        set
+        {
+            _appSettings.OsuDirectory = value;
+        }
     }
 
-    public void GoGetOsuApiKey()
+    public async Task UpdateSettings(string propName, object? value)
+    {
+        var property = typeof(SettingsService).GetProperty(propName);
+        if (property is null || !property.CanWrite) return;
+
+        var convertedValue = Convert.ChangeType(value, property.PropertyType);
+        property.SetValue(this, convertedValue);
+
+        await SaveAsync();
+    }
+
+    public void OpenWebPageOsuApiKey()
     {
         try
         {
@@ -46,5 +77,11 @@ public class SettingsService
     private async Task SaveAsync()
     {
         await AppSettingsManager.SaveSettingsAsync(_appSettings);
+    }
+
+    public Action OnOsuApiSettingsChanged;
+    private void OsuApiSettingsChanged()
+    {
+        OnOsuApiSettingsChanged?.Invoke();
     }
 }

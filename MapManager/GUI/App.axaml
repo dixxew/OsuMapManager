@@ -19,12 +19,12 @@
 		<StyleInclude Source="avares://IconPacks.Avalonia.ForkAwesome/ForkAwesome.axaml" />
 	</Application.Styles>
 
-
 	<Application.Resources>
 		<converters:BoolConverter x:Key="BoolConverter" />
 		<converters:TreeViewWidthByParentConveter x:Key="TreeViewWidthByParentConveter" />
 		<converters:BeatmapsSearchModeToBoolConverter x:Key="BeatmapsSearchModeToBoolConverter" />
-		<converters:TimeSpanToStringConverter x:Key="TimeSpanToStringConverter"/>
+		<converters:TimeSpanToStringConverter x:Key="TimeSpanToStringConverter" />
+		<converters:ColorToBrushConverter x:Key="ColorToBrushConverter" />
 		<vm:ViewModelLocator x:Key="Locator" />
 	</Application.Resources>
 </Application>

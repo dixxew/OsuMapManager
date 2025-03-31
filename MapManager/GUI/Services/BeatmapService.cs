@@ -1,10 +1,7 @@
-﻿using System;
+﻿using Avalonia.Media.Imaging;
+using MapManager.GUI.Models;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Threading.Tasks;
-using Avalonia.Media.Imaging;
-using MapManager.GUI.Models;
-using MapManager.OSU;
 
 namespace MapManager.GUI.Services;
 

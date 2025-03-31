@@ -1,19 +1,16 @@
-﻿using Avalonia;
+﻿using AutoMapper;
+using Avalonia;
 using Avalonia.ReactiveUI;
 using MapManager.GUI;
+using MapManager.GUI.Services;
+using MapManager.GUI.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
-using OsuSharp.Exceptions;
-using OsuSharp.Extensions;
 using OsuSharp;
-using MapManager.OSU;
+using OsuSharp.Extensions;
 using OsuSharp.Legacy;
-using MapManager.GUI.ViewModels;
+using System;
 using System.Net.Http;
-using AutoMapper;
-using MapManager.GUI.Services;
-using System.Threading;
 
 namespace MapManager
 {
@@ -41,20 +38,20 @@ namespace MapManager
 
         public static IHost BuildHost(string[] args)
         {
-            var appSettings = AppSettingsManager.LoadSettingsAsync().GetAwaiter().GetResult();
+            var appSettings = AppSettingsManager.LoadSettingsAsync();
 
             return Host.CreateDefaultBuilder(args)
                 .ConfigureOsuSharp((ctx, options) => options.Configuration = new OsuClientConfiguration
                 {
-                    ClientId = 36783,
-                    ClientSecret = "XnR2bWHI4f3qEeCN0jsAdMA54jixORj40s7x43Rd"
+                    ClientId = 0,
+                    ClientSecret = ""
                 })
                 .ConfigureServices((context, services) =>
                 {
 
                     services.AddSingleton(appSettings);
 
-                    services.AddSingleton<OsuService>();
+                    services.AddSingleton<OsuApiService>();
                     services.AddSingleton<SettingsService>();
                     services.AddSingleton<AppInitializationService>();
                     services.AddSingleton<AuxiliaryService>();
@@ -85,11 +82,8 @@ namespace MapManager
                             ApiKey = "c9f024e60c2551bea39b507163405098ed8fbd85"
                         }));
                     services.AddScoped<HttpClient>();
-                    services.AddScoped<Mapper>(provider =>
-                    {
-                        var configuration = new MapperConfig().MapperConfiguration;
-                        return new Mapper(configuration);
-                    });
+                    services.AddAutoMapper(typeof(MappingProfile));
+
 
                     services.AddSingleton<MainWindowViewModel>();
                 })

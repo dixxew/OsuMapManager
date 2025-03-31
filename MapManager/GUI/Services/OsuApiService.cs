@@ -1,51 +1,39 @@
-﻿using OsuSharp.Domain;
-using OsuSharp;
+﻿using OsuSharp;
+using OsuSharp.Domain;
+using OsuSharp.Interfaces;
+using OsuSharp.Legacy;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using OsuSharp.Interfaces;
-using System.IO;
-using System.Threading;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using OsuSharp.Exceptions;
-using OsuSharp.JsonModels;
-using System.Collections.Concurrent;
-using System.Collections;
-using System.Net.Http.Headers;
-using System.Net.Http;
-using System.Net;
-using System.Reflection;
-using OsuSharp.Legacy;
 
-namespace MapManager.OSU;
-public class OsuService
+namespace MapManager.GUI.Services;
+public class OsuApiService
 {
     private readonly IOsuClient _client;
     private readonly LegacyOsuClient _legacyClient;
-    private readonly AppSettings _appSettings;
+    private readonly SettingsService _settingsService;
 
-    public OsuService(IOsuClient client, LegacyOsuClient legacyClient, AppSettings appSettings)
+    public OsuApiService(IOsuClient client, LegacyOsuClient legacyClient, SettingsService settingsService)
     {
         _client = client;
         _legacyClient = legacyClient;
-        _appSettings = appSettings;
-        ApplySettings();
+        _settingsService = settingsService;
+        _settingsService.OnOsuApiSettingsChanged += OnOsuApiSettingsChanged;
+        UpdateClientSettings();
     }
 
-    private void ApplySettings()
+    private void OnOsuApiSettingsChanged()
     {
-        _client.Configuration.ClientId = _appSettings.OsuClientId;
-        _client.Configuration.ClientSecret = _appSettings.OsuClientSecret;
+        UpdateClientSettings();
     }
-    public void UpdateSettings(AppSettings updatedSettings)
+
+    private void UpdateClientSettings()
     {
-        // Set new settings
-        _appSettings.OsuClientId = updatedSettings.OsuClientId;
-        _appSettings.OsuClientSecret = updatedSettings.OsuClientSecret;
-        ApplySettings();
+        
+        _client.Configuration.ClientSecret = _settingsService.OsuClientSecret ?? "";
+        _client.Configuration.ClientId = long.TryParse(_settingsService.OsuClientId, out var osuClientId) 
+            ? osuClientId 
+            : _client.Configuration.ClientId;
     }
 
     public async IAsyncEnumerable<IBeatmapset> GetLastRankedBeatmapsetsAsync(int count)
@@ -61,9 +49,7 @@ public class OsuService
 
             count--;
             if (count == 0)
-            {
                 break;
-            }
         }
     }
     public async Task<IBeatmap> GetBeatmapByIdAsync(long id)
@@ -72,7 +58,8 @@ public class OsuService
     }
     public async Task<IBeatmapScores> GetBeatmapScoresByIdAsync(long id)
     {
-            return await _client.GetBeatmapScoresAsync(id, gameMode: GameMode.Osu);        
+        var scores = await _client.GetBeatmapScoresAsync(id, gameMode: GameMode.Osu);
+        return scores;
     }
 
 

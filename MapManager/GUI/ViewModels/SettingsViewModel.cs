@@ -3,17 +3,18 @@ using System.Diagnostics;
 using System;
 using System.Threading.Tasks;
 using MapManager.GUI.Services;
+using System.Collections.Generic;
+using Avalonia.Media;
+using SukiUI.Models;
+using SukiUI;
+using System.Linq;
 
 namespace MapManager.GUI.ViewModels;
 
-public class SettingsViewModel : ReactiveObject
+public class SettingsViewModel : ViewModelBase
 {
     private readonly SettingsService _settingsService;
-    private bool _isInitialized;
 
-    private string? _osuClientSecret;
-    private string? _osuClientId;
-    private string? _osuDirPath;
 
     public SettingsViewModel(SettingsService settingsService)
     {
@@ -23,8 +24,44 @@ public class SettingsViewModel : ReactiveObject
         OsuClientId = _settingsService.OsuClientId;
         OsuDirPath = _settingsService.OsuDirPath;
 
-        _isInitialized = true;
+        CreateThemes();
     }
+
+    
+
+    private string? _osuClientSecret;
+    private string? _osuClientId;
+    private string? _osuDirPath;
+
+    public List<Color> ThemeColors => new()
+    {
+        Colors.Bisque,
+        Colors.Cyan,
+        Colors.DarkGray,
+        Colors.DarkOliveGreen,
+        Colors.DarkOrchid,
+        Colors.DarkSlateGray,
+        Colors.DeepSkyBlue,
+        Colors.Firebrick,
+        Colors.GreenYellow,
+        Colors.IndianRed,
+        Colors.Khaki,
+        Colors.LightPink,
+        Colors.MediumAquamarine,
+        Colors.MediumPurple,
+        Colors.MediumSeaGreen,
+        Colors.MediumSlateBlue,
+        Colors.NavajoWhite,
+        Colors.PaleGoldenrod,
+        Colors.PeachPuff,
+        Colors.Salmon,
+        Colors.SeaGreen,
+        Colors.SkyBlue,
+        Colors.SlateBlue,
+        Colors.Wheat
+    };
+
+    private List<SukiColorTheme> Themes = new();
 
     public string? OsuClientSecret
     {
@@ -32,44 +69,50 @@ public class SettingsViewModel : ReactiveObject
         set
         {
             this.RaiseAndSetIfChanged(ref _osuClientSecret, value);
-            NotifySettingsChanged();
+            NotifySettingsChanged(nameof(OsuClientSecret), value);
         }
     }
-
     public string? OsuClientId
     {
         get => _osuClientId;
         set
         {
             this.RaiseAndSetIfChanged(ref _osuClientId, value);
-            NotifySettingsChanged();
+            NotifySettingsChanged(nameof(OsuClientId), value);
         }
     }
-
     public string? OsuDirPath
     {
         get => _osuDirPath;
         set
         {
             this.RaiseAndSetIfChanged(ref _osuDirPath, value);
-            NotifySettingsChanged();
+            NotifySettingsChanged(nameof(OsuDirPath), value);
         }
     }
 
-    public void GoGetOsuApiKey()
+    public void SetThemeColor(object color)
     {
-        _settingsService.GoGetOsuApiKey();
+        SukiTheme.GetInstance().ChangeColorTheme(Themes.Where(t => t.DisplayName == color.ToString()).First());
     }
 
-    public void InitSettings()
+    public void OpenWebPageOsuApiKey()
     {
-        NotifySettingsChanged();
+        _settingsService.OpenWebPageOsuApiKey();
     }
 
-    private void NotifySettingsChanged()
-    {
-        if (!_isInitialized) return;
 
-        _settingsService.UpdateSettings(OsuClientId, OsuClientSecret, OsuDirPath);
+    private void CreateThemes()
+    {
+        ThemeColors.ForEach(c =>
+        {
+            var theme = new SukiColorTheme(c.ToString(), c, Colors.DarkBlue);
+            Themes.Add(theme);
+            SukiTheme.GetInstance().AddColorTheme(theme);
+        });
+    }
+    private void NotifySettingsChanged(string propName, object? value)
+    {
+        Task.Run(() => _settingsService.UpdateSettings(propName, value));
     }
 }
