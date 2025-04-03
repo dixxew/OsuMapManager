@@ -19,7 +19,9 @@ public class LocalScoresViewModel : ViewModelBase
     private void OnSelectedBeatmapChanged()
     {
         this.RaisePropertyChanged(nameof(SelectedBeatmap));
+        this.RaisePropertyChanged(nameof(IsSelectedBeatmapScoresEmpty));
     }
 
     public Beatmap SelectedBeatmap => _beatmapDataService.SelectedBeatmap;
+    public bool IsSelectedBeatmapScoresEmpty => SelectedBeatmap.Scores is null || SelectedBeatmap.Scores.Count == 0;
 }

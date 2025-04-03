@@ -71,7 +71,11 @@ public class BeatmapInfoViewModel : ViewModelBase
     {
         _auxiliaryService.OpenBeatmapInOsu(SelectedBeatmap.BeatmapId);
     }
-
+    public void LookSimilar()
+    {
+        _beatmapDataService.SearchMode = Models.Enums.BeatmapsSearchModeEnum.SAME;
+        _beatmapDataService.Search();
+    }
 
 
 

@@ -75,6 +75,7 @@ namespace MapManager
                     services.AddSingleton<BeatmapInfoViewModel>();
                     services.AddSingleton<LocalScoresViewModel>();
                     services.AddSingleton<GlobalScoresViewModel>();
+                    services.AddSingleton<GreetingsViewModel>();
 
 
                     services.AddSingleton(_ => new LegacyOsuClient(new LegacyOsuSharpConfiguration

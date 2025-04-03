@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Avalonia.Controls.Primitives;
+using Avalonia.Threading;
 using DynamicData;
 using MapManager.GUI.Models;
 using MapManager.GUI.Services;
@@ -44,11 +45,20 @@ public class GlobalScoresViewModel : ViewModelBase
 
     public async Task LoadScores()
     {
+        IsGlobalRankingsLoadingVisible = true;
         if (SelectedBeatmap != null)
         {
             var scores = await _rankingService.GetGlobalRanksByBeatmapIdAsync(SelectedBeatmap.BeatmapId);
-            GlobalScores.AddRange(scores.Select(s => _mapper.Map<GlobalScore>(s)).ToList());
-            IsGlobalRankingsLoadingVisible = false;
+            for (int i = 0; i < scores.Count; i++)
+                scores[i].Index = i+1;
+
+
+            Dispatcher.UIThread.Post(() =>
+            {
+                GlobalScores.Clear();
+                GlobalScores.AddRange(scores);
+                IsGlobalRankingsLoadingVisible = false;
+            });
         }
     }
 

@@ -27,6 +27,7 @@ public class BeatmapDataService
     private bool _isOnlyfavorite;
     private string _queryText;
     private BeatmapsSearchModeEnum _searchMode;
+    private Beatmap? _referenceBeatmap = null;
 
     public string QueryText
     {
@@ -56,6 +57,23 @@ public class BeatmapDataService
             Search();
         }
     }
+
+    public Beatmap? ReferenceBeatmap
+    {
+        get => _referenceBeatmap;
+        set
+        {
+            _referenceBeatmap = value;
+            ReferenceBeatmapChanged();
+        }
+    }
+
+    public Action OnReferenceBeatmapChanged;
+    private void ReferenceBeatmapChanged()
+    {
+        OnReferenceBeatmapChanged?.Invoke();
+    }
+
     public Beatmap SelectedBeatmap
     {
         get => _selectedBeatmap;
@@ -91,11 +109,20 @@ public class BeatmapDataService
     {
         switch (SearchMode)
         {
-        case BeatmapsSearchModeEnum.QUERY:
+            case BeatmapsSearchModeEnum.QUERY:
+                ReferenceBeatmap = null;
                 PerformSearch(QueryText, IsOnlyFavorite);
+                FiltesChanged();
                 break;
-        case BeatmapsSearchModeEnum.FILTERS:
+            case BeatmapsSearchModeEnum.FILTERS:
+                ReferenceBeatmap = null;
                 FilterBeatmapSets();
+                FiltesChanged();
+                break;
+            case BeatmapsSearchModeEnum.SAME:
+                ReferenceBeatmap = SelectedBeatmap;
+                SearchSame();
+                FiltesChanged();
                 break;
         }
     }
@@ -210,6 +237,32 @@ public class BeatmapDataService
     }
 
 
+    private void SearchSame()
+    {
+        var currentTags = SelectedBeatmap.TagsList.ToHashSet();
+
+        IEnumerable<BeatmapSet> beatmapSets = IsOnlyFavorite ?
+            BeatmapSets.Where(set => FavoriteBeatmapSets.Contains(set.Id))
+            : BeatmapSets;
+
+
+        var matchedSets = beatmapSets
+            .Where(set => set.Beatmaps.Any(b => b != SelectedBeatmap)) // исключаем сеты с одной картой
+            .Select(set => new
+            {
+                Set = set,
+                MatchCount = set.Beatmaps
+                    .Where(b => b != SelectedBeatmap)
+                    .Max(b => b.TagsList.Count(tag => currentTags.Contains(tag)))
+            })
+            .Where(x => x.MatchCount > 0)
+            .OrderByDescending(x => x.MatchCount)
+            .Select(x => x.Set)
+            .ToList();
+
+        UpdateCollection(FilteredBeatmapSets, matchedSets);
+    }
+
 
     private void FilterBeatmapSets()
     {
@@ -319,7 +372,12 @@ public class BeatmapDataService
 
 
 
+    public Action OnFiltesChanged;
 
+    private void FiltesChanged()
+    {
+        OnFiltesChanged?.Invoke();
+    }
     public Action OnSelectedBeatmapSetChanged;
 
     private void SelectedBeatmapSetChanged()

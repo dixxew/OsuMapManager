@@ -1,4 +1,5 @@
-﻿using MapManager.GUI.Models.Enums;
+﻿using MapManager.GUI.Models;
+using MapManager.GUI.Models.Enums;
 using MapManager.GUI.Services;
 using ReactiveUI;
 using System;
@@ -15,9 +16,18 @@ public class BeatmapsSearchViewModel : ViewModelBase
     public BeatmapsSearchViewModel(BeatmapDataService beatmapDataService)
     {
         _beatmapDataService = beatmapDataService;
+        _beatmapDataService.OnFiltesChanged += OnFiltesChanged;
+        _beatmapDataService.OnReferenceBeatmapChanged += OnReferenceBeatmapChanged;
     }
 
     private BeatmapsSearchModeEnum _searchMode;
+
+
+
+    public Beatmap? ReferenceBeatmap => _beatmapDataService.ReferenceBeatmap;
+    public bool IsReferenceSearhcing => _beatmapDataService.ReferenceBeatmap is not null;
+
+
     public BeatmapsSearchModeEnum SearchMode
     {
         get => _beatmapDataService.SearchMode;
@@ -49,5 +59,20 @@ public class BeatmapsSearchViewModel : ViewModelBase
         }
     }
 
-    public long BeatmapsCount { get; set; } = 0;
+    public long BeatmapsCount => _beatmapDataService.FilteredBeatmapSets.SelectMany(bs => bs.Beatmaps).Count();
+
+
+
+
+    private void OnFiltesChanged()
+    {
+        this.RaisePropertyChanged(nameof(BeatmapsCount));
+    }
+    private void OnReferenceBeatmapChanged()
+    {
+        this.RaisePropertyChanged(nameof(ReferenceBeatmap));
+        this.RaisePropertyChanged(nameof(IsReferenceSearhcing));
+        this.RaisePropertyChanged(nameof(SearchMode));
+    }
+    
 }

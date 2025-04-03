@@ -8,5 +8,6 @@ namespace MapManager.GUI.Models.Enums;
 public enum BeatmapsSearchModeEnum
 {
     QUERY,
-    FILTERS
+    FILTERS,
+    SAME
 }

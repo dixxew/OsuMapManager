@@ -8,6 +8,14 @@ namespace MapManager.GUI.Models;
 
 public class GlobalScore : ReactiveObject
 {
+    private int _index; 
+    public int Index
+    {
+        get => _index;
+        set => this.RaiseAndSetIfChanged(ref _index, value);
+    }
+
+
     private long _id;
     public long Id
     {

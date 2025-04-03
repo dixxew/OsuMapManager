@@ -105,6 +105,7 @@ public class AudioPlayerService
         };
 
         _wavePlayer.Init(_soundTouchProvider);
+        _wavePlayer.Volume = Volume;
         _wavePlayer.Play();
         _wavePlayer.PlaybackStopped += PlaybackStopped;
     }

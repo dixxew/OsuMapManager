@@ -40,5 +40,7 @@ public class ViewModelLocator
 
     public GlobalScoresViewModel GlobalScoresViewModel =>
         App.AppHost.Services.GetRequiredService<GlobalScoresViewModel>();
+    public GreetingsViewModel GreetingsViewModel =>
+        App.AppHost.Services.GetRequiredService<GreetingsViewModel>();
 
 }

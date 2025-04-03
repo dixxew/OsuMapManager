@@ -1,6 +1,7 @@
 ﻿using MapManager.GUI.Models;
 using MapManager.GUI.Services;
 using ReactiveUI;
+using System;
 using System.Collections.ObjectModel;
 
 namespace MapManager.GUI.ViewModels;
@@ -27,5 +28,10 @@ public class BeatmapsViewModel : ViewModelBase
     public ObservableCollection<BeatmapSet> FilteredBeatmapSets => _beatmapDataService.FilteredBeatmapSets;
 
     private void OnSelectedBeatmapSetChanged()
-        => this.RaisePropertyChanged(nameof(SelectedBeatmapSet));
+    {
+        this.RaisePropertyChanged(nameof(SelectedBeatmapSet));
+        SelectedBeatmapSetChanged?.Invoke();
+    }
+
+    public Action SelectedBeatmapSetChanged;
 }

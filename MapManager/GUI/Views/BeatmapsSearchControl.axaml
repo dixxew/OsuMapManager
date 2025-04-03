@@ -15,15 +15,14 @@
 	<sukiUi:GlassCard Padding="12,6" Classes="Primary">
 		<StackPanel Orientation="Vertical">
 			<DockPanel>
-				<RadioButton Margin="0,0,-3,0" IsChecked="{Binding SearchMode, Converter={StaticResource BeatmapsSearchModeToBoolConverter}, ConverterParameter=QUERY}"/>
+				<RadioButton Margin="0,0,-3,0" IsChecked="{Binding SearchMode, Converter={StaticResource BeatmapsSearchModeToBoolConverter}, ConverterParameter=QUERY}" />
 				<TextBox
 					FlowDirection="LeftToRight"
 					Text="{Binding SearchBeatmapSetText}"
 					Watermark="Search, ex: 'Sotarks We Are' or use Filters" />
 			</DockPanel>
 			<StackPanel Orientation="Horizontal" Spacing="12">
-				<RadioButton Margin="0,0,-10,0" IsChecked="{Binding SearchMode, Converter={StaticResource BeatmapsSearchModeToBoolConverter}, ConverterParameter=FILTERS}"/>
-
+				<RadioButton Margin="0,0,-10,0" IsChecked="{Binding SearchMode, Converter={StaticResource BeatmapsSearchModeToBoolConverter}, ConverterParameter=FILTERS}" />
 				<DropDownButton
 					Padding="12,8"
 					Content="Filters"
@@ -60,6 +59,59 @@
 				</TextBlock>
 				<CheckBox Content="Only favorites" IsChecked="{Binding IsShowOnlyFavorites}" />
 			</StackPanel>
+			<Grid
+				Width="{Binding $parent.Bounds.Width}"
+				Margin="0,4"
+				ColumnDefinitions="Auto,*"
+				IsVisible="{Binding IsReferenceSearhcing}">
+				<RadioButton Margin="0,0,6,0" IsChecked="{Binding SearchMode, Converter={StaticResource BeatmapsSearchModeToBoolConverter}, ConverterParameter=SAME}" />
+				<Grid Grid.Column="1" ColumnDefinitions="auto, auto, *">
+					<TextBlock
+						Grid.Column="0"
+						Margin="0,0,6,0"
+						VerticalAlignment="Center"
+						FontWeight="600"
+						Text="Similar:" />
+					<StackPanel
+						Grid.Column="1"
+						Margin="0,0,6,0"
+						Orientation="Vertical">
+						<TextBlock Text="{Binding ReferenceBeatmap.Title}" />
+						<TextBlock FontSize="8" Text="{Binding ReferenceBeatmap.Artist}" />
+					</StackPanel>
+					<ScrollViewer
+						x:Name="TagScrollViewer"
+						Grid.Column="2"
+						VerticalAlignment="Center"
+						Background="Transparent"
+						Focusable="True"
+						HorizontalScrollBarVisibility="Hidden"
+						VerticalScrollBarVisibility="Disabled">
+						<ItemsControl ItemsSource="{Binding ReferenceBeatmap.TagsList}">
+							<ItemsControl.ItemsPanel>
+								<ItemsPanelTemplate>
+									<WrapPanel Orientation="Horizontal" />
+								</ItemsPanelTemplate>
+							</ItemsControl.ItemsPanel>
+							<ItemsControl.ItemTemplate>
+								<DataTemplate>
+									<Border
+										Margin="2,1"
+										Padding="6,2"
+										Background="#191435"
+										CornerRadius="8">
+										<TextBlock
+											FontSize="8"
+											Foreground="White"
+											Text="{Binding}" />
+									</Border>
+								</DataTemplate>
+							</ItemsControl.ItemTemplate>
+						</ItemsControl>
+					</ScrollViewer>
+				</Grid>
+			</Grid>
+
 		</StackPanel>
 	</sukiUi:GlassCard>
 </UserControl>

@@ -16,6 +16,7 @@
 	<ListBox
 		FontWeight="550"
 		Foreground="White"
+		x:Name="BeatmapsListBox"
 		ItemsSource="{Binding FilteredBeatmapSets}"
 		ScrollViewer.VerticalScrollBarVisibility="Hidden"
 		SelectedItem="{Binding SelectedBeatmapSet}">

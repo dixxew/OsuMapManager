@@ -138,7 +138,10 @@
 							Classes="Basic"
 							Command="{Binding OpenBeatmapInOsu}"
 							Content="Open in osu!" />
-						<Button Classes="Basic" Content="Look similar" />
+						<Button
+							Classes="Basic"
+							Command="{Binding LookSimilar}"
+							Content="Look similar" />
 					</StackPanel>
 
 					<ScrollViewer
