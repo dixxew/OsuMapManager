@@ -13,6 +13,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <AvaloniaResource Remove="GUI\Assets\Новая папка\**" />
+    <AvaloniaXaml Remove="GUI\Assets\Новая папка\**" />
+    <Compile Remove="GUI\Assets\Новая папка\**" />
+    <EmbeddedResource Remove="GUI\Assets\Новая папка\**" />
+    <None Remove="GUI\Assets\Новая папка\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AutoMapper" Version="13.0.1" />
     <PackageReference Include="Avalonia" Version="11.2.3" />
     <PackageReference Include="Avalonia.Desktop" Version="11.2.3" />
@@ -45,10 +53,6 @@
     <EditorConfigFiles Remove="C:\Users\ayrat\source\repos\MapManager\MapManager\.editorconfig" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Remove="GUI\Assets\defaultBg.jpg" />
-	</ItemGroup>
-
 	<ItemGroup>
     <None Include="C:\Users\ayrat\source\repos\MapManager\MapManager\.editorconfig" />
   </ItemGroup>
@@ -60,6 +64,13 @@
     <ProjectReference Include="..\OsuSharp-dev\src\OsuSharp.Legacy\OsuSharp.Legacy.csproj" />
     <ProjectReference Include="..\OsuSharp-dev\src\OsuSharp\OsuSharp.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+  <None Update="GUI\Assets\greetings\*">
+    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+  </None>
+</ItemGroup>
+
 
   <ItemGroup>
     <Compile Update="GUI\Views\BeatmapsControl.axaml.cs">

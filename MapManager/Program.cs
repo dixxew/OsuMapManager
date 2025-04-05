@@ -4,6 +4,7 @@ using Avalonia.ReactiveUI;
 using MapManager.GUI;
 using MapManager.GUI.Services;
 using MapManager.GUI.ViewModels;
+using MapManager.GUI.Views;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OsuSharp;
@@ -59,13 +60,25 @@ namespace MapManager
                     services.AddSingleton<RankingService>();
                     services.AddSingleton<BeatmapDataService>();
                     services.AddSingleton<BeatmapService>();
+                    services.AddSingleton<NavigationService>();
+                    services.AddSingleton<OsuDataReader>();
+
+                    services.AddSingleton<ViewLocator>(sp =>
+                    {
+                        var locator = new ViewLocator();
+
+                        locator.Register<GreetingsViewModel, GreetingsControl>();
+                        locator.Register<MainViewModel, MainControl>();
+
+                        return locator;
+                    });
 
 
 
                     services.AddHostedService<AppInitializationService>();
-
                     services.AddSingleton<SettingsViewModel>();
-                    services.AddSingleton<OsuDataReader>();
+
+                    services.AddSingleton<MainViewModel>();
                     services.AddSingleton<AudioPlayerViewModel>();
                     services.AddSingleton<SearchFiltersViewModel>();
                     services.AddSingleton<BeatmapsSearchViewModel>();

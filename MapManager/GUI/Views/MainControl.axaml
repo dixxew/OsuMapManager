@@ -1,0 +1,109 @@
+<UserControl
+	x:Class="MapManager.MainControl"
+	xmlns="https://github.com/avaloniaui"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:model="using:MapManager.GUI.Models"
+	xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+	xmlns:view="using:MapManager.GUI.Views"
+	xmlns:vm="using:MapManager.GUI.ViewModels"
+	d:DesignHeight="450"
+	d:DesignWidth="800"
+	mc:Ignorable="d">
+	<Grid>
+		<Grid ColumnDefinitions="2*, 8, 6*">
+			<Grid.Styles>
+				<Style Selector="Grid">
+					<Setter Property="Background" Value="Transparent" />
+				</Style>
+			</Grid.Styles>
+			<Image
+				Grid.ColumnSpan="3"
+				Opacity="0.27"
+				Source="{Binding MapBackground}"
+				Stretch="UniformToFill">
+				<Image.DataContext>
+					<Binding Path="BeatmapInfoViewModel" Source="{StaticResource Locator}" />
+				</Image.DataContext>
+				<Image.Effect>
+					<BlurEffect Radius="35" />
+				</Image.Effect>
+			</Image>
+
+			<Grid Background="#0fffffff">
+				<TabControl SelectedIndex="{Binding SelectedMainTab}">
+					<TabControl.Styles>
+						<Style Selector="TabItem">
+							<Setter Property="HeaderTemplate">
+								<Setter.Value>
+									<DataTemplate>
+										<TextBlock
+											Margin="8,0"
+											FontSize="18"
+											FontWeight="Bold"
+											Text="{Binding}" />
+									</DataTemplate>
+								</Setter.Value>
+							</Setter>
+						</Style>
+					</TabControl.Styles>
+					<TabItem Header="Maps">
+						<Grid RowDefinitions="auto, *">
+							<view:BeatmapsSearchControl />
+							<Grid Grid.Row="1">
+								<view:BeatmapsControl />
+							</Grid>
+						</Grid>
+					</TabItem>
+					<TabItem Header="Collections">
+						<Grid RowDefinitions="auto, *">
+							<view:CollectionsSearchControl />
+							<Grid Grid.Row="1">
+								<view:CollectionsControl />
+							</Grid>
+						</Grid>
+					</TabItem>
+				</TabControl>
+			</Grid>
+
+			<Grid Grid.Column="2">
+				<Grid
+					Grid.Row="1"
+					Margin="4"
+					RowDefinitions="*, auto">
+					<Grid Margin="4" ColumnDefinitions="7*,3*">
+						<view:BeatmapInfoControl />
+
+						<sukiUi:GlassCard Grid.Column="1" Margin="4">
+							<TabControl
+								Margin="0,0,0,-12"
+								SelectedIndex="{Binding SelectedRightTabIndex}"
+								TabStripPlacement="Bottom">
+								<TabItem Header="Local">
+									<view:LocalScoresControl />
+								</TabItem>
+								<TabItem Header="Global">
+									<view:GlobalScoresControl />
+								</TabItem>
+								<TabItem Header="Comments">
+
+									<TextBlock
+										HorizontalAlignment="Center"
+										VerticalAlignment="Center"
+										FontSize="50"
+										Foreground="LightGray"
+										Text="Not realized" />
+								</TabItem>
+							</TabControl>
+						</sukiUi:GlassCard>
+					</Grid>
+					<view:AudioPlayerControl
+						Grid.Row="1"
+						Margin="4"
+						VerticalAlignment="Bottom" />
+				</Grid>
+			</Grid>
+		</Grid>
+	</Grid>
+</UserControl>

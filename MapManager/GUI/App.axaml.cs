@@ -25,7 +25,6 @@ namespace MapManager.GUI
         public override void OnFrameworkInitializationCompleted()
         {
             AppHost = Program.BuildHost(Array.Empty<string>());
-
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
                 var mainWindowVM = AppHost.Services.GetRequiredService<MainWindowViewModel>();

@@ -2,26 +2,36 @@ using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using MapManager.GUI.ViewModels;
 using System;
+using System.Collections.Generic;
 
 namespace MapManager.GUI
 {
     public class ViewLocator : IDataTemplate
     {
+        private readonly Dictionary<Type, Type> _viewMap = new();
+
+        public void Register<TViewModel, TView>()
+            where TViewModel : ViewModelBase
+            where TView : Control, new()
+        {
+            _viewMap[typeof(TViewModel)] = typeof(TView);
+        }
 
         public Control? Build(object? param)
         {
             if (param is null)
                 return null;
 
-            var name = param.GetType().FullName!.Replace("ViewModel", "View", StringComparison.Ordinal);
-            var type = Type.GetType(name);
+            var vmType = param.GetType();
 
-            if (type != null)
+            if (_viewMap.TryGetValue(vmType, out var viewType))
             {
-                return (Control)Activator.CreateInstance(type)!;
+                var view = (Control)Activator.CreateInstance(viewType)!;
+                view.DataContext = param;
+                return view;
             }
 
-            return new TextBlock { Text = "Not Found: " + name };
+            return new TextBlock { Text = $"Not Found View for: {vmType.Name}" };
         }
 
         public bool Match(object? data)

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -10,6 +11,9 @@ public class ViewModelLocator
 {
     public MainWindowViewModel MainWindowViewModel =>
         App.AppHost.Services.GetRequiredService<MainWindowViewModel>();
+
+    public MainViewModel MainViewModel =>
+        App.AppHost.Services.GetRequiredService<MainViewModel>();
 
     public AudioPlayerViewModel AudioPlayerViewModel =>
         App.AppHost.Services.GetRequiredService<AudioPlayerViewModel>();
@@ -43,4 +47,15 @@ public class ViewModelLocator
     public GreetingsViewModel GreetingsViewModel =>
         App.AppHost.Services.GetRequiredService<GreetingsViewModel>();
 
+    public object GetByType(Type type)
+    {
+        var prop = GetType()
+            .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+            .FirstOrDefault(p => p.PropertyType == type);
+
+        if (prop == null)
+            throw new InvalidOperationException($"ViewModelLocator не содержит свойство типа {type.Name}");
+
+        return prop.GetValue(this)!;
+    }
 }
