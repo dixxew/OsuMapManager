@@ -43,5 +43,9 @@
 			</Button.Flyout>
 		</Button>
 	</sukiUi:SukiWindow.RightWindowTitleBarControls>
-	<ContentControl Content="{Binding Content}" />
+	<Grid>
+
+		<ContentControl Content="{Binding Content}" />
+		<ContentControl Content="{Binding DialogContent}" />
+	</Grid>
 </sukiUi:SukiWindow>

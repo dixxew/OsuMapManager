@@ -32,6 +32,7 @@
     </PackageReference>
     <PackageReference Include="Avalonia.Labs.Lottie" Version="11.2.0" />
     <PackageReference Include="Avalonia.ReactiveUI" Version="11.2.3" />
+    <PackageReference Include="HoLLy.osu.DatabaseReader" Version="3.3.0" />
     <PackageReference Include="IconPacks.Avalonia.FontAwesome" Version="1.0.0" />
     <PackageReference Include="IconPacks.Avalonia.ForkAwesome" Version="1.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.1" />
@@ -41,7 +42,6 @@
     <PackageReference Include="NAudio.Core" Version="2.2.1" />
     <PackageReference Include="NAudio.Vorbis" Version="1.5.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="OsuParsers" Version="1.7.2" />
     <!--<PackageReference Include="OsuSharp" Version="6.4.1" />
     <PackageReference Include="OsuSharp.JsonModels" Version="6.4.1" />-->
     <PackageReference Include="SoundTouch.Net" Version="2.3.2" />
@@ -66,7 +66,7 @@
   </ItemGroup>
 
   <ItemGroup>
-  <None Update="GUI\Assets\greetings\*">
+  <None Update="GUI\Assets\**">
     <CopyToOutputDirectory>Always</CopyToOutputDirectory>
   </None>
 </ItemGroup>

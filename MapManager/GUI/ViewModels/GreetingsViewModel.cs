@@ -17,10 +17,12 @@ namespace MapManager.GUI.ViewModels;
 public class GreetingsViewModel : ViewModelBase
 {
     private readonly NavigationService _navigationService;
+    private readonly BeatmapDataService _beatmapDataService;
 
-    public GreetingsViewModel(NavigationService navigationService)
+    public GreetingsViewModel(NavigationService navigationService, BeatmapDataService beatmapDataService)
     {
         _navigationService = navigationService;
+        _beatmapDataService = beatmapDataService;
     }
 
     public void NavigateToMainControl()

@@ -1,6 +1,6 @@
-﻿using OsuParsers.Database.Objects;
-using OsuParsers.Enums;
-using OsuParsers.Enums.Database;
+﻿using osu.Shared;
+using osu_database_reader.Components.Beatmaps;
+using osu_database_reader.Components.Player;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
@@ -92,8 +92,8 @@ namespace MapManager.GUI.Models
             set => this.RaiseAndSetIfChanged(ref _fileName, value);
         }
 
-        private RankedStatus _rankedStatus;
-        public RankedStatus RankedStatus
+        private SubmissionStatus _rankedStatus;
+        public SubmissionStatus RankedStatus
         {
             get => _rankedStatus;
             set => this.RaiseAndSetIfChanged(ref _rankedStatus, value);
@@ -189,35 +189,33 @@ namespace MapManager.GUI.Models
         public string FolderName { get; set; }
 
 
-        // Метод создания Beatmap из DbBeatmap
-        public static Beatmap FromDbBeatmap(DbBeatmap dbBeatmap)
+        public static Beatmap FromBeatmapEntry(BeatmapEntry dbBeatmap)
         {
             return new Beatmap
             {
                 BeatmapId = dbBeatmap.BeatmapId,
                 BeatmapSetId = dbBeatmap.BeatmapSetId,
-                BytesOfBeatmapEntry = dbBeatmap.BytesOfBeatmapEntry,
                 Artist = dbBeatmap.Artist,
                 ArtistUnicode = dbBeatmap.ArtistUnicode,
                 Title = dbBeatmap.Title,
                 TitleUnicode = dbBeatmap.TitleUnicode,
+                Difficulty = dbBeatmap.Version,
                 Creator = dbBeatmap.Creator,
-                Difficulty = dbBeatmap.Difficulty,
                 AudioFileName = dbBeatmap.AudioFileName,
-                MD5Hash = dbBeatmap.MD5Hash,
-                FileName = dbBeatmap.FileName,
+                MD5Hash = dbBeatmap.BeatmapChecksum,
+                FileName = dbBeatmap.BeatmapFileName,
                 RankedStatus = dbBeatmap.RankedStatus,
-                CirclesCount = dbBeatmap.CirclesCount,
-                SlidersCount = dbBeatmap.SlidersCount,
-                SpinnersCount = dbBeatmap.SpinnersCount,
+                CirclesCount = dbBeatmap.CountHitCircles,
+                SlidersCount = dbBeatmap.CountSliders,
+                SpinnersCount = dbBeatmap.CountSpinners,
                 LastModifiedTime = dbBeatmap.LastModifiedTime,
                 ApproachRate = dbBeatmap.ApproachRate,
                 CircleSize = dbBeatmap.CircleSize,
-                HPDrain = dbBeatmap.HPDrain,
-                IsUnplayed = dbBeatmap.IsUnplayed,
-                OverallDifficulty = dbBeatmap.OverallDifficulty,
-                StandardStarRating = dbBeatmap.StandardStarRating.TryGetValue(Mods.None, out double stars) ? stars : 0,
-                TagsList = dbBeatmap.Tags.Split(' ').ToList(),
+                HPDrain = dbBeatmap.HPDrainRate,
+                IsUnplayed = dbBeatmap.Unplayed,
+                OverallDifficulty = dbBeatmap.OveralDifficulty,
+                StandardStarRating = dbBeatmap.DiffStarRatingStandard.TryGetValue(osu.Shared.Mods.None, out double stars) ? stars : 0,
+                TagsList = dbBeatmap.SongTags.Split(' ').ToList(),
                 Duration = TimeSpan.FromMilliseconds(dbBeatmap.TotalTime).ToString(@"m\:ss"),
                 TotalTime = TimeSpan.FromMilliseconds(dbBeatmap.TotalTime),
                 FolderName = dbBeatmap.FolderName,
@@ -225,26 +223,25 @@ namespace MapManager.GUI.Models
             };
         }
 
-        public static void AddScores(Beatmap beatmap, List<OsuParsers.Database.Objects.Score> scores)
+        public static void AddReplays(Beatmap beatmap, List<Replay> scores)
         {
             beatmap.Scores = scores.Select((s, i) => new Score(
                  i + 1,
-                 s.Ruleset,               // Ruleset
                  s.OsuVersion,           // OsuVersion
                  beatmap.MD5Hash,        // BeatmapMD5Hash (берём MD5Hash из текущего Beatmap)
                  s.PlayerName,           // PlayerName
-                 s.ReplayMD5Hash,        // ReplayMD5Hash
+                 s.BeatmapHash,        // ReplayMD5Hash
                  s.Count300,             // Count300
                  s.Count100,             // Count100
                  s.Count50,              // Count50
                  s.CountGeki,            // CountGeki
                  s.CountKatu,            // CountKatu
                  s.CountMiss,            // CountMiss
-                 s.ReplayScore,          // ReplayScore
+                 s.Score,          // ReplayScore
                  s.Combo,                // Combo
-                 s.PerfectCombo,         // PerfectCombo
-                 s.Mods,                 // Mods
-                 s.ScoreTimestamp,       // ScoreTimestamp
+                 s.FullCombo,         // PerfectCombo
+                 (int)s.Mods,                 // Mods
+                 s.TimePlayed,       // ScoreTimestamp
                  s.ScoreId               // ScoreId
              )).ToList();
         }

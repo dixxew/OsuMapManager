@@ -13,10 +13,10 @@ using System.Threading.Tasks;
 namespace MapManager.GUI.Services;
 public class BeatmapDataService
 {
-    private readonly OsuDataReader _osuDataReader;
+    private readonly OsuDataService _osuDataReader;
 
 
-    public BeatmapDataService(OsuDataReader osuDataReader)
+    public BeatmapDataService(OsuDataService osuDataReader)
     {
         _osuDataReader = osuDataReader;
     }
@@ -126,27 +126,6 @@ public class BeatmapDataService
                 break;
         }
     }
-    public void FilterBeatmaps(string searchText, bool showOnlyFavorites)
-    {
-        //var filtered = BeatmapSets.AsQueryable();
-
-        //if (showOnlyFavorites)
-        //    filtered = filtered.Where(set => set.IsFavorite);
-
-        //if (!string.IsNullOrWhiteSpace(searchText))
-        //{
-        //    var query = searchText.ToLower();
-        //    filtered = filtered.Where(set => set.Beatmaps.Any(b =>
-        //        (b.Artist?.ToLower().Contains(query) ?? false) ||
-        //        (b.Title?.ToLower().Contains(query) ?? false) ||
-        //        (b.Creator?.ToLower().Contains(query) ?? false)));
-        //}
-
-        //Dispatcher.UIThread.Invoke(() =>
-        //{
-        //    FilteredBeatmapSets = new ObservableCollection<BeatmapSet>(filtered.ToList());
-        //});
-    }
     public void LoadFavoriteBeatmaps()
     {
         var list = FavoriteBeatmapManager.Load();
@@ -216,7 +195,7 @@ public class BeatmapDataService
         }
         else
         {
-            SelectRandomBeatmapSet();
+            SelectedBeatmapSet = FilteredBeatmapSets.ElementAt(Random.Shared.Next(0, FilteredBeatmapSets.Count));
             SelectBeatmap();
         }
     }

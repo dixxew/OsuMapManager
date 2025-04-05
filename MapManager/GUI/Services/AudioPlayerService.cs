@@ -86,7 +86,7 @@ public class AudioPlayerService
         _isFavorite = beatmapSet.IsFavorite;
         SongChanged(beatmapSet.IsFavorite, SongDuration, true);
     }
-    public void Play(string filePath)
+    public async Task Play(string filePath)
     {
         Stop();
         _progressTimer.Start();
@@ -94,9 +94,11 @@ public class AudioPlayerService
 
         IWaveProvider waveProvider;
         if (filePath.EndsWith(".ogg", StringComparison.OrdinalIgnoreCase))
-            _waveStream = new NAudio.Vorbis.VorbisWaveReader(filePath);
+        {
+            _waveStream = await Task.Run(() => new NAudio.Vorbis.VorbisWaveReader(filePath));
+        }
         else
-            _waveStream = new AudioFileReader(filePath);
+            _waveStream = await Task.Run(() => new AudioFileReader(filePath));
 
 
         _soundTouchProvider = new SoundTouchWaveProvider(_waveStream)

@@ -19,8 +19,14 @@ private readonly NavigationService _navigationService;
             Content = control;
         });
 
+        _navigationService.Subscribe(NavigationTarget.DialogContent, control =>
+        {
+            DialogContent = control;
+        });
+
         // старт с Greetings
-        _navigationService.SetContent(NavigationTarget.MainContent, typeof(GreetingsViewModel));
+        _navigationService.SetContent(NavigationTarget.MainContent, typeof(MainViewModel));
+        _navigationService.SetContent(NavigationTarget.DialogContent, typeof(GreetingsViewModel));
     }
 
     private UserControl _content;
@@ -31,5 +37,11 @@ private readonly NavigationService _navigationService;
         set => this.RaiseAndSetIfChanged(ref _content, value);
     }
 
+    private UserControl _dialogContent;
 
+    public UserControl DialogContent
+    {
+        get => _dialogContent;
+        set => this.RaiseAndSetIfChanged(ref _dialogContent, value);
+    }
 }

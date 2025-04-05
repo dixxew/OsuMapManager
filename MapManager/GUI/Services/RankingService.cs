@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using MapManager.GUI.Models;
+using osu_database_reader.Components.Player;
 using OsuSharp.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -11,17 +12,17 @@ namespace MapManager.GUI.Services;
 public class RankingService
 {
     private readonly OsuApiService _osuApiService;
-    private readonly OsuDataReader OsuDataReader;
+    private readonly OsuDataService OsuDataReader;
     private readonly IMapper _mapper;
 
-    public RankingService(OsuApiService osuService, OsuDataReader osuDataReader, IMapper mapper)
+    public RankingService(OsuApiService osuService, OsuDataService osuDataReader, IMapper mapper)
     {
         _osuApiService = osuService;
         OsuDataReader = osuDataReader;
         _mapper = mapper;
     }
 
-    public List<Tuple<string, List<OsuParsers.Database.Objects.Score>>> GetAllLocalScores()
+    public List<Replay> GetAllLocalScores()
     {
 
         return OsuDataReader.GetScoresList();

@@ -5,7 +5,7 @@ using System.Globalization;
 namespace MapManager.GUI.Converters;
 public class TreeViewWidthByParentConveter : IValueConverter
 {
-    public double Subtract { get; set; } = 32;
+    public double Subtract { get; set; } = 36;
 
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {

@@ -60,7 +60,7 @@ public class BeatmapInfoViewModel : ViewModelBase
         set
         {
             this.RaiseAndSetIfChanged(ref _selectedBeatmapCollections, value);
-            _selectedBeatmapCollections.CollectionChanged += OnBeatmapSelectedCollectionsChanges;
+            _selectedBeatmapCollections.CollectionChanged += OnBeatmapSelectedCollectionsChanged;
             if (value != null)
                 this.RaisePropertyChanged(nameof(SelectedBeatmapCollectionsCount));
         }
@@ -82,6 +82,7 @@ public class BeatmapInfoViewModel : ViewModelBase
     private void SelectedBeatmapSetChanged()
     {
         this.RaisePropertyChanged(nameof(SelectedBeatmapSet));
+        this.RaisePropertyChanged(nameof(SelectedBeatmapCollectionsCount));
 
     }
     private void SelectedBeatmapChanged()
@@ -91,11 +92,11 @@ public class BeatmapInfoViewModel : ViewModelBase
         var beatmapData = _beatmapService.GetBeatmapPresentationData(SelectedBeatmap);
         MapBackground = beatmapData.bitmap;
         SelectedBeatmapCollections = beatmapData.collections;
-
+        this.RaisePropertyChanged(nameof(SelectedBeatmapCollectionsCount));
     }
 
 
-    private void OnBeatmapSelectedCollectionsChanges(object? sender, NotifyCollectionChangedEventArgs e)
+    private void OnBeatmapSelectedCollectionsChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         switch (e.Action)
         {

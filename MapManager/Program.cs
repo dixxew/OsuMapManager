@@ -61,7 +61,7 @@ namespace MapManager
                     services.AddSingleton<BeatmapDataService>();
                     services.AddSingleton<BeatmapService>();
                     services.AddSingleton<NavigationService>();
-                    services.AddSingleton<OsuDataReader>();
+                    services.AddSingleton<OsuDataService>();
 
                     services.AddSingleton<ViewLocator>(sp =>
                     {
@@ -82,6 +82,7 @@ namespace MapManager
                     services.AddSingleton<AudioPlayerViewModel>();
                     services.AddSingleton<SearchFiltersViewModel>();
                     services.AddSingleton<BeatmapsSearchViewModel>();
+                    services.AddSingleton<BeatmapBlockCollectionsViewModel>();
                     services.AddSingleton<BeatmapsViewModel>();
                     services.AddSingleton<CollectionsSearchViewModel>();
                     services.AddSingleton<CollectionsViewModel>();

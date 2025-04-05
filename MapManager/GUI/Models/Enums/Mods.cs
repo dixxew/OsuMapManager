@@ -1,9 +1,4 @@
-﻿using OsuParsers.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace MapManager.GUI.Models.Enums;
 public enum Mods
@@ -42,58 +37,55 @@ public enum Mods
 }
 public static class ModsMapper
 {
-    private static readonly Dictionary<OsuParsers.Enums.Mods, Mods> ModsToMyModsMapping = new()
+    private static readonly Dictionary<int, Mods> IntToMyModsMapping = new()
     {
-        { OsuParsers.Enums.Mods.None, Mods.nm },
-        { OsuParsers.Enums.Mods.NoFail, Mods.nf },
-        { OsuParsers.Enums.Mods.Easy, Mods.ez },
-        { OsuParsers.Enums.Mods.TouchDevice, Mods.td },
-        { OsuParsers.Enums.Mods.Hidden, Mods.hd },
-        { OsuParsers.Enums.Mods.HardRock, Mods.hr },
-        { OsuParsers.Enums.Mods.SuddenDeath, Mods.sd },
-        { OsuParsers.Enums.Mods.DoubleTime, Mods.dt },
-        { OsuParsers.Enums.Mods.Relax, Mods.rx },
-        { OsuParsers.Enums.Mods.HalfTime, Mods.ht },
-        { OsuParsers.Enums.Mods.Nightcore, Mods.nc },
-        { OsuParsers.Enums.Mods.Flashlight, Mods.fl },
-        { OsuParsers.Enums.Mods.Autoplay, Mods.ap },
-        { OsuParsers.Enums.Mods.SpunOut, Mods.so },
-        { OsuParsers.Enums.Mods.Relax2, Mods.rx2 },
-        { OsuParsers.Enums.Mods.Perfect, Mods.pf },
-        { OsuParsers.Enums.Mods.Key4, Mods.k4 },
-        { OsuParsers.Enums.Mods.Key5, Mods.k5 },
-        { OsuParsers.Enums.Mods.Key6, Mods.k6 },
-        { OsuParsers.Enums.Mods.Key7, Mods.k7 },
-        { OsuParsers.Enums.Mods.Key8, Mods.k8 },
-        { OsuParsers.Enums.Mods.FadeIn, Mods.fi },
-        { OsuParsers.Enums.Mods.Random, Mods.rd },
-        { OsuParsers.Enums.Mods.Cinema, Mods.cm },
-        { OsuParsers.Enums.Mods.Target, Mods.tg },
-        { OsuParsers.Enums.Mods.Key9, Mods.k9 },
-        { OsuParsers.Enums.Mods.KeyCoop, Mods.kc },
-        { OsuParsers.Enums.Mods.Key1, Mods.k1 },
-        { OsuParsers.Enums.Mods.Key3, Mods.k3 },
-        { OsuParsers.Enums.Mods.Key2, Mods.k2 },
-        { OsuParsers.Enums.Mods.ScoreV2, Mods.v2 }
+        { 0, Mods.nm },
+        { 1, Mods.nf },
+        { 2, Mods.ez },
+        { 4, Mods.td },
+        { 8, Mods.hd },
+        { 0x10, Mods.hr },
+        { 0x20, Mods.sd },
+        { 0x40, Mods.dt },
+        { 0x80, Mods.rx },
+        { 0x100, Mods.ht },
+        { 0x200, Mods.nc },
+        { 0x400, Mods.fl },
+        { 0x800, Mods.ap },
+        { 0x1000, Mods.so },
+        { 0x2000, Mods.rx2 },
+        { 0x4000, Mods.pf },
+        { 0x8000, Mods.k4 },
+        { 0x10000, Mods.k5 },
+        { 0x20000, Mods.k6 },
+        { 0x40000, Mods.k7 },
+        { 0x80000, Mods.k8 },
+        { 0x100000, Mods.fi },
+        { 0x200000, Mods.rd },
+        { 0x400000, Mods.cm },
+        { 0x800000, Mods.tg },
+        { 0x1000000, Mods.k9 },
+        { 0x2000000, Mods.kc },
+        { 0x4000000, Mods.k1 },
+        { 0x8000000, Mods.k3 },
+        { 0x10000000, Mods.k2 },
+        { 0x20000000, Mods.v2 }
     };
 
-    public static List<string> GetMappedMods(OsuParsers.Enums.Mods mods)
+    public static List<string> GetMappedMods(int mods)
     {
         var result = new List<string>();
 
-        foreach (var mapping in ModsToMyModsMapping)
+        foreach (var mapping in IntToMyModsMapping)
         {
-            if (mapping.Key != OsuParsers.Enums.Mods.None && (mods & mapping.Key) == mapping.Key)
+            if ((mods & mapping.Key) == mapping.Key)
             {
-                result.Add(mapping.Value.ToString()); // Добавляем только активные моды, кроме None
+                result.Add(mapping.Value.ToString());
             }
         }
 
-        // Если не найдено активных модов, добавляем nm
         if (result.Count == 0)
-        {
             result.Add(Mods.nm.ToString());
-        }
 
         return result;
     }

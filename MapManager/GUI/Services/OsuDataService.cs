@@ -1,17 +1,16 @@
-﻿// OsuDataReader.cs
-using OsuParsers.Beatmaps;
-using OsuParsers.Decoders;
-using OsuParsers.Database;
-using OsuParsers.Replays;
-using OsuParsers.Storyboards;
+﻿using MapManager;
+using osu.Shared.Serialization;
+using osu_database_reader.BinaryFiles;
+using osu_database_reader.Components.Beatmaps;
+using osu_database_reader.Components.Player;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using OsuParsers.Database.Objects;
-using MapManager;
-using System;
+using System.Threading.Tasks;
 
-public class OsuDataReader
+public class OsuDataService
 {
     private readonly AppSettings _appSettings;
 
@@ -20,7 +19,11 @@ public class OsuDataReader
     private string scoresDbPath;
     private string collectionsDbPath;
 
-    public OsuDataReader(AppSettings appSettings)
+    private OsuDb _osuDb;
+    private CollectionDb _collectionDb;
+    private ScoresDb _scoresDb;
+
+    public OsuDataService(AppSettings appSettings)
     {
         _appSettings = appSettings;
         osuDirectory = appSettings.OsuDirectory;
@@ -34,29 +37,78 @@ public class OsuDataReader
         osuDirectory = updatedSettings.OsuDirectory;
     }
 
-    public List<DbBeatmap> GetBeatmapList()
+    public List<BeatmapEntry> GetBeatmapList()
     {
-        var osuDb = DatabaseDecoder.DecodeOsu(osuDbPath);
+        _osuDb = OsuDb.Read(osuDbPath);
 
-        return osuDb.Beatmaps;
+        return _osuDb.Beatmaps;
     }
 
-    public List<Collection> GeCollectionsList()
+    public List<Collection> GetCollectionsList()
     {
-        var collectionsDb = DatabaseDecoder.DecodeCollection(collectionsDbPath);
+        _collectionDb = CollectionDb.Read(collectionsDbPath);
 
-        return collectionsDb.Collections;
+        return _collectionDb.Collections;
     }
-    public List<Tuple<string, List<Score>>> GetScoresList()
+    public List<Replay> GetScoresList()
     {
-        var scoresDb = DatabaseDecoder.DecodeScores(scoresDbPath);
+        _scoresDb = ScoresDb.Read(scoresDbPath);
 
-        return scoresDb.Scores;
+        return _scoresDb.Scores.ToList();
     }
 
-    public Beatmap ReadBeatmap(string beatmapPath)
+
+
+    public void AddCollection(string name, List<string> md5hashes)
     {
-        return BeatmapDecoder.Decode(beatmapPath);
+        Task.Run(() =>
+        {
+            var collection = new Collection()
+            {
+                Name = name,
+                BeatmapHashes = md5hashes,
+            };
+            _collectionDb.Collections.Add(collection);
+
+            using (var stream = new FileStream(collectionsDbPath, FileMode.Create, FileAccess.Write))
+            {
+                var writer = new SerializationWriter(stream);
+                _collectionDb.WriteToStream(writer);
+            }
+        });
+    }
+
+
+    public void AddToCollection(string collectionName, string md5)
+    {
+        Task.Run(() =>
+        {
+            if (_collectionDb.Collections.First(c => c.Name == collectionName).BeatmapHashes.Contains(md5))
+                return;
+
+            _collectionDb.Collections.First(c => c.Name == collectionName).BeatmapHashes.Add(md5);
+
+            using (var stream = new FileStream(collectionsDbPath, FileMode.Create, FileAccess.Write))
+            {
+                var writer = new SerializationWriter(stream);
+                _collectionDb.WriteToStream(writer);
+            }
+        });
+    }
+    public void RemoveFromCollection(string collectionName, string md5)
+    {
+        Task.Run(() =>
+        {
+            if (!_collectionDb.Collections.First(c => c.Name == collectionName).BeatmapHashes.Contains(md5))
+                return;
+
+            _collectionDb.Collections.First(c => c.Name == collectionName).BeatmapHashes.Remove(md5);
+            using (var stream = new FileStream(collectionsDbPath, FileMode.Create, FileAccess.Write))
+            {
+                var writer = new SerializationWriter(stream);
+                _collectionDb.WriteToStream(writer);
+            }
+        });
     }
     public string GetBeatmapImage(string beatmapFolder, string beatmapFileName)
     {
@@ -114,7 +166,7 @@ public class OsuDataReader
                 .OrderByDescending(fileInfo => fileInfo.Length)
                 .FirstOrDefault();
 
-            return largestImage?.FullName ?? "avares://MapManager/GUI/Assets/defaultBg.jpg";
+            return largestImage?.FullName ?? "GUI/Assets/defaultBg.jpg";
         }
         catch (Exception ex)
         {
@@ -122,48 +174,8 @@ public class OsuDataReader
             Console.WriteLine($"Ошибка при поиске изображения для карты {beatmapFileName}: {ex.Message}");
 
             // Возвращаем путь к изображению по умолчанию
-            return "avares://MapManager/GUI/Assets/defaultBg.jpg";
+            return "GUI/Assets/defaultBg.jpg";
         }
     }
 
-
-
-    public void ModifyBeatmapSettings(string beatmapPath, float cs, float ar, float od, string[] tags)
-    {
-        var beatmap = BeatmapDecoder.Decode(beatmapPath);
-        beatmap.DifficultySection.CircleSize = cs;
-        beatmap.DifficultySection.ApproachRate = ar;
-        beatmap.DifficultySection.OverallDifficulty = od;
-        beatmap.MetadataSection.Tags = tags;
-
-        beatmap.Save(beatmapPath);
-    }
-
-    public void SaveModifiedBeatmap(Beatmap beatmap, string newPath)
-    {
-        beatmap.Save(newPath);
-    }
-
-    public Replay ReadReplay(string replayPath)
-    {
-        return ReplayDecoder.Decode(replayPath);
-    }
-
-    public string GetReplayPlayer(string replayPath)
-    {
-        var replay = ReplayDecoder.Decode(replayPath);
-        return replay.PlayerName;
-    }
-
-    public Storyboard ReadStoryboard(string storyboardPath)
-    {
-        return StoryboardDecoder.Decode(storyboardPath);
-    }
-
-    public void ModifyReplayPlayer(string replayPath, string newPlayerName)
-    {
-        var replay = ReplayDecoder.Decode(replayPath);
-        replay.PlayerName = newPlayerName;
-        replay.Save(replayPath);
-    }
 }

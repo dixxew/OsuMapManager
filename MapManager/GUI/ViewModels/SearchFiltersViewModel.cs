@@ -1,5 +1,5 @@
 ﻿using MapManager.GUI.Services;
-using OsuParsers.Enums.Database;
+using osu.Shared;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
@@ -16,12 +16,12 @@ public class SearchFiltersViewModel : ViewModelBase
     }
 
 
-    public List<RankedStatus> TargetRankedStatusesList =>
-        Enum.GetValues(typeof(RankedStatus)).Cast<RankedStatus>().ToList();
+    public List<SubmissionStatus> TargetRankedStatusesList =>
+        Enum.GetValues(typeof(SubmissionStatus)).Cast<SubmissionStatus>().ToList();
 
 
-    private RankedStatus _targetRankedStatus;
-    public RankedStatus TargetRankedStatus
+    private SubmissionStatus _targetRankedStatus;
+    public SubmissionStatus TargetRankedStatus
     {
         get => _targetRankedStatus;
         set

@@ -2,23 +2,21 @@
 using DynamicData;
 using MapManager.GUI.Models;
 using Microsoft.Extensions.Hosting;
-using OsuParsers.Database.Objects;
-using System;
+using osu_database_reader.Components.Beatmaps;
+using osu_database_reader.Components.Player;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace MapManager.GUI.Services;
 public class AppInitializationService : IHostedService
 {
-    private readonly OsuDataReader OsuDataReader;
+    private readonly OsuDataService OsuDataReader;
     private readonly RankingService _rankingService;
     private readonly BeatmapDataService _beatmapDataService;
 
-    public AppInitializationService(OsuDataReader osuDataReader, RankingService rankingService, BeatmapDataService beatmapDataService)
+    public AppInitializationService(OsuDataService osuDataReader, RankingService rankingService, BeatmapDataService beatmapDataService)
     {
         OsuDataReader = osuDataReader;
         _rankingService = rankingService;
@@ -29,7 +27,7 @@ public class AppInitializationService : IHostedService
         var scores = LoadScores();
         await LoadBeatmaps(scores);
         _beatmapDataService.LoadFavoriteBeatmaps();
-        await Dispatcher.UIThread.InvokeAsync(() =>
+        Dispatcher.UIThread.Post(() =>
         {
             _beatmapDataService.Search();
         });
@@ -41,35 +39,33 @@ public class AppInitializationService : IHostedService
     }
 
 
-    private List<Tuple<string, List<OsuParsers.Database.Objects.Score>>> LoadScores()
+    private List<Replay> LoadScores()
     {
         return _rankingService.GetAllLocalScores();
     }
 
     private async Task LoadCollections()
     {
-        var collectionList = OsuDataReader.GeCollectionsList();
+        var collectionList = OsuDataReader.GetCollectionsList();
         var collections = collectionList.Select(c => new Models.Collection
         {
             Beatmaps = new(_beatmapDataService.BeatmapSets
                     .SelectMany(bs => bs.Beatmaps)
-                    .Where(b => c.MD5Hashes.Contains(b.MD5Hash))
+                    .Where(b => c.BeatmapHashes.Contains(b.MD5Hash))
                     .ToList()),
             Name = c.Name,
-            Count = c.Count
+            Count = c.BeatmapHashes.Count
         }).ToList();
-        await Dispatcher.UIThread.InvokeAsync(() =>
+        Dispatcher.UIThread.Post(() =>
         {
             _beatmapDataService.Collections.AddRange(collections);
         });
     }
 
-    private async Task LoadBeatmaps(List<Tuple<string, List<OsuParsers.Database.Objects.Score>>> scores)
+    private async Task LoadBeatmaps(List<Replay> scores)
     {
-        // Преобразуем список скорингов в словарь для быстрого поиска
-        var scoresDictionary = scores.ToDictionary(s => s.Item1, s => s.Item2);
 
-        List<DbBeatmap> dbBeatmaps = new();
+        List<BeatmapEntry> dbBeatmaps = new();
         await Task.Run(() =>
         {
             dbBeatmaps = OsuDataReader.GetBeatmapList();
@@ -88,20 +84,16 @@ public class AppInitializationService : IHostedService
                 FolderName = firstBeatmap.FolderName,
                 Beatmaps = g.Select(b =>
                 {
-                    var beatmap = Beatmap.FromDbBeatmap(b);
+                    var beatmap = Beatmap.FromBeatmapEntry(b);
 
-                    // Добавляем скоринги, если они есть
-                    if (scoresDictionary.TryGetValue(b.MD5Hash, out var beatmapScores))
-                    {
-                        Beatmap.AddScores(beatmap, beatmapScores);
-                    }
+                        Beatmap.AddReplays(beatmap, scores.Where(s => s.BeatmapHash == b.BeatmapChecksum).ToList());                    
 
                     return beatmap;
                 }).ToList()
             };
         }).ToList();
         _beatmapDataService.BeatmapSets.AddRange(list);
-        LoadCollections();
+        await LoadCollections();
 
     }
 

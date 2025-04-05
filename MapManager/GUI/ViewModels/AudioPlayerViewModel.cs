@@ -190,17 +190,17 @@ public class AudioPlayerViewModel : ReactiveObject
 
 
 
-    private async void OnSongProgressChanged(double songProgress)
+    private void OnSongProgressChanged(double songProgress)
     {
-        await Dispatcher.UIThread.InvokeAsync(new Action(() =>
+        Dispatcher.UIThread.Post(new Action(() =>
         {
             SongProgress = songProgress;
         }));
     }
 
-    private async void OnSongChanged(bool isFavorite, double songDuration, bool isPlaying)
+    private void OnSongChanged(bool isFavorite, double songDuration, bool isPlaying)
     {
-        await Dispatcher.UIThread.InvokeAsync(() =>
+        Dispatcher.UIThread.Post(() =>
         {
             IsFavorite = isFavorite;
             SongDuration = songDuration;

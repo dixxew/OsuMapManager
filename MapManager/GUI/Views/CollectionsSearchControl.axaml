@@ -25,6 +25,7 @@
 					<Run Text="{Binding CollectionsCount}" />
 					<Run Text="Collections" />
 				</TextBlock>
+				<Button Content="Add" Command="{Binding AddCollection}"/>
 			</DockPanel>
 		</StackPanel>
 	</sukiUi:GlassCard>

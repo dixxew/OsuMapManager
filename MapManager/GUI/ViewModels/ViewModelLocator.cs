@@ -44,8 +44,12 @@ public class ViewModelLocator
 
     public GlobalScoresViewModel GlobalScoresViewModel =>
         App.AppHost.Services.GetRequiredService<GlobalScoresViewModel>();
+
     public GreetingsViewModel GreetingsViewModel =>
         App.AppHost.Services.GetRequiredService<GreetingsViewModel>();
+
+    public BeatmapBlockCollectionsViewModel BeatmapBlockCollectionsViewModel =>
+        App.AppHost.Services.GetRequiredService<BeatmapBlockCollectionsViewModel>();
 
     public object GetByType(Type type)
     {

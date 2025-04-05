@@ -1,6 +1,5 @@
 ﻿using DynamicData;
 using MapManager.GUI.Models.Enums;
-using OsuParsers.Enums;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
@@ -11,7 +10,6 @@ namespace MapManager.GUI.Models;
 public class Score : ReactiveObject
 {
     public int Index { get; set; }
-    public Ruleset Ruleset { get; set; }
 
     public int OsuVersion { get; set; }
 
@@ -43,7 +41,7 @@ public class Score : ReactiveObject
 
     public DateTime ScoreTimestamp { get; set; }
 
-    public long ScoreId { get; set; }
+    public long? ScoreId { get; set; }
 
     private double _accuracy;
 
@@ -54,17 +52,15 @@ public class Score : ReactiveObject
     }
 
     public Score(
-        int index,
-        Ruleset ruleset, int osuVersion,
+        int index, int osuVersion,
         string beatmapMD5Hash, string playerName,
         string replayMD5Hash, ushort count300, ushort count100,
         ushort count50, ushort countGeki, ushort countKatu,
         ushort countMiss, int replayScore, ushort combo,
-        bool perfectCombo, OsuParsers.Enums.Mods mods,
-        DateTime scoreTimestamp, long scoreId)
+        bool perfectCombo, int mods,
+        DateTime scoreTimestamp, long? scoreId)
     {
         Index = index;
-        Ruleset = ruleset;
         OsuVersion = osuVersion;
         BeatmapMD5Hash = beatmapMD5Hash;
         PlayerName = playerName;
@@ -78,7 +74,7 @@ public class Score : ReactiveObject
         ReplayScore = replayScore;
         Combo = combo;
         PerfectCombo = perfectCombo;
-        Mods.AddRange(ModsMapper.GetMappedMods(mods));
+        Mods.AddRange(ModsMapper.GetMappedMods((int)mods));
         ScoreTimestamp = scoreTimestamp;
         ScoreId = scoreId;
         Accuracy = CalculateAccuracy(count300, count100, count50, countMiss);

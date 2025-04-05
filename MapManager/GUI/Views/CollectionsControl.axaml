@@ -2,6 +2,7 @@
 	x:Class="MapManager.GUI.Views.CollectionsControl"
 	xmlns="https://github.com/avaloniaui"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:additional="using:MapManager.GUI.ViewModels.Additional"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:model="using:MapManager.GUI.Models"
@@ -16,17 +17,59 @@
 			<Setter Property="FontSize" Value="18" />
 		</Style>
 	</UserControl.Styles>
-	<TreeView Grid.Row="1" ItemsSource="{Binding Collections}" SelectedItem="{Binding SelectedTreeViewCollection}" SelectionMode="Single">
+	<TreeView
+		Grid.Row="1"
+		ItemsSource="{Binding Collections}"
+		SelectedItem="{Binding SelectedTreeViewCollection}"
+		SelectionMode="Single">
+		<TreeView.Styles>
+			<Style Selector="ScrollViewer">
+				<Setter Property="HorizontalScrollBarVisibility" Value="Disabled" />
+				<Setter Property="VerticalScrollBarVisibility" Value="Hidden" />
+
+			</Style>
+		</TreeView.Styles>
 		<TreeView.DataTemplates>
 			<TreeDataTemplate DataType="model:Collection" ItemsSource="{Binding Beatmaps}">
-				<TextBlock HorizontalAlignment="Stretch" Text="{Binding Name}" />
+				<TextBlock
+					HorizontalAlignment="Stretch"
+					FontSize="12"
+					Text="{Binding Name}" />
 			</TreeDataTemplate>
 			<DataTemplate DataType="model:Beatmap">
-				<TextBlock Width="{Binding $parent.Bounds.Width, Converter={StaticResource TreeViewWidthByParentConveter}}" Margin="-26,0,0,0">
-					<Run Text="{Binding Artist}" />
-					<Run Text=" - " />
-					<Run Text="{Binding Title}" />
-				</TextBlock>
+				<Grid
+					Width="{Binding $parent[UserControl].Bounds.Width, Converter={StaticResource TreeViewWidthByParentConveter}}"
+					Margin="-28,0,0,0"
+					ColumnDefinitions="* auto">
+					<StackPanel
+						Grid.Column="0"
+						HorizontalAlignment="Left"
+						Orientation="Vertical">
+						<TextBlock
+							FontSize="12"
+							Foreground="LightGray"
+							Text="{Binding Artist}" />
+						<TextBlock FontSize="16" Text="{Binding Title}" />
+					</StackPanel>
+					<StackPanel
+						Grid.Column="1"
+						HorizontalAlignment="Right"
+						Orientation="Horizontal"
+						Spacing="4">
+						<TextBlock
+							VerticalAlignment="Center"
+							FontSize="12"
+							Text="{Binding Difficulty}" />
+						<Button
+							Margin="0"
+							Padding="8,4"
+							VerticalAlignment="Center"
+							Classes="Flat Accent"
+							Click="OnRemoveClick"
+							Content="X"
+							FontSize="12"/>
+					</StackPanel>
+				</Grid>
 			</DataTemplate>
 		</TreeView.DataTemplates>
 	</TreeView>
