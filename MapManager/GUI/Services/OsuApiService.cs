@@ -10,13 +10,11 @@ namespace MapManager.GUI.Services;
 public class OsuApiService
 {
     private readonly IOsuClient _client;
-    private readonly LegacyOsuClient _legacyClient;
     private readonly SettingsService _settingsService;
 
-    public OsuApiService(IOsuClient client, LegacyOsuClient legacyClient, SettingsService settingsService)
+    public OsuApiService(IOsuClient client,  SettingsService settingsService)
     {
         _client = client;
-        _legacyClient = legacyClient;
         _settingsService = settingsService;
         _settingsService.OnOsuApiSettingsChanged += OnOsuApiSettingsChanged;
         UpdateClientSettings();

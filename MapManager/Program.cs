@@ -93,11 +93,6 @@ namespace MapManager
                     services.AddSingleton<GlobalScoresViewModel>();
                     services.AddSingleton<GreetingsViewModel>();
 
-
-                    services.AddSingleton(_ => new LegacyOsuClient(new LegacyOsuSharpConfiguration
-                        {
-                            ApiKey = ""
-                        }));
                     services.AddScoped<HttpClient>();
                     services.AddAutoMapper(typeof(MappingProfile));
 
