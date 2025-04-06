@@ -21,12 +21,50 @@
 					Text="{Binding SearchBeatmapSetText}"
 					Watermark="Search, ex: 'Sotarks We Are' or use Filters" />
 			</DockPanel>
-			<StackPanel Orientation="Horizontal" Spacing="12">
-				<RadioButton Margin="0,0,-10,0" IsChecked="{Binding SearchMode, Converter={StaticResource BeatmapsSearchModeToBoolConverter}, ConverterParameter=FILTERS}" />
+			<DockPanel Margin="0,0,6,0">
+				<StackPanel Orientation="Horizontal" Spacing="12">
+					<RadioButton Margin="0,0,-10,0" IsChecked="{Binding SearchMode, Converter={StaticResource BeatmapsSearchModeToBoolConverter}, ConverterParameter=FILTERS}" />
+					<DropDownButton
+						Padding="12,8"
+						Content="Filters"
+						FontSize="12">
+						<DropDownButton.Flyout>
+							<Flyout>
+								<Panel>
+									<Border
+										Margin="20"
+										BoxShadow="{DynamicResource SukiPopupShadow}"
+										CornerRadius="20" />
+									<Border
+										MinWidth="350"
+										Margin="20"
+										Background="{DynamicResource SukiCardBackground}"
+										BorderBrush="{DynamicResource SukiLightBorderBrush}"
+										BorderThickness="1"
+										ClipToBounds="True"
+										CornerRadius="15">
+										<Border Padding="15" Background="{DynamicResource PopupGradientBrush}">
+											<view:SearchFiltersControl />
+										</Border>
+									</Border>
+								</Panel>
+							</Flyout>
+						</DropDownButton.Flyout>
+					</DropDownButton>
+					<TextBlock
+						VerticalAlignment="Center"
+						FontSize="16"
+						FontWeight="550">
+						<Run Text="{Binding BeatmapsCount}" />
+						<Run Text="Maps" />
+					</TextBlock>
+					<CheckBox Content="Favorites" IsChecked="{Binding IsShowOnlyFavorites}" />
+				</StackPanel>
 				<DropDownButton
 					Padding="12,8"
-					Content="Filters"
-					FontSize="14">
+					HorizontalAlignment="Right"
+					Content="Options"
+					FontSize="12">
 					<DropDownButton.Flyout>
 						<Flyout>
 							<Panel>
@@ -43,22 +81,15 @@
 									ClipToBounds="True"
 									CornerRadius="15">
 									<Border Padding="15" Background="{DynamicResource PopupGradientBrush}">
-										<view:SearchFiltersControl />
+										<view:SearchOptionsControl />
 									</Border>
 								</Border>
 							</Panel>
 						</Flyout>
 					</DropDownButton.Flyout>
 				</DropDownButton>
-				<TextBlock
-					VerticalAlignment="Center"
-					FontSize="16"
-					FontWeight="550">
-					<Run Text="{Binding BeatmapsCount}" />
-					<Run Text="Maps" />
-				</TextBlock>
-				<CheckBox Content="Only favorites" IsChecked="{Binding IsShowOnlyFavorites}" />
-			</StackPanel>
+			</DockPanel>
+
 			<Grid
 				Width="{Binding $parent.Bounds.Width}"
 				Margin="0,4"

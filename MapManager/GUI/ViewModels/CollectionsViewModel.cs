@@ -35,7 +35,7 @@ public class CollectionsViewModel : ViewModelBase
 
     public void RemoveFromCollection(Beatmap beatmap, Collection collection)
     {
-        _collectionService.RemoveFromCollection(collection.Name, beatmap);
+        _collectionService.RemoveFromCollection(collection, beatmap);
     }
 
     public void RemoveCollection(object collection)
@@ -54,6 +54,7 @@ public class CollectionsViewModel : ViewModelBase
                 _collectionService.RemoveCollection(col);
             }, true)
             .WithActionButton("No ", _ => { }, true)  // last parameter optional
+            .OfType(Avalonia.Controls.Notifications.NotificationType.Warning)
             .TryShow();
     }
 

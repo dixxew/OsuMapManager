@@ -1,6 +1,7 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Platform.Storage;
 using MapManager.GUI.Dialogs;
+using MapManager.GUI.Models;
 using MapManager.GUI.Services;
 using SukiUI.Dialogs;
 using System;
@@ -32,14 +33,14 @@ public class CollectionsSearchViewModel : ViewModelBase
                 {
                     if (string.IsNullOrWhiteSpace(name))
                         return false;
-
-                    return _collectionService.AddCollection(name, new() { _beatmapDataService.SelectedBeatmap.MD5Hash });
+                    var collection = new Collection
+                    {
+                        Name = name
+                    };
+                    return _collectionService.AddCollection(collection, new() { _beatmapDataService.SelectedBeatmap });
                 })
             })
             .TryShow();
-
-           
-        //_collectionService.AddCollection(Random.Shared.Next(0, 99999999).ToString(), new() { _beatmapDataService.SelectedBeatmap.MD5Hash });
     }
 
     public async Task ImportCollections(TopLevel topLevel)

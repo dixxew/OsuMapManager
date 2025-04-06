@@ -31,13 +31,13 @@ public class BeatmapBlockCollectionsViewModel : ViewModelBase
         if (e.NewItems is not null && e.NewItems.Count > 0)
             foreach (var item in e.NewItems)
             {
-                _collectionService.AddToCollection(((Collection)item).Name, _beatmapDataService.SelectedBeatmap);
+                _collectionService.AddToCollection((Collection)item, _beatmapDataService.SelectedBeatmap);
             }
 
         if (e.OldItems is not null && e.OldItems.Count > 0)
             foreach (var item in e.OldItems)
             {
-                _collectionService.RemoveFromCollection(((Collection)item).Name, _beatmapDataService.SelectedBeatmap);
+                _collectionService.RemoveFromCollection(((Collection)item), _beatmapDataService.SelectedBeatmap);
             }
     }
 

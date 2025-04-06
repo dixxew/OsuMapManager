@@ -1,0 +1,23 @@
+<UserControl
+	x:Class="MapManager.GUI.Views.SearchOptionsControl"
+	xmlns="https://github.com/avaloniaui"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+	d:DesignHeight="450"
+	d:DesignWidth="800"
+	mc:Ignorable="d">
+	<UserControl.DataContext>
+		<Binding Path="SearchOptionsViewModel" Source="{StaticResource Locator}" />
+	</UserControl.DataContext>
+	<Grid>
+		<StackPanel Orientation="Vertical" Spacing="4">
+			<Button
+				Padding="8,2"
+				Classes="Rounded"
+				Command="{Binding CreateFilteredCollection}"
+				Content="Create collection with filtered" />
+		</StackPanel>
+	</Grid>
+</UserControl>

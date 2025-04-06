@@ -86,30 +86,38 @@ public class AudioPlayerService
         _isFavorite = beatmapSet.IsFavorite;
         SongChanged(beatmapSet.IsFavorite, SongDuration, true);
     }
-    public async Task Play(string filePath)
+    public void Play(string filePath)
     {
-        Stop();
-        _progressTimer.Start();
-        _wavePlayer = new WaveOutEvent();
 
-        IWaveProvider waveProvider;
-        if (filePath.EndsWith(".ogg", StringComparison.OrdinalIgnoreCase))
+        try
         {
-            _waveStream = await Task.Run(() => new NAudio.Vorbis.VorbisWaveReader(filePath));
+            Stop();
+            _progressTimer.Start();
+            _wavePlayer = new WaveOutEvent();
+
+            IWaveProvider waveProvider;
+
+            if (filePath.EndsWith(".ogg", StringComparison.OrdinalIgnoreCase))
+            {
+                _waveStream = new NAudio.Vorbis.VorbisWaveReader(filePath);
+            }
+            else
+                _waveStream = new AudioFileReader(filePath);
+
+            _soundTouchProvider = new SoundTouchWaveProvider(_waveStream)
+            {
+                Tempo = _playbackRate
+            };
+
+            _wavePlayer.Init(_soundTouchProvider);
+            _wavePlayer.Volume = Volume;
+            _wavePlayer.Play();
+            _wavePlayer.PlaybackStopped += PlaybackStopped;
         }
-        else
-            _waveStream = await Task.Run(() => new AudioFileReader(filePath));
-
-
-        _soundTouchProvider = new SoundTouchWaveProvider(_waveStream)
+        catch
         {
-            Tempo = _playbackRate
-        };
-
-        _wavePlayer.Init(_soundTouchProvider);
-        _wavePlayer.Volume = Volume;
-        _wavePlayer.Play();
-        _wavePlayer.PlaybackStopped += PlaybackStopped;
+            Stop();
+        }
     }
 
 

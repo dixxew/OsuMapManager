@@ -51,6 +51,12 @@
 								Margin="0,0,-4,0"
 								ItemsSource="{Binding SelectedBeatmapSet.Beatmaps}"
 								SelectedItem="{Binding SelectedBeatmap, Mode=TwoWay}">
+								<ComboBox.Styles>
+									<Style Selector="ScrollViewer">
+										<Setter Property="VerticalAlignment" Value="Center" />
+										<Setter Property="Margin" Value="10" />
+									</Style>
+								</ComboBox.Styles>
 								<ComboBox.ItemTemplate>
 									<DataTemplate>
 										<TextBlock Text="{Binding Difficulty}" />

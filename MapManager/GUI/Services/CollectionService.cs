@@ -22,57 +22,37 @@ public class CollectionService
     }
 
 
-    public bool AddToCollection(string collectionName, Models.Beatmap beatmap)
+    public bool AddToCollection(Collection collection, Beatmap beatmap)
     {
-        var collection = _beatmapDataService.Collections.FirstOrDefault(c => c.Name == collectionName);
-        if (collection == null)
-            return false;
-
         if (collection.Beatmaps.Contains(beatmap))
             return false;
 
         collection.Beatmaps.Add(beatmap);
-        _osuDataService.AddToCollection(collectionName, beatmap.MD5Hash);
+        _osuDataService.AddToCollection(collection.Name, beatmap.MD5Hash);
 
         return true;
     }
 
 
-    public bool RemoveFromCollection(string collectionName, Models.Beatmap beatmap)
+    public bool RemoveFromCollection(Collection collection, Beatmap beatmap)
     {
-        var collection = _beatmapDataService.Collections.FirstOrDefault(c => c.Name == collectionName);
-        if (collection == null)
-            return false;
-
         if (!collection.Beatmaps.Contains(beatmap))
             return false;
 
         collection.Beatmaps.Remove(beatmap);
-        _osuDataService.RemoveFromCollection(collectionName, beatmap.MD5Hash);
+        _osuDataService.RemoveFromCollection(collection.Name, beatmap.MD5Hash);
 
         return true;
     }
 
 
-    public bool AddCollection(string collectionName, List<string> md5hashes)
+    public bool AddCollection(Collection collection, List<Beatmap> beatmaps)
     {
-        if (_beatmapDataService.Collections.Any(c => c.Name == collectionName))
+        if (_beatmapDataService.Collections.Any(c => c.Name == collection.Name))
             return false;
-
-        var beatmaps = _beatmapDataService.BeatmapSets
-            .SelectMany(bs => bs.Beatmaps)
-            .Where(b => md5hashes.Contains(b.MD5Hash))
-            .ToList();
-
-        var collection = new Collection
-        {
-            Name = collectionName,
-            Beatmaps = new ObservableCollection<Models.Beatmap>(beatmaps),
-            Count = beatmaps.Count
-        };
-
+        collection.Beatmaps = new (beatmaps);
         _beatmapDataService.Collections.Add(collection);
-        _osuDataService.AddCollection(collectionName, md5hashes);
+        _osuDataService.AddCollection(collection.Name, beatmaps.Select(b => b.MD5Hash).ToList());
 
         return true;
     }

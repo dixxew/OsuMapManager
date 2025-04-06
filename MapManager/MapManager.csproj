@@ -88,5 +88,8 @@
     <Compile Update="GUI\Dialogs\TextBoxDialogView.axaml.cs">
       <DependentUpon>TextBoxDialogView.axaml</DependentUpon>
     </Compile>
+    <Compile Update="GUI\Views\SearchOptionsControl.axaml.cs">
+      <DependentUpon>SearchOptionsControl.axaml</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>

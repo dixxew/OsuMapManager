@@ -35,6 +35,7 @@
 				</StackPanel.Styles>
 				<sukiUi:GlassCard>
 					<StackPanel Orientation="Vertical" Spacing="4">
+						
 						<StackPanel Orientation="Horizontal">
 							<TextBlock Text="MaxDuration" />
 							<MaskedTextBox Mask="00:00" Text="{Binding MaxDuration, Converter={StaticResource TimeSpanToStringConverter}}" />
@@ -50,31 +51,33 @@
 									VerticalAlignment="Bottom"
 									FontSize="10"
 									Foreground="LightGray"
-									Text="{Binding MinStarRating, StringFormat={}{0:F2}}" />
+									Text="{Binding MinStarRating, StringFormat={}{0:F1}}" />
 								<TextBlock Text="StarRating" />
 								<TextBlock
 									HorizontalAlignment="Right"
 									VerticalAlignment="Top"
 									FontSize="10"
 									Foreground="LightGray"
-									Text="{Binding MaxStarRating, StringFormat={}{0:F2}}" />
+									Text="{Binding MaxStarRating, StringFormat={}{0:F1}}" />
 							</StackPanel>
 							<StackPanel Width="140" Orientation="Vertical">
 								<Slider
+									IsSnapToTickEnabled="True"
 									Maximum="{Binding MaxStarRating}"
 									Minimum="0"
-									TickFrequency="0.01"
+									TickFrequency="0.1"
 									Value="{Binding MinStarRating}" />
 								<Slider
+									IsSnapToTickEnabled="True"
 									Maximum="10"
 									Minimum="0"
-									TickFrequency="0.01"
+									TickFrequency="0.1"
 									Value="{Binding MaxStarRating}" />
 							</StackPanel>
 						</StackPanel>
 						<StackPanel Orientation="Horizontal">
 							<TextBlock Text="Status" />
-							<ComboBox ItemsSource="{Binding TargetRankedStatusesList}" SelectedItem="{Binding TargetRankedStatus}" />
+							<ComboBox ItemsSource="{Binding TargetRankedStatusesList}" SelectedItem="{Binding TargetRankedStatus}" MaxDropDownHeight="200"/>
 						</StackPanel>
 					</StackPanel>
 				</sukiUi:GlassCard>
@@ -96,7 +99,7 @@
 												VerticalAlignment="Bottom"
 												FontSize="10"
 												Foreground="LightGray"
-												Text="{Binding MinAR, StringFormat={}{0:F2}}" />
+												Text="{Binding MinAR, StringFormat={}{0:F1}}" />
 											<TextBlock
 												HorizontalAlignment="Center"
 												FontSize="18"
@@ -106,17 +109,19 @@
 												VerticalAlignment="Bottom"
 												FontSize="10"
 												Foreground="LightGray"
-												Text="{Binding MaxAR, StringFormat={}{0:F2}}" />
+												Text="{Binding MaxAR, StringFormat={}{0:F1}}" />
 										</StackPanel>
 										<Slider
+											IsSnapToTickEnabled="True"
 											Maximum="{Binding MaxAR}"
 											Minimum="0"
-											TickFrequency="0.01"
+											TickFrequency="0.1"
 											Value="{Binding MinAR}" />
 										<Slider
+											IsSnapToTickEnabled="True"
 											Maximum="10"
 											Minimum="0"
-											TickFrequency="0.01"
+											TickFrequency="0.1"
 											Value="{Binding MaxAR}" />
 									</StackPanel>
 								</StackPanel>
@@ -131,7 +136,7 @@
 												VerticalAlignment="Bottom"
 												FontSize="10"
 												Foreground="LightGray"
-												Text="{Binding MinCS, StringFormat={}{0:F2}}" />
+												Text="{Binding MinCS, StringFormat={}{0:F1}}" />
 											<TextBlock
 												HorizontalAlignment="Center"
 												FontSize="18"
@@ -141,17 +146,19 @@
 												VerticalAlignment="Bottom"
 												FontSize="10"
 												Foreground="LightGray"
-												Text="{Binding MaxCS, StringFormat={}{0:F2}}" />
+												Text="{Binding MaxCS, StringFormat={}{0:F1}}" />
 										</StackPanel>
 										<Slider
+											IsSnapToTickEnabled="True"
 											Maximum="{Binding MaxCS}"
 											Minimum="0"
-											TickFrequency="0.01"
+											TickFrequency="0.1"
 											Value="{Binding MinCS}" />
 										<Slider
+											IsSnapToTickEnabled="True"
 											Maximum="10"
 											Minimum="0"
-											TickFrequency="0.01"
+											TickFrequency="0.1"
 											Value="{Binding MaxCS}" />
 									</StackPanel>
 								</StackPanel>
@@ -168,7 +175,7 @@
 												VerticalAlignment="Bottom"
 												FontSize="10"
 												Foreground="LightGray"
-												Text="{Binding MinHP, StringFormat={}{0:F2}}" />
+												Text="{Binding MinHP, StringFormat={}{0:F1}}" />
 											<TextBlock
 												HorizontalAlignment="Center"
 												FontSize="18"
@@ -178,17 +185,19 @@
 												VerticalAlignment="Bottom"
 												FontSize="10"
 												Foreground="LightGray"
-												Text="{Binding MaxHP, StringFormat={}{0:F2}}" />
+												Text="{Binding MaxHP, StringFormat={}{0:F1}}" />
 										</StackPanel>
 										<Slider
+											IsSnapToTickEnabled="True"
 											Maximum="{Binding MaxHP}"
 											Minimum="0"
-											TickFrequency="0.01"
+											TickFrequency="0.1"
 											Value="{Binding MinHP}" />
 										<Slider
+											IsSnapToTickEnabled="True"
 											Maximum="10"
 											Minimum="0"
-											TickFrequency="0.01"
+											TickFrequency="0.1"
 											Value="{Binding MaxHP}" />
 									</StackPanel>
 								</StackPanel>
@@ -203,7 +212,7 @@
 												VerticalAlignment="Bottom"
 												FontSize="10"
 												Foreground="LightGray"
-												Text="{Binding MinOD, StringFormat={}{0:F2}}" />
+												Text="{Binding MinOD, StringFormat={}{0:F1}}" />
 											<TextBlock
 												HorizontalAlignment="Center"
 												FontSize="18"
@@ -213,17 +222,19 @@
 												VerticalAlignment="Bottom"
 												FontSize="10"
 												Foreground="LightGray"
-												Text="{Binding MaxOD, StringFormat={}{0:F2}}" />
+												Text="{Binding MaxOD, StringFormat={}{0:F1}}" />
 										</StackPanel>
 										<Slider
+											IsSnapToTickEnabled="True"
 											Maximum="{Binding MaxOD}"
 											Minimum="0"
-											TickFrequency="0.01"
+											TickFrequency="0.1"
 											Value="{Binding MinOD}" />
 										<Slider
+											IsSnapToTickEnabled="True"
 											Maximum="10"
 											Minimum="0"
-											TickFrequency="0.01"
+											TickFrequency="0.1"
 											Value="{Binding MaxOD}" />
 									</StackPanel>
 								</StackPanel>

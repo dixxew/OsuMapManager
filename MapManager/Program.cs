@@ -82,6 +82,7 @@ namespace MapManager
                     services.AddSingleton<MainViewModel>();
                     services.AddSingleton<AudioPlayerViewModel>();
                     services.AddSingleton<SearchFiltersViewModel>();
+                    services.AddSingleton<SearchOptionsViewModel>();
                     services.AddSingleton<BeatmapsSearchViewModel>();
                     services.AddSingleton<BeatmapBlockCollectionsViewModel>();
                     services.AddSingleton<BeatmapsViewModel>();
