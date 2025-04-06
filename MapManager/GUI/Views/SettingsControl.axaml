@@ -57,7 +57,7 @@
 					</StackPanel>
 				</sukiUi:GlassCard>
 				<sukiUi:GlassCard>
-					<ItemsControl ItemsSource="{Binding ThemeColors}" Margin="-6">
+					<ItemsControl Margin="-6" ItemsSource="{Binding ThemeColors}">
 						<ItemsControl.ItemsPanel>
 							<ItemsPanelTemplate>
 								<WrapPanel Orientation="Horizontal" />
@@ -68,7 +68,7 @@
 								<Button
 									Width="24"
 									Height="24"
-									Margin="2 0"
+									Margin="2,0"
 									Background="{Binding Converter={StaticResource ColorToBrushConverter}}"
 									Command="{Binding $parent[UserControl].DataContext.SetThemeColor}"
 									CommandParameter="{Binding}" />
@@ -77,6 +77,10 @@
 					</ItemsControl>
 
 				</sukiUi:GlassCard>
+				<TextBlock
+					HorizontalAlignment="Right"
+					FontSize="10"
+					Text="{Binding AppVersion, StringFormat='appVer: {0}'}" />
 			</StackPanel>
 		</ScrollViewer>
 	</Grid>

@@ -6,18 +6,11 @@
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <ApplicationManifest>app.manifest</ApplicationManifest>
       <ApplicationIcon>GUI/Assets/mm_logo.ico</ApplicationIcon>
+	  <Version>0.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
     <AvaloniaResource Include="GUI\Assets\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <AvaloniaResource Remove="GUI\Assets\Новая папка\**" />
-    <AvaloniaXaml Remove="GUI\Assets\Новая папка\**" />
-    <Compile Remove="GUI\Assets\Новая папка\**" />
-    <EmbeddedResource Remove="GUI\Assets\Новая папка\**" />
-    <None Remove="GUI\Assets\Новая папка\**" />
   </ItemGroup>
 
   <ItemGroup>

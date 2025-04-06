@@ -19,6 +19,7 @@ public class SettingsService
     }
 
 
+    public string AppVersion => typeof(App).Assembly.GetName().Version.ToString();
     public string? OsuClientSecret
     {
         get => _appSettings.OsuClientSecret;

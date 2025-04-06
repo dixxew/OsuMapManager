@@ -33,6 +33,8 @@ public class SettingsViewModel : ViewModelBase
     private string? _osuClientId;
     private string? _osuDirPath;
 
+    public string AppVersion => _settingsService.AppVersion;
+
     public List<Color> ThemeColors => new()
     {
         Colors.Bisque,
