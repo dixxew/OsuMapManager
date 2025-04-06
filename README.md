@@ -41,6 +41,14 @@ osu! profile: [dixxew](https://osu.ppy.sh/users/13928601)
 - Stats by genre/artist/difficulty/etc.
 - Scores additional data.
 - UI improvements (drag & drop, mod icons, previews)
+- 
+---
+
+## 🐞 Bugs / Feedback
+
+There might be bugs — feel free to contact me via:
+- [osu! PM](https://osu.ppy.sh/users/13928601)
+- Telegram: [@Dixxew](https://t.me/Dixxew)
 
 ---
 
