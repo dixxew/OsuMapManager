@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="MapManager/GUI/Assets/mm_logo.png" height="128">
+  <img src="MapManager/GUI/Assets/mm_logo.png" height="512">
 </p>
 
 # Osu Map Manager
