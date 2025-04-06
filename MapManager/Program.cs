@@ -96,7 +96,7 @@ namespace MapManager
 
                     services.AddSingleton(_ => new LegacyOsuClient(new LegacyOsuSharpConfiguration
                         {
-                            ApiKey = "c9f024e60c2551bea39b507163405098ed8fbd85"
+                            ApiKey = ""
                         }));
                     services.AddScoped<HttpClient>();
                     services.AddAutoMapper(typeof(MappingProfile));
