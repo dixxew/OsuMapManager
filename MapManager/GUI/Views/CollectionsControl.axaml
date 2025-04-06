@@ -31,10 +31,32 @@
 		</TreeView.Styles>
 		<TreeView.DataTemplates>
 			<TreeDataTemplate DataType="model:Collection" ItemsSource="{Binding Beatmaps}">
-				<TextBlock
-					HorizontalAlignment="Stretch"
-					FontSize="12"
-					Text="{Binding Name}" />
+				<Grid ColumnDefinitions="* auto">
+
+					<TextBlock
+						HorizontalAlignment="Stretch"
+						FontSize="12"
+						Text="{Binding Name}" />
+					<StackPanel Orientation="Horizontal" Spacing="4" 
+							Grid.Column="1">
+						<Button
+							Padding="6,2"
+							VerticalAlignment="Center"
+							Classes="Outlined Rounded"
+							Click="ExportClick"
+							Content="Export"
+							FontSize="12" />
+						<Button
+							Padding="6,2"
+							VerticalAlignment="Center"
+							Classes="Outlined Rounded"
+							Command="{Binding $parent[UserControl].DataContext.RemoveCollection}"
+							CommandParameter="{Binding}"
+							Content="Remove"
+							FontSize="12" />
+					</StackPanel>
+
+				</Grid>
 			</TreeDataTemplate>
 			<DataTemplate DataType="model:Beatmap">
 				<Grid
@@ -64,10 +86,10 @@
 							Margin="0"
 							Padding="8,4"
 							VerticalAlignment="Center"
-							Classes="Flat Accent"
+							Classes="Outlined Rounded"
 							Click="OnRemoveClick"
 							Content="X"
-							FontSize="12"/>
+							FontSize="12" />
 					</StackPanel>
 				</Grid>
 			</DataTemplate>

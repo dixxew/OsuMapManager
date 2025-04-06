@@ -60,6 +60,7 @@ namespace MapManager
                     services.AddSingleton<RankingService>();
                     services.AddSingleton<BeatmapDataService>();
                     services.AddSingleton<BeatmapService>();
+                    services.AddSingleton<CollectionService>();
                     services.AddSingleton<NavigationService>();
                     services.AddSingleton<OsuDataService>();
 

@@ -1,18 +1,23 @@
-﻿using MapManager.GUI.Models;
+﻿using Avalonia.Controls;
+using Avalonia.Platform.Storage;
+using MapManager.GUI.Models;
 using MapManager.GUI.Services;
+using SukiUI.Dialogs;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 
 namespace MapManager.GUI.ViewModels;
 
 public class CollectionsViewModel : ViewModelBase
 {
     private readonly BeatmapDataService _beatmapDataService;
-    private readonly BeatmapService _beatmapService;
+    private readonly CollectionService _collectionService;
 
-    public CollectionsViewModel(BeatmapDataService beatmapDataService, BeatmapService beatmapService)
+    public CollectionsViewModel(CollectionService collectionService, BeatmapDataService beatmapDataService)
     {
         _beatmapDataService = beatmapDataService;
-        _beatmapService = beatmapService;
+        _collectionService = collectionService;
     }
 
     public ObservableCollection<Collection> Collections => _beatmapDataService.Collections;
@@ -30,7 +35,38 @@ public class CollectionsViewModel : ViewModelBase
 
     public void RemoveFromCollection(Beatmap beatmap, Collection collection)
     {
-        _beatmapService.RemoveFromCollection(collection.Name, beatmap);
+        _collectionService.RemoveFromCollection(collection.Name, beatmap);
+    }
+
+    public void RemoveCollection(object collection)
+    {
+        if (collection is not Collection)
+            return;
+
+        var col = collection as Collection;
+
+        MainWindowViewModel.DialogManager.CreateDialog()
+            .WithTitle($"Remove {col.Name}")
+            .WithContent($"Are you sure want to delete collection with {col.Beatmaps.Count} betmaps?")
+            .Dismiss().ByClickingBackground()
+            .WithActionButton("Yes", _ =>
+            {
+                _collectionService.RemoveCollection(col);
+            }, true)
+            .WithActionButton("No ", _ => { }, true)  // last parameter optional
+            .TryShow();
+    }
+
+    public async Task ExportCollection(Collection collection, TopLevel topLevel)
+    {
+        var filePath = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+        {
+            Title = $"Export {collection.Name}.db",
+            DefaultExtension = "db",
+            SuggestedFileName = $"collection-{collection.Name}"
+        });
+
+        _collectionService.ExportCollection(collection, filePath);
     }
 
 }

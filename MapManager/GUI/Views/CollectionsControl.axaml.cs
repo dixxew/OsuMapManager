@@ -45,4 +45,16 @@ public partial class CollectionsControl : UserControl
         }, DispatcherPriority.Background);
     }
 
+    private void ExportClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        var vm = DataContext as CollectionsViewModel;
+        var collection = (sender as Button)!.DataContext as Collection;
+
+
+        var topLevel = TopLevel.GetTopLevel(this);
+        if (topLevel == null)
+            return;
+
+        vm.ExportCollection(collection, topLevel);
+    }
 }

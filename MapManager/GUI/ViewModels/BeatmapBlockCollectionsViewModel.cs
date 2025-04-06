@@ -14,14 +14,16 @@ namespace MapManager.GUI.ViewModels;
 public class BeatmapBlockCollectionsViewModel : ViewModelBase
 {
     private readonly BeatmapService _beatmapService;
+    private readonly CollectionService _collectionService;
     private readonly BeatmapDataService _beatmapDataService;
-    public BeatmapBlockCollectionsViewModel(BeatmapService beatmapService, BeatmapDataService beatmapDataService)
+    public BeatmapBlockCollectionsViewModel(BeatmapService beatmapService, BeatmapDataService beatmapDataService, CollectionService collectionService)
     {
         _beatmapService = beatmapService;
         _beatmapDataService = beatmapDataService;
 
         SelectedBeatmapCollections.CollectionChanged += SelectedBeatmapCollections_CollectionChanged;
         _beatmapDataService.OnSelectedBeatmapChanged += OnSelectedBeatmapChanged;
+        _collectionService = collectionService;
     }
 
     private void SelectedBeatmapCollections_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -29,13 +31,13 @@ public class BeatmapBlockCollectionsViewModel : ViewModelBase
         if (e.NewItems is not null && e.NewItems.Count > 0)
             foreach (var item in e.NewItems)
             {
-                _beatmapService.AddToCollection(((Collection)item).Name, _beatmapDataService.SelectedBeatmap);
+                _collectionService.AddToCollection(((Collection)item).Name, _beatmapDataService.SelectedBeatmap);
             }
 
         if (e.OldItems is not null && e.OldItems.Count > 0)
             foreach (var item in e.OldItems)
             {
-                _beatmapService.RemoveFromCollection(((Collection)item).Name, _beatmapDataService.SelectedBeatmap);
+                _collectionService.RemoveFromCollection(((Collection)item).Name, _beatmapDataService.SelectedBeatmap);
             }
     }
 

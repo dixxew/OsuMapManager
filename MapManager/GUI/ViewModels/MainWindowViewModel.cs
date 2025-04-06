@@ -1,13 +1,14 @@
 ﻿using Avalonia.Controls;
 using MapManager.GUI.Services;
 using ReactiveUI;
+using SukiUI.Dialogs;
 using static MapManager.GUI.Services.NavigationService;
 
 namespace MapManager.GUI.ViewModels;
 
 public class MainWindowViewModel : ViewModelBase
 {
-private readonly NavigationService _navigationService;
+    private readonly NavigationService _navigationService;
 
     public MainWindowViewModel(NavigationService navigationService)
     {
@@ -28,6 +29,8 @@ private readonly NavigationService _navigationService;
         _navigationService.SetContent(NavigationTarget.MainContent, typeof(MainViewModel));
         _navigationService.SetContent(NavigationTarget.DialogContent, typeof(GreetingsViewModel));
     }
+
+    public static ISukiDialogManager DialogManager { get; } = new SukiDialogManager();
 
     private UserControl _content;
 

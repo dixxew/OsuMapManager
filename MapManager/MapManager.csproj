@@ -85,5 +85,8 @@
     <Compile Update="GUI\Views\LocalScoresControl.axaml.cs">
       <DependentUpon>LocalScoresControl.axaml</DependentUpon>
     </Compile>
+    <Compile Update="GUI\Dialogs\TextBoxDialogView.axaml.cs">
+      <DependentUpon>TextBoxDialogView.axaml</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>

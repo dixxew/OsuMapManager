@@ -25,7 +25,21 @@
 					<Run Text="{Binding CollectionsCount}" />
 					<Run Text="Collections" />
 				</TextBlock>
-				<Button Content="Add" Command="{Binding AddCollection}"/>
+				<StackPanel
+					HorizontalAlignment="Right"
+					Orientation="Horizontal"
+					Spacing="4">
+					<Button
+						Padding="8,2"
+						Classes="Rounded"
+						Command="{Binding AddCollection}"
+						Content="Add" />
+					<Button
+						Padding="8,2"
+						Classes="Rounded"
+						Click="ImportClick"
+						Content="Import" />
+				</StackPanel>
 			</DockPanel>
 		</StackPanel>
 	</sukiUi:GlassCard>

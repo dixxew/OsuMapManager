@@ -13,6 +13,9 @@
 	<sukiUi:SukiWindow.Title>
 		<Binding Path="BeatmapInfoViewModel.SelectedBeatmap.Title" Source="{StaticResource Locator}" />
 	</sukiUi:SukiWindow.Title>
+	<sukiUi:SukiWindow.Hosts>
+		<sukiUi:SukiDialogHost Manager="{Binding DialogManager}" />
+	</sukiUi:SukiWindow.Hosts>
 	<sukiUi:SukiWindow.RightWindowTitleBarControls>
 		<Button Classes="Basic Rounded WindowControlsButton">
 			<iconPacks:PackIconFontAwesome

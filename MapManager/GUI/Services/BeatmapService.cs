@@ -1,5 +1,10 @@
 ﻿using Avalonia.Media.Imaging;
+using Avalonia.Platform.Storage;
+using Avalonia.Threading;
+using DynamicData;
 using MapManager.GUI.Models;
+using OsuSharp.Domain;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -21,32 +26,9 @@ public class BeatmapService
         _osuDataService = osuDataService;
     }
 
-    public (Bitmap bitmap, ObservableCollection<Collection> collections) GetBeatmapPresentationData(Beatmap selectedBeatmap)
+    public (Bitmap bitmap, ObservableCollection<Collection> collections) GetBeatmapPresentationData(Models.Beatmap selectedBeatmap)
     {
         return (new Bitmap(OsuDataReader.GetBeatmapImage(selectedBeatmap.FolderName, selectedBeatmap.FileName)),
             new(_beatmapDataService.Collections.Where(c => c.Beatmaps.Contains(selectedBeatmap))));
-    }
-
-    public void AddToCollection(string collectionName, Beatmap beatmap)
-    {
-        if (!_beatmapDataService.Collections.First(c => c.Name == collectionName).Beatmaps.Contains(beatmap))
-        {
-            _beatmapDataService.Collections.First(c => c.Name == collectionName).Beatmaps.Add(beatmap);
-            _osuDataService.AddToCollection(collectionName, beatmap.MD5Hash);
-        }
-    }
-
-    public void RemoveFromCollection(string collectionName, Beatmap beatmap)
-    {
-        if (_beatmapDataService.Collections.First(c => c.Name == collectionName).Beatmaps.Contains(beatmap))
-        {
-            _beatmapDataService.Collections.First(c => c.Name == collectionName).Beatmaps.Remove(beatmap);
-            _osuDataService.RemoveFromCollection(collectionName, beatmap.MD5Hash);
-        }
-    }
-
-    public void AddCollection(string name, List<string> md5hashes)
-    {
-        _osuDataService.AddCollection(name, md5hashes);
-    }
+    }    
 }

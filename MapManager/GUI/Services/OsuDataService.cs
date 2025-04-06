@@ -77,6 +77,25 @@ public class OsuDataService
             }
         });
     }
+    public void AddCollections(Dictionary<string, List<string>> collectionsData)
+    {
+        Task.Run(() =>
+        {
+            var newCollections = collectionsData
+                .Select(entry => new Collection
+                {
+                    Name = entry.Key,
+                    BeatmapHashes = entry.Value
+                })
+                .ToList();
+
+            _collectionDb.Collections.AddRange(newCollections);
+
+            using var stream = new FileStream(collectionsDbPath, FileMode.Create, FileAccess.Write);
+            var writer = new SerializationWriter(stream);
+            _collectionDb.WriteToStream(writer);
+        });
+    }
 
 
     public void AddToCollection(string collectionName, string md5)
@@ -110,6 +129,49 @@ public class OsuDataService
             }
         });
     }
+    public void RemoveCollection(string collectionName)
+    {
+        Task.Run(() =>
+        {
+            if (!_collectionDb.Collections.Any(c => c.Name == collectionName))
+                return;
+
+            _collectionDb.Collections.Remove(_collectionDb.Collections.First(c => c.Name == collectionName));
+            using (var stream = new FileStream(collectionsDbPath, FileMode.Create, FileAccess.Write))
+            {
+                var writer = new SerializationWriter(stream);
+                _collectionDb.WriteToStream(writer);
+            }
+        });
+    }
+
+    public void ExportCollection(Collection collection, string path)
+    {
+        Task.Run(() =>
+        {
+            var db = new CollectionDb()
+            {
+                OsuVersion = _collectionDb.OsuVersion
+            };
+            db.Collections.Add(collection);
+            using (var stream = new FileStream(path, FileMode.Create, FileAccess.Write))
+            {
+                var writer = new SerializationWriter(stream);
+                db.WriteToStream(writer);
+            }
+        });
+    }
+
+    internal List<Collection> ImportCollections(IEnumerable<string> paths)
+    {
+        List<Collection> res = new();
+        foreach (var path in paths)
+            res.AddRange(CollectionDb.Read(collectionsDbPath).Collections);
+
+        return res;
+
+    }
+
     public string GetBeatmapImage(string beatmapFolder, string beatmapFileName)
     {
         // Путь к файлу карты
