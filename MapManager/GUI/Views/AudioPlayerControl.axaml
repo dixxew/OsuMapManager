@@ -152,7 +152,7 @@
 							<iconPacks:PackIconForkAwesome
 								Height="18"
 								VerticalAlignment="Center"
-								Foreground="{Binding IsRandomEnabled, Converter={StaticResource BoolConverter}, ConverterParameter=PlayerRandom}}"
+								Foreground="{Binding IsRandomEnabled, Converter={StaticResource BoolConverter}, ConverterParameter=PlayerRandom}"
 								Kind="Random" />
 						</Button>
 						<Button
@@ -167,7 +167,7 @@
 							<iconPacks:PackIconForkAwesome
 								Height="18"
 								VerticalAlignment="Center"
-								Foreground="{Binding IsLoopEnabled, Converter={StaticResource BoolConverter}, ConverterParameter=PlayerRepeat}}"
+								Foreground="{Binding IsLoopEnabled, Converter={StaticResource BoolConverter}, ConverterParameter=PlayerRepeat}"
 								Kind="Repeat" />
 						</Button>
 					</StackPanel>

@@ -18,9 +18,8 @@ namespace MapManager.GUI.ViewModels;
 
 public class ChatViewModel : ViewModelBase
 {
-
-
     private readonly ChatService _service;
+
     public ChatViewModel(ChatService service)
     {
         _service = service;
@@ -35,8 +34,13 @@ public class ChatViewModel : ViewModelBase
     public ChatChannel SelectedChannel
     {
         get => _selectedChannel;
-        set => this.RaiseAndSetIfChanged(ref _selectedChannel, value);
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _selectedChannel, value);
+            OnSelectedChannelChanged();
+        }
     }
+
 
     private string _inputMessage;
 
@@ -45,7 +49,6 @@ public class ChatViewModel : ViewModelBase
         get => _inputMessage;
         set => this.RaiseAndSetIfChanged(ref _inputMessage, value);
     }
-
 
 
     public void ConnectChat()
@@ -64,5 +67,11 @@ public class ChatViewModel : ViewModelBase
     {
         if (channel.Equals(SelectedChannel))
             CurrentChannelMessageReceived?.Invoke();
+    }
+    
+    public event Action SelectedChannelChanged;
+    private void OnSelectedChannelChanged()
+    {
+        SelectedChannelChanged?.Invoke();
     }
 }

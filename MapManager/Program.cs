@@ -66,6 +66,7 @@ namespace MapManager
                     services.AddSingleton<OsuDataService>();
                     services.AddSingleton<IrcClient>();
                     services.AddSingleton<ChatService>();
+                    services.AddSingleton<AvatarService>();
 
                     services.AddSingleton<ViewLocator>(sp =>
                     {

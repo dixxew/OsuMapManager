@@ -8,6 +8,8 @@ public class ChatChannel
 {
     public string Name { get; }
     public ObservableCollection<ChatMessage> Messages { get; } = new();
+    public ObservableCollection<ChatUser> Users { get; } = new();
+    public bool IsUsersLoaded { get; set; } = false;
 
     public ChatChannel(string name)
     {

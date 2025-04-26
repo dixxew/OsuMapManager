@@ -22,7 +22,6 @@ public class OsuApiService
         UpdateClientSettings();
     }
 
-    private readonly Dictionary<string, Bitmap> _avatarCache = new();
     private readonly HttpClient _httpClient = new HttpClient();
 
 
@@ -82,19 +81,14 @@ public class OsuApiService
 
     public async Task<Bitmap?> GetAvatarAsync(string username)
     {
-        if (_avatarCache.TryGetValue(username, out var bitmap))
-            return bitmap;
-
         try
         {
-            // Замените URL на реальный API для получения аватара
             var url = await GetUserAvatarUrlAsync(username);
             var response = await _httpClient.GetAsync(url);
             if (response.IsSuccessStatusCode)
             {
                 using var stream = await response.Content.ReadAsStreamAsync();
-                bitmap = new Bitmap(stream);
-                _avatarCache[username] = bitmap;
+                var bitmap = new Bitmap(stream);
                 return bitmap;
             }
         }
