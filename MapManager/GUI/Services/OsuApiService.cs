@@ -1,9 +1,11 @@
-﻿using OsuSharp;
+﻿using Avalonia.Media.Imaging;
+using OsuSharp;
 using OsuSharp.Domain;
 using OsuSharp.Interfaces;
 using OsuSharp.Legacy;
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace MapManager.GUI.Services;
@@ -19,6 +21,12 @@ public class OsuApiService
         _settingsService.OnOsuApiSettingsChanged += OnOsuApiSettingsChanged;
         UpdateClientSettings();
     }
+
+    private readonly Dictionary<string, Bitmap> _avatarCache = new();
+    private readonly HttpClient _httpClient = new HttpClient();
+
+
+
 
     private void OnOsuApiSettingsChanged()
     {
@@ -68,6 +76,29 @@ public class OsuApiService
     public async Task<string> GetUserAvatarUrlAsync(string username)
     {
         var user = await _client.GetUserAsync(username);
+
         return user.AvatarUrl.ToString();
+    }
+
+    public async Task<Bitmap?> GetAvatarAsync(string username)
+    {
+        if (_avatarCache.TryGetValue(username, out var bitmap))
+            return bitmap;
+
+        try
+        {
+            // Замените URL на реальный API для получения аватара
+            var url = await GetUserAvatarUrlAsync(username);
+            var response = await _httpClient.GetAsync(url);
+            if (response.IsSuccessStatusCode)
+            {
+                using var stream = await response.Content.ReadAsStreamAsync();
+                bitmap = new Bitmap(stream);
+                _avatarCache[username] = bitmap;
+                return bitmap;
+            }
+        }
+        catch { }
+        return null;
     }
 }

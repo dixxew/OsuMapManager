@@ -14,37 +14,48 @@
 		<Binding Path="BeatmapInfoViewModel.SelectedBeatmap.Title" Source="{StaticResource Locator}" />
 	</sukiUi:SukiWindow.Title>
 	<sukiUi:SukiWindow.Hosts>
-		<sukiUi:SukiDialogHost Manager="{Binding DialogManager}" />
+		<StackPanel Orientation="Horizontal">
+			<sukiUi:SukiDialogHost Manager="{Binding DialogManager}" />
+		</StackPanel>
 	</sukiUi:SukiWindow.Hosts>
 	<sukiUi:SukiWindow.RightWindowTitleBarControls>
-		<Button Classes="Basic Rounded WindowControlsButton">
-			<iconPacks:PackIconFontAwesome
-				Height="12"
-				Foreground="White"
-				Kind="GearSolid" />
-			<Button.Flyout>
-				<Flyout>
-					<Panel>
-						<Border
-							Margin="20"
-							BoxShadow="{DynamicResource SukiPopupShadow}"
-							CornerRadius="20" />
-						<Border
-							MinWidth="350"
-							Margin="20"
-							Background="{DynamicResource SukiCardBackground}"
-							BorderBrush="{DynamicResource SukiLightBorderBrush}"
-							BorderThickness="1"
-							ClipToBounds="True"
-							CornerRadius="15">
-							<Border Padding="15" Background="{DynamicResource PopupGradientBrush}">
-								<view:SettingsControl />
+		<StackPanel Orientation="Horizontal">
+			<Button Classes="Basic Rounded WindowControlsButton">
+				<iconPacks:PackIconFontAwesome
+					Height="12"
+					Foreground="White"
+					Kind="GearSolid" />
+				<Button.Flyout>
+					<Flyout>
+						<Panel>
+							<Border
+								Margin="20"
+								BoxShadow="{DynamicResource SukiPopupShadow}"
+								CornerRadius="20" />
+							<Border
+								MinWidth="350"
+								Margin="20"
+								Background="{DynamicResource SukiCardBackground}"
+								BorderBrush="{DynamicResource SukiLightBorderBrush}"
+								BorderThickness="1"
+								ClipToBounds="True"
+								CornerRadius="15">
+								<Border Padding="15" Background="{DynamicResource PopupGradientBrush}">
+									<view:SettingsControl />
+								</Border>
 							</Border>
-						</Border>
-					</Panel>
-				</Flyout>
-			</Button.Flyout>
-		</Button>
+						</Panel>
+					</Flyout>
+				</Button.Flyout>
+			</Button>
+
+			<Button Classes="Basic Rounded WindowControlsButton" Command="{Binding SwitchChat}">
+				<iconPacks:PackIconFontAwesome
+					Height="12"
+					Foreground="White"
+					Kind="CommentsSolid" />
+			</Button>
+		</StackPanel>
 	</sukiUi:SukiWindow.RightWindowTitleBarControls>
 	<Grid>
 

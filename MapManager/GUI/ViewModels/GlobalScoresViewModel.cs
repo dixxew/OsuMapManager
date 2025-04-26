@@ -1,13 +1,10 @@
 ﻿using AutoMapper;
-using Avalonia.Controls.Primitives;
 using Avalonia.Threading;
 using DynamicData;
 using MapManager.GUI.Models;
 using MapManager.GUI.Services;
 using ReactiveUI;
-using System;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace MapManager.GUI.ViewModels;
@@ -26,6 +23,7 @@ public class GlobalScoresViewModel : ViewModelBase
         _rankingService = rankingService;
         _mapper = mapper;
     }
+
 
     private bool _isGlobalRankingsLoadingVisible = true;
 

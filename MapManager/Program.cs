@@ -5,6 +5,7 @@ using MapManager.GUI;
 using MapManager.GUI.Services;
 using MapManager.GUI.ViewModels;
 using MapManager.GUI.Views;
+using Meebey.SmartIrc4net;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OsuSharp;
@@ -63,6 +64,8 @@ namespace MapManager
                     services.AddSingleton<CollectionService>();
                     services.AddSingleton<NavigationService>();
                     services.AddSingleton<OsuDataService>();
+                    services.AddSingleton<IrcClient>();
+                    services.AddSingleton<ChatService>();
 
                     services.AddSingleton<ViewLocator>(sp =>
                     {
@@ -70,6 +73,8 @@ namespace MapManager
 
                         locator.Register<GreetingsViewModel, GreetingsControl>();
                         locator.Register<MainViewModel, MainControl>();
+                        locator.Register<ChatViewModel, ChatControl>();
+                        locator.Register<MainBlockBeatmapViewModel, MainBlockBeatmapControl>();
 
                         return locator;
                     });
@@ -92,6 +97,8 @@ namespace MapManager
                     services.AddSingleton<LocalScoresViewModel>();
                     services.AddSingleton<GlobalScoresViewModel>();
                     services.AddSingleton<GreetingsViewModel>();
+                    services.AddSingleton<ChatViewModel>();
+                    services.AddSingleton<MainBlockBeatmapViewModel>();
 
                     services.AddScoped<HttpClient>();
                     services.AddAutoMapper(typeof(MappingProfile));

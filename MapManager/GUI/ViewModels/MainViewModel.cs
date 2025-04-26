@@ -1,5 +1,7 @@
-﻿using MapManager.GUI.Services;
+﻿using Avalonia.Controls;
+using MapManager.GUI.Services;
 using ReactiveUI;
+using static MapManager.GUI.Services.NavigationService;
 
 namespace MapManager.GUI.ViewModels;
 
@@ -7,22 +9,43 @@ public class MainViewModel : ViewModelBase
 {
     private readonly AppInitializationService _appInitializationService;
     private readonly AuxiliaryService _auxiliaryService;
+    private readonly NavigationService _navigationService;
 
-    public MainViewModel(AppInitializationService appInitializationService, AuxiliaryService auxiliaryService)
+    public MainViewModel(NavigationService navigationService, AppInitializationService appInitializationService, AuxiliaryService auxiliaryService)
     {
+        _navigationService = navigationService;
         _appInitializationService = appInitializationService;
         _auxiliaryService = auxiliaryService;
+
+        _navigationService.Subscribe(NavigationTarget.MainBlockContent, control =>
+        {
+            MainBlockContent = control;
+        });
+
+        _navigationService.SwitchChatContent += () =>
+        {
+            if (MainBlockContent.DataContext is ChatViewModel)
+                _navigationService.SetContent(NavigationTarget.MainBlockContent, typeof(MainBlockBeatmapViewModel));
+            else
+                _navigationService.SetContent(NavigationTarget.MainBlockContent, typeof(ChatViewModel));
+        };
     }
 
     #region private props
-    private int _selectedRightTabIndex;
     private bool _isGlobalRankingsLoadingVisible;
     private bool _isLocalBeatmapsVisible;
     private bool _isGlobalBeatmapsVisible;
+    private UserControl _mainBlockContent;
     #endregion
 
 
+
     #region public props
+    public UserControl MainBlockContent
+    {
+        get => _mainBlockContent;
+        set => this.RaiseAndSetIfChanged(ref _mainBlockContent, value);
+    }
     public bool IsGlobalBeatmapsVisible
     {
         get => _isGlobalBeatmapsVisible;
@@ -44,20 +67,7 @@ public class MainViewModel : ViewModelBase
 
 
 
-    public int SelectedRightTabIndex
-    {
-        get => _selectedRightTabIndex;
-        set
-        {
-            this.RaiseAndSetIfChanged(ref _selectedRightTabIndex, value);
-            UpdateRightTab();
-        }
-    }
 
     #endregion
-
-    private async void UpdateRightTab()
-    {
-    }
 
 }

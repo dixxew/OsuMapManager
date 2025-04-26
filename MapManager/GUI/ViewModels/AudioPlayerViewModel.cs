@@ -64,14 +64,7 @@ public class AudioPlayerViewModel : ReactiveObject
     public string FormattedSongProgress => TimeSpan.FromSeconds(SongProgress).ToString(@"m\:ss");
     public string FormattedSongDuration => TimeSpan.FromSeconds(SongDuration).ToString(@"m\:ss");
 
-    public bool IsPlaying
-    {
-        get => _isPlaying;
-        private set
-        {
-            this.RaiseAndSetIfChanged(ref _isPlaying, value);
-        }
-    }
+    public bool IsPlaying => !_audioPlayerService.IsPaused;
 
     public bool IsLoopEnabled
     {
@@ -139,19 +132,19 @@ public class AudioPlayerViewModel : ReactiveObject
         if (IsPlaying)
         {
             _audioPlayerService.Pause();
-            IsPlaying = false;
+            this.RaisePropertyChanged(nameof(IsPlaying));
         }
         else
         {
             _audioPlayerService.Resume();
-            IsPlaying = true;
+            this.RaisePropertyChanged(nameof(IsPlaying));
         }
     }
 
     public void StopCommand()
     {
         _audioPlayerService.Stop();
-        IsPlaying = false;
+        this.RaisePropertyChanged(nameof(IsPlaying));
         SongProgress = 0;
     }
 
@@ -198,13 +191,13 @@ public class AudioPlayerViewModel : ReactiveObject
         }));
     }
 
-    private void OnSongChanged(bool isFavorite, double songDuration, bool isPlaying)
+    private void OnSongChanged(bool isFavorite, double songDuration)
     {
         Dispatcher.UIThread.Post(() =>
         {
             IsFavorite = isFavorite;
             SongDuration = songDuration;
-            IsPlaying = isPlaying;
+            this.RaisePropertyChanged(nameof(IsPlaying));
         });
     }
 }

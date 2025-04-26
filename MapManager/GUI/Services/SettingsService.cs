@@ -16,6 +16,10 @@ public class SettingsService
         OsuClientId = _appSettings.OsuClientId.ToString();
         OsuClientSecret = _appSettings.OsuClientSecret;
         OsuDirPath = _appSettings.OsuDirectory;
+        IrcServer = _appSettings.IrcServer;
+        IrcPort = _appSettings.IrcPort;
+        IrcNickname = _appSettings.IrcNickname;
+        IrcPassword = _appSettings.IrcPassword;
     }
 
 
@@ -44,6 +48,42 @@ public class SettingsService
         set
         {
             _appSettings.OsuDirectory = value;
+        }
+    }
+    public string? IrcServer
+    {
+        get => _appSettings.IrcServer;
+        set
+        {
+            _appSettings.IrcServer = value;
+            IrcSettingsChanged();
+        }
+    }
+    public int? IrcPort
+    {
+        get => _appSettings.IrcPort;
+        set
+        {
+            _appSettings.IrcPort = value;
+            IrcSettingsChanged();
+        }
+    }
+    public string? IrcNickname
+    {
+        get => _appSettings.IrcNickname;
+        set
+        {
+            _appSettings.IrcNickname = value;
+            IrcSettingsChanged();
+        }
+    }
+    public string? IrcPassword
+    {
+        get => _appSettings.IrcPassword;
+        set
+        {
+            _appSettings.IrcPassword = value; 
+            IrcSettingsChanged();
         }
     }
 
@@ -84,5 +124,12 @@ public class SettingsService
     private void OsuApiSettingsChanged()
     {
         OnOsuApiSettingsChanged?.Invoke();
+    }
+
+
+    public Action OnIrcSettingsChanged;
+    private void IrcSettingsChanged()
+    {
+        OnIrcSettingsChanged?.Invoke();
     }
 }

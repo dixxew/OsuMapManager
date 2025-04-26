@@ -25,6 +25,8 @@
 		<converters:BeatmapsSearchModeToBoolConverter x:Key="BeatmapsSearchModeToBoolConverter" />
 		<converters:TimeSpanToStringConverter x:Key="TimeSpanToStringConverter" />
 		<converters:ColorToBrushConverter x:Key="ColorToBrushConverter" />
+		<converters:BoolToChatItemConverter x:Key="BoolToChatItemConverter" />
+		<converters:BoolToAlignConverter x:Key="BoolToAlignConverter" />
 		<vm:ViewModelLocator x:Key="Locator" />
 	</Application.Resources>
 </Application>

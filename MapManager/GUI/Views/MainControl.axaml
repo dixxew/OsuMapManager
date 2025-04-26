@@ -72,32 +72,7 @@
 					Grid.Row="1"
 					Margin="4"
 					RowDefinitions="*, auto">
-					<Grid Margin="4" ColumnDefinitions="7*,3*">
-						<view:BeatmapInfoControl />
-
-						<sukiUi:GlassCard Grid.Column="1" Margin="4">
-							<TabControl
-								Margin="0,0,0,-12"
-								SelectedIndex="{Binding SelectedRightTabIndex}"
-								TabStripPlacement="Bottom">
-								<TabItem Header="Local">
-									<view:LocalScoresControl />
-								</TabItem>
-								<TabItem Header="Global">
-									<view:GlobalScoresControl />
-								</TabItem>
-								<TabItem Header="Comments">
-
-									<TextBlock
-										HorizontalAlignment="Center"
-										VerticalAlignment="Center"
-										FontSize="50"
-										Foreground="LightGray"
-										Text="Not realized" />
-								</TabItem>
-							</TabControl>
-						</sukiUi:GlassCard>
-					</Grid>
+					<UserControl Content="{Binding MainBlockContent}" />
 					<view:AudioPlayerControl
 						Grid.Row="1"
 						Margin="4"

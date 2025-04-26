@@ -15,6 +15,7 @@ public class NavigationService
     {
         MainContent,
         DialogContent,
+        MainBlockContent
     }
 
     private readonly ViewLocator _viewLocator;
@@ -60,4 +61,6 @@ public class NavigationService
         if (_targetChangedEvents.TryGetValue(target, out var handler))
             handler.Invoke(control);
     }
+
+    public Action SwitchChatContent;
 }

@@ -32,29 +32,66 @@
 					</StackPanel>
 				</sukiUi:GlassCard>
 				<sukiUi:GlassCard>
-					<StackPanel FlowDirection="LeftToRight" Orientation="Horizontal">
+					<DockPanel FlowDirection="LeftToRight">
 						<TextBlock Text="Osu api key:" />
-						<TextBox
-							Width="250"
-							Text="{Binding OsuClientSecret}"
-							Watermark="App key" />
-						<TextBox
-							Width="100"
-							Text="{Binding OsuClientId}"
-							Watermark="App ID" />
-						<Button
-							Margin="8,5"
-							Classes="Standard Icon"
-							Command="{Binding OpenWebPageOsuApiKey}">
-							<StackPanel Orientation="Horizontal">
-								<TextBlock Text="Get" />
-								<iconPacks:PackIconForkAwesome
-									Height="14"
-									VerticalAlignment="Center"
-									Kind="GlobeW" />
-							</StackPanel>
-						</Button>
-					</StackPanel>
+						<StackPanel
+							HorizontalAlignment="Right"
+							Orientation="Horizontal"
+							Spacing="4">
+							<TextBox
+								Width="250"
+								Text="{Binding OsuClientSecret}"
+								Watermark="App key" />
+							<TextBox
+								Width="100"
+								Text="{Binding OsuClientId}"
+								Watermark="App ID" />
+							<Button
+								Margin="8,5"
+								HorizontalAlignment="Right"
+								Classes="Standard Icon"
+								Command="{Binding OpenWebPageOsuApiKey}">
+								<StackPanel Orientation="Horizontal">
+									<TextBlock Text="Get" />
+									<iconPacks:PackIconForkAwesome
+										Height="14"
+										VerticalAlignment="Center"
+										Kind="GlobeW" />
+								</StackPanel>
+							</Button>
+						</StackPanel>
+					</DockPanel>
+				</sukiUi:GlassCard>
+				<sukiUi:GlassCard>
+					<DockPanel FlowDirection="LeftToRight">
+						<TextBlock Text="IRC" />
+						<StackPanel
+							HorizontalAlignment="Right"
+							Orientation="Horizontal"
+							Spacing="4">
+							<TextBox
+								Width="250"
+								Text="{Binding IrcNickname}"
+								Watermark="Nickname" />
+							<TextBox
+								Width="100"
+								PasswordChar="*"
+								Text="{Binding IrcPassword}"
+								Watermark="Password" />
+							<Button
+								Margin="8,5"
+								Classes="Standard Icon"
+								Command="{Binding OpenWebPageOsuApiKey}">
+								<StackPanel Orientation="Horizontal">
+									<TextBlock Text="Get" />
+									<iconPacks:PackIconForkAwesome
+										Height="14"
+										VerticalAlignment="Center"
+										Kind="GlobeW" />
+								</StackPanel>
+							</Button>
+						</StackPanel>
+					</DockPanel>
 				</sukiUi:GlassCard>
 				<sukiUi:GlassCard>
 					<ItemsControl Margin="-6" ItemsSource="{Binding ThemeColors}">

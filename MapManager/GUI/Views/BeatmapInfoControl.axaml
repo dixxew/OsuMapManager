@@ -66,7 +66,7 @@
 						</StackPanel>
 					</Grid>
 				</Border>
-				<Grid Grid.Row="1">
+				<Grid Grid.Row="1" ColumnDefinitions="* auto">
 					<StackPanel
 						VerticalAlignment="Top"
 						Orientation="Vertical"
@@ -112,6 +112,7 @@
 						</StackPanel>
 					</StackPanel>
 					<StackPanel
+						Grid.Column="1"
 						Margin="0,4,0,0"
 						HorizontalAlignment="Right"
 						Orientation="Vertical"
@@ -151,7 +152,7 @@
 					</StackPanel>
 
 					<ScrollViewer
-						MaxWidth="700"
+						Grid.Column="0"
 						MaxHeight="52"
 						HorizontalAlignment="Left"
 						VerticalAlignment="Bottom">

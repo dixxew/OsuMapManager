@@ -23,15 +23,19 @@ public class SettingsViewModel : ViewModelBase
         OsuClientSecret = _settingsService.OsuClientSecret;
         OsuClientId = _settingsService.OsuClientId;
         OsuDirPath = _settingsService.OsuDirPath;
+        IrcNickname = _settingsService.IrcNickname;
+        IrcPassword = _settingsService.IrcPassword;
 
         CreateThemes();
     }
 
-    
+
 
     private string? _osuClientSecret;
     private string? _osuClientId;
     private string? _osuDirPath;
+    private string? _ircNickname;
+    private string? _ircPassword;
 
     public string AppVersion => _settingsService.AppVersion;
 
@@ -90,6 +94,24 @@ public class SettingsViewModel : ViewModelBase
         {
             this.RaiseAndSetIfChanged(ref _osuDirPath, value);
             NotifySettingsChanged(nameof(OsuDirPath), value);
+        }
+    }
+    public string? IrcNickname
+    {
+        get => _ircNickname;
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _ircNickname, value);
+            NotifySettingsChanged(nameof(IrcNickname), value);
+        }
+    }
+    public string? IrcPassword
+    {
+        get => _ircPassword;
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _ircPassword, value);
+            NotifySettingsChanged(nameof(IrcPassword), value);
         }
     }
 

@@ -1,0 +1,123 @@
+<UserControl
+	x:Class="MapManager.GUI.Views.ChatControl"
+	xmlns="https://github.com/avaloniaui"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:iconPacks="https://github.com/MahApps/IconPacks.Avalonia"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+	d:DesignHeight="450"
+	d:DesignWidth="800"
+	Loaded="ChatLoaded"
+	mc:Ignorable="d">
+	<UserControl.DataContext>
+		<Binding Path="ChatViewModel" Source="{StaticResource Locator}" />
+	</UserControl.DataContext>
+	<Grid ColumnDefinitions="3* 7* 2*">
+		<sukiUi:GlassCard Grid.Column="0">
+			<StackPanel Orientation="Vertical">
+				<DockPanel>
+					<TextBlock
+						VerticalAlignment="Center"
+						FontSize="18"
+						Text="Channels" />
+					<Button
+						Padding="9,4"
+						HorizontalAlignment="Right"
+						Classes="Outlined Rounded"
+						Content="+" />
+				</DockPanel>
+				<ListBox
+					Grid.Row="1"
+					ItemsSource="{Binding Channels}"
+					SelectedItem="{Binding SelectedChannel}">
+					<ItemsControl.ItemTemplate>
+						<DataTemplate>
+							<TextBlock
+								Margin="8,4"
+								FontSize="18"
+								FontWeight="600"
+								Foreground="White"
+								Text="{Binding Name}"
+								TextWrapping="Wrap" />
+						</DataTemplate>
+					</ItemsControl.ItemTemplate>
+				</ListBox>
+			</StackPanel>
+		</sukiUi:GlassCard>
+		<sukiUi:GlassCard Grid.Column="1">
+			<Grid RowDefinitions="auto * auto">
+				<TextBlock FontSize="28" Text="{Binding SelectedChannel.Name}" />
+				<ScrollViewer
+					x:Name="MessagesScroll"
+					Grid.Row="1"
+					VerticalScrollBarVisibility="Auto">
+					<ItemsControl ItemsSource="{Binding SelectedChannel.Messages}">
+						<ItemsControl.ItemTemplate>
+							<DataTemplate>
+								<StackPanel Orientation="Horizontal">
+									<Border
+										Width="48"
+										Height="48"
+										ClipToBounds="True"
+										CornerRadius="48">
+
+										<Image
+											Width="48"
+											Height="48"
+											Source="{Binding Avatar}" />
+									</Border>
+									<sukiUi:GlassCard
+										Margin="5"
+										Padding="16,8"
+										HorizontalAlignment="Left">
+										<StackPanel Orientation="Vertical">
+											<TextBlock
+												FontSize="12"
+												FontWeight="650"
+												Foreground="{Binding NickColor}"
+												Text="{Binding Sender}"
+												TextWrapping="Wrap" />
+											<TextBlock
+												FontSize="18"
+												Foreground="White"
+												Text="{Binding Message}"
+												TextWrapping="Wrap" />
+											<TextBlock
+												HorizontalAlignment="Right"
+												FontSize="12"
+												Foreground="LightGray"
+												Text="{Binding Timestamp, StringFormat='{}{0:HH:mm}'}" />
+
+										</StackPanel>
+									</sukiUi:GlassCard>
+								</StackPanel>
+							</DataTemplate>
+						</ItemsControl.ItemTemplate>
+					</ItemsControl>
+				</ScrollViewer>
+				<TextBox
+					Grid.Row="2"
+					Padding="18"
+					CornerRadius="20"
+					FontSize="20"
+					Opacity="1"
+					Text="{Binding InputMessage}"
+					Watermark="Input message..." />
+				<Button
+					Grid.Row="2"
+					Margin="0,0,18,0"
+					HorizontalAlignment="Right"
+					VerticalAlignment="Center"
+					Classes="Outlined Rounded"
+					Command="{Binding Send}"
+					Content="Send" />
+			</Grid>
+		</sukiUi:GlassCard>
+		<sukiUi:GlassCard Grid.Column="2">
+			<StackPanel Orientation="Vertical">
+				<TextBlock Text="Users" />
+			</StackPanel>
+		</sukiUi:GlassCard>
+	</Grid>
+</UserControl>

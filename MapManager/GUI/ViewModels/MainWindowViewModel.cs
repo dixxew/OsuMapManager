@@ -1,5 +1,6 @@
 ﻿using Avalonia.Controls;
 using MapManager.GUI.Services;
+using MapManager.GUI.Views;
 using ReactiveUI;
 using SukiUI.Dialogs;
 using static MapManager.GUI.Services.NavigationService;
@@ -28,6 +29,7 @@ public class MainWindowViewModel : ViewModelBase
         // старт с Greetings
         _navigationService.SetContent(NavigationTarget.MainContent, typeof(MainViewModel));
         _navigationService.SetContent(NavigationTarget.DialogContent, typeof(GreetingsViewModel));
+        _navigationService.SetContent(NavigationTarget.MainBlockContent, typeof(MainBlockBeatmapViewModel));
     }
 
     public static ISukiDialogManager DialogManager { get; } = new SukiDialogManager();
@@ -46,5 +48,10 @@ public class MainWindowViewModel : ViewModelBase
     {
         get => _dialogContent;
         set => this.RaiseAndSetIfChanged(ref _dialogContent, value);
+    }
+
+    public void SwitchChat()
+    {
+        _navigationService.SwitchChatContent?.Invoke();
     }
 }

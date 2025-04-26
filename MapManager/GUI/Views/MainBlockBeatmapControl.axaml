@@ -1,0 +1,41 @@
+<UserControl
+	x:Class="MapManager.GUI.Views.MainBlockBeatmapControl"
+	xmlns="https://github.com/avaloniaui"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:model="using:MapManager.GUI.Models"
+	xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+	xmlns:view="using:MapManager.GUI.Views"
+	xmlns:vm="using:MapManager.GUI.ViewModels"
+	mc:Ignorable="d">
+	<UserControl.DataContext>
+		<Binding Path="MainBlockBetmapViewModel" Source="{StaticResource Locator}" />
+	</UserControl.DataContext>
+	<Grid Margin="4" ColumnDefinitions="7*,3*">
+		<view:BeatmapInfoControl />
+
+		<sukiUi:GlassCard Grid.Column="1" Margin="4">
+			<TabControl
+				Margin="0,0,0,-12"
+				SelectedIndex="{Binding SelectedRightTabIndex}"
+				TabStripPlacement="Bottom">
+				<TabItem Header="Local">
+					<view:LocalScoresControl />
+				</TabItem>
+				<TabItem Header="Global">
+					<view:GlobalScoresControl />
+				</TabItem>
+				<TabItem Header="Comments">
+
+					<TextBlock
+						HorizontalAlignment="Center"
+						VerticalAlignment="Center"
+						FontSize="50"
+						Foreground="LightGray"
+						Text="Not realized" />
+				</TabItem>
+			</TabControl>
+		</sukiUi:GlassCard>
+	</Grid>
+</UserControl>

@@ -76,6 +76,8 @@ public class AudioPlayerService
         }
     }
 
+    public bool IsPaused { get; set; }
+
 
     public void SetSongAndPlay(BeatmapSet beatmapSet, int selectedBeatmapId)
     {
@@ -84,7 +86,7 @@ public class AudioPlayerService
 
         Play(audioFilePath);
         _isFavorite = beatmapSet.IsFavorite;
-        SongChanged(beatmapSet.IsFavorite, SongDuration, true);
+        SongChanged(beatmapSet.IsFavorite, SongDuration);
     }
     public void Play(string filePath)
     {
@@ -111,7 +113,8 @@ public class AudioPlayerService
 
             _wavePlayer.Init(_soundTouchProvider);
             _wavePlayer.Volume = Volume;
-            _wavePlayer.Play();
+            if (!IsPaused)
+                _wavePlayer.Play();
             _wavePlayer.PlaybackStopped += PlaybackStopped;
         }
         catch
@@ -123,8 +126,16 @@ public class AudioPlayerService
 
 
 
-    public void Pause() => _wavePlayer?.Pause();
-    public void Resume() => _wavePlayer?.Play();
+    public void Pause()
+    {
+        _wavePlayer?.Pause();
+        IsPaused = true;
+    }
+    public void Resume()
+    {
+        _wavePlayer?.Play();
+        IsPaused = false;
+    }
     public void Stop()
     {
         if (_wavePlayer != null)
@@ -199,10 +210,10 @@ public class AudioPlayerService
     {
         SetSongAndPlay(_beatmapDataService.SelectedBeatmapSet, _beatmapDataService.SelectedBeatmap.BeatmapId);
     }
-    public event Action<bool, double, bool> OnSongChanged;
-    private void SongChanged(bool isFavorite, double songDuration, bool isPlaying)
+    public event Action<bool, double> OnSongChanged;
+    private void SongChanged(bool isFavorite, double songDuration)
     {
-        OnSongChanged?.Invoke(isFavorite, songDuration, isPlaying);
+        OnSongChanged?.Invoke(isFavorite, songDuration);
     }
     public event Action<double> OnSongProgressChanged;
 

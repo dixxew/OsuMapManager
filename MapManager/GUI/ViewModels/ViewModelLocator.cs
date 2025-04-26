@@ -50,8 +50,14 @@ public class ViewModelLocator
 
     public BeatmapBlockCollectionsViewModel BeatmapBlockCollectionsViewModel =>
         App.AppHost.Services.GetRequiredService<BeatmapBlockCollectionsViewModel>();
+
     public SearchOptionsViewModel SearchOptionsViewModel =>
         App.AppHost.Services.GetRequiredService<SearchOptionsViewModel>();
+
+    public ChatViewModel ChatViewModel =>
+        App.AppHost.Services.GetRequiredService<ChatViewModel>();
+    public MainBlockBeatmapViewModel MainBlockBetmapViewModel =>
+        App.AppHost.Services.GetRequiredService<MainBlockBeatmapViewModel>();
 
     public object GetByType(Type type)
     {
