@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Avalonia.Media.Imaging;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -10,12 +10,14 @@ public class AvatarService
     private const int MaxCacheSize = 200;
 
     private readonly OsuApiService _osuApiService;
+    private readonly CacheService _cacheService;
     private readonly Dictionary<string, Bitmap?> _avatarCache = new();
     private readonly Queue<string> _cacheOrder = new();
 
-    public AvatarService(OsuApiService osuApiService)
+    public AvatarService(OsuApiService osuApiService, CacheService cacheService)
     {
         _osuApiService = osuApiService;
+        _cacheService = cacheService;
     }
 
     public Bitmap? GetAvatar(string username)
@@ -29,7 +31,9 @@ public class AvatarService
 
     private async Task LoadAvatarAsync(string username)
     {
-        var avatar = await _osuApiService.GetAvatarAsync(username);
+        var avatar = await _cacheService.GetImageAsync(
+            $"chat_{username}",
+            () => _osuApiService.GetAvatarAsync(username));
         if (avatar == null) return;
 
         if (!_avatarCache.ContainsKey(username))

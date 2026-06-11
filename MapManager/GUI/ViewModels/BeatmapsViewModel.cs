@@ -13,7 +13,10 @@ public class BeatmapsViewModel : ViewModelBase
     {
         _beatmapDataService = beatmapDataService;
         _beatmapDataService.OnSelectedBeatmapSetChanged += OnSelectedBeatmapSetChanged;
+        _beatmapDataService.OnLoadingChanged += () => this.RaisePropertyChanged(nameof(IsLoading));
     }
+
+    public bool IsLoading => _beatmapDataService.IsLoading;
 
     public BeatmapSet SelectedBeatmapSet
     {

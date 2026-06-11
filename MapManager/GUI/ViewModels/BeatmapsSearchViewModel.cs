@@ -59,14 +59,14 @@ public class BeatmapsSearchViewModel : ViewModelBase
         }
     }
 
+    public bool IsAnyBeatmap => BeatmapsCount > 0;
+
     public long BeatmapsCount => _beatmapDataService.FilteredBeatmapSets.SelectMany(bs => bs.Beatmaps).Count();
-
-
-
 
     private void OnFiltesChanged()
     {
         this.RaisePropertyChanged(nameof(BeatmapsCount));
+        this.RaisePropertyChanged(nameof(IsAnyBeatmap));
     }
     private void OnReferenceBeatmapChanged()
     {

@@ -3,6 +3,7 @@
 	xmlns="https://github.com/avaloniaui"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:iconPacks="https://github.com/MahApps/IconPacks.Avalonia"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
 	xmlns:view="using:MapManager.GUI.Views"
@@ -19,15 +20,28 @@
 				<TextBox
 					FlowDirection="LeftToRight"
 					Text="{Binding SearchBeatmapSetText}"
-					Watermark="Search, ex: 'Sotarks We Are' or use Filters" />
+					Watermark="Search, ex: 'Sotarks We Are' or use Filters">
+					<TextBox.InnerLeftContent>
+						<iconPacks:PackIconFontAwesome
+							Height="13"
+							Margin="8,0,0,0"
+							VerticalAlignment="Center"
+							Foreground="Gray"
+							Kind="MagnifyingGlassSolid" />
+					</TextBox.InnerLeftContent>
+				</TextBox>
 			</DockPanel>
 			<DockPanel Margin="0,0,6,0">
-				<StackPanel Orientation="Horizontal" Spacing="12">
-					<RadioButton Margin="0,0,-10,0" IsChecked="{Binding SearchMode, Converter={StaticResource BeatmapsSearchModeToBoolConverter}, ConverterParameter=FILTERS}" />
-					<DropDownButton
-						Padding="12,8"
-						Content="Filters"
-						FontSize="12">
+				<StackPanel Orientation="Horizontal" Spacing="8">
+					<RadioButton Margin="0,0,-6,0" IsChecked="{Binding SearchMode, Converter={StaticResource BeatmapsSearchModeToBoolConverter}, ConverterParameter=FILTERS}" />
+					<DropDownButton Padding="12,8" FontSize="12">
+						<StackPanel Orientation="Horizontal" Spacing="6">
+							<iconPacks:PackIconFontAwesome
+								Height="11"
+								VerticalAlignment="Center"
+								Kind="FilterSolid" />
+							<TextBlock VerticalAlignment="Center" Text="Filters" />
+						</StackPanel>
 						<DropDownButton.Flyout>
 							<Flyout>
 								<Panel>
@@ -51,21 +65,75 @@
 							</Flyout>
 						</DropDownButton.Flyout>
 					</DropDownButton>
+					<ToggleButton
+						Padding="10,8"
+						VerticalAlignment="Center"
+						IsEnabled="{Binding IsAnyBeatmap}"
+						IsChecked="{Binding IsShowOnlyFavorites}"
+						ToolTip.Tip="Only favorites">
+						<ToggleButton.Styles>
+							<Style Selector="ToggleButton iconPacks|PackIconFontAwesome">
+								<Setter Property="Foreground" Value="Gray" />
+							</Style>
+							<Style Selector="ToggleButton:checked iconPacks|PackIconFontAwesome">
+								<Setter Property="Foreground" Value="#e0507a" />
+							</Style>
+							<Style Selector="ToggleButton">
+								<Setter Property="Foreground" Value="White" />
+								<Setter Property="Padding" Value="8 0" />
+								<Setter Property="BorderBrush" Value="Transparent" />
+							</Style>
+							<Style Selector="ToggleButton:pointerover /template/ Border">
+								<Setter Property="BorderBrush" Value="Transparent" />
+							</Style>
+							<Style Selector="ToggleButton:pointerover /template/ ContentPresenter">
+								<Setter Property="BorderBrush" Value="Transparent" />
+							</Style>
+							<Style Selector="ToggleButton:pointerover /template/ Border">
+								<Setter Property="BorderBrush" Value="Transparent" />
+							</Style>
+							<Style Selector="ToggleButton:pointerover /template/ ContentPresenter">
+								<Setter Property="Foreground" Value="White" />
+								<Setter Property="Background" Value="Transparent" />
+							</Style>
+							<Style Selector="ToggleButton:unchecked /template/ ContentPresenter">
+								<Setter Property="BorderBrush" Value="Transparent" />
+								<Setter Property="Background" Value="Transparent" />
+							</Style>
+							<Style Selector="ToggleButton:checked /template/ ContentPresenter">
+								<Setter Property="Background" Value="Transparent" />
+								<Setter Property="BorderBrush" Value="Transparent" />
+							</Style>
+						</ToggleButton.Styles>
+						<StackPanel Orientation="Horizontal" Spacing="4">
+							<TextBlock>My</TextBlock>
+							<iconPacks:PackIconFontAwesome
+								Height="13"
+								VerticalAlignment="Center"
+								Kind="HeartSolid" />
+						</StackPanel>
+					</ToggleButton>
+				</StackPanel>
+				<StackPanel
+					HorizontalAlignment="Right"
+					Orientation="Horizontal"
+					Spacing="10">
 					<TextBlock
 						VerticalAlignment="Center"
-						FontSize="16"
-						FontWeight="550">
+						FontSize="12"
+						Foreground="LightGray">
 						<Run Text="{Binding BeatmapsCount}" />
-						<Run Text="Maps" />
+						<Run Text="maps" />
 					</TextBlock>
-					<CheckBox Content="Favorites" IsChecked="{Binding IsShowOnlyFavorites}" />
-				</StackPanel>
-				<DropDownButton
-					Padding="12,8"
-					HorizontalAlignment="Right"
-					Content="Options"
-					FontSize="12">
-					<DropDownButton.Flyout>
+					<DropDownButton
+						Padding="10,8"
+						FontSize="12"
+						ToolTip.Tip="Options">
+						<iconPacks:PackIconFontAwesome
+							Height="13"
+							VerticalAlignment="Center"
+							Kind="SlidersSolid" />
+						<DropDownButton.Flyout>
 						<Flyout>
 							<Panel>
 								<Border
@@ -86,8 +154,9 @@
 								</Border>
 							</Panel>
 						</Flyout>
-					</DropDownButton.Flyout>
-				</DropDownButton>
+						</DropDownButton.Flyout>
+					</DropDownButton>
+				</StackPanel>
 			</DockPanel>
 
 			<Grid

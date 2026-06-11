@@ -3,6 +3,7 @@
 	xmlns="https://github.com/avaloniaui"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:iconPacks="https://github.com/MahApps/IconPacks.Avalonia"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:model="using:MapManager.GUI.Models"
 	xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
@@ -33,22 +34,22 @@
 
 			<Grid Background="#0fffffff">
 				<TabControl SelectedIndex="{Binding SelectedMainTab}">
-					<TabControl.Styles>
-						<Style Selector="TabItem">
-							<Setter Property="HeaderTemplate">
-								<Setter.Value>
-									<DataTemplate>
-										<TextBlock
-											Margin="8,0"
-											FontSize="18"
-											FontWeight="Bold"
-											Text="{Binding}" />
-									</DataTemplate>
-								</Setter.Value>
-							</Setter>
-						</Style>
-					</TabControl.Styles>
-					<TabItem Header="Maps">
+					<TabItem>
+						<TabItem.Header>
+							<StackPanel
+								Margin="8,0"
+								Orientation="Horizontal"
+								Spacing="8">
+								<iconPacks:PackIconFontAwesome
+									Height="15"
+									VerticalAlignment="Center"
+									Kind="MapSolid" />
+								<TextBlock
+									FontSize="18"
+									FontWeight="Bold"
+									Text="Maps" />
+							</StackPanel>
+						</TabItem.Header>
 						<Grid RowDefinitions="auto, *">
 							<view:BeatmapsSearchControl />
 							<Grid Grid.Row="1">
@@ -56,7 +57,22 @@
 							</Grid>
 						</Grid>
 					</TabItem>
-					<TabItem Header="Collections">
+					<TabItem>
+						<TabItem.Header>
+							<StackPanel
+								Margin="8,0"
+								Orientation="Horizontal"
+								Spacing="8">
+								<iconPacks:PackIconFontAwesome
+									Height="15"
+									VerticalAlignment="Center"
+									Kind="LayerGroupSolid" />
+								<TextBlock
+									FontSize="18"
+									FontWeight="Bold"
+									Text="Collections" />
+							</StackPanel>
+						</TabItem.Header>
 						<Grid RowDefinitions="auto, *">
 							<view:CollectionsSearchControl />
 							<Grid Grid.Row="1">

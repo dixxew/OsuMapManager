@@ -17,7 +17,7 @@ public class AppInitializationService : IHostedService
     private readonly RankingService _rankingService;
     private readonly BeatmapDataService _beatmapDataService;
 
-    public AppInitializationService(OsuDataService osuDataReader, RankingService rankingService, BeatmapDataService beatmapDataService)
+    public AppInitializationService(OsuDataService osuDataReader, RankingService rankingService, BeatmapDataService beatmapDataService, ThumbnailService _)
     {
         OsuDataReader = osuDataReader;
         _rankingService = rankingService;

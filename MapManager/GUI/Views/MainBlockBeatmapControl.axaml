@@ -4,6 +4,7 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:iconPacks="https://github.com/MahApps/IconPacks.Avalonia"
 	xmlns:model="using:MapManager.GUI.Models"
 	xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
 	xmlns:view="using:MapManager.GUI.Views"
@@ -27,13 +28,22 @@
 					<view:GlobalScoresControl />
 				</TabItem>
 				<TabItem Header="Comments">
-
-					<TextBlock
+					<StackPanel
 						HorizontalAlignment="Center"
 						VerticalAlignment="Center"
-						FontSize="50"
-						Foreground="LightGray"
-						Text="Not realized" />
+						Spacing="10">
+						<iconPacks:PackIconFontAwesome
+							Height="42"
+							Width="42"
+							HorizontalAlignment="Center"
+							Foreground="LightGray"
+							Kind="PersonDiggingSolid" />
+						<TextBlock
+							HorizontalAlignment="Center"
+							FontSize="18"
+							Foreground="LightGray"
+							Text="Coming soon" />
+					</StackPanel>
 				</TabItem>
 			</TabControl>
 		</sukiUi:GlassCard>

@@ -25,6 +25,22 @@
 							Padding="12,6"
 							IsInteractive="True">
 							<Grid>
+								<Canvas
+									Width="0"
+									Height="0"
+									HorizontalAlignment="Right"
+									VerticalAlignment="Center"
+									IsHitTestVisible="False"
+									Margin="0,0,50,0">
+									<TextBlock
+										Canvas.Left="-90"
+										Canvas.Top="-50"
+										FontSize="90"
+										FontWeight="900"
+										Opacity="0.12"
+										Foreground="{Binding Rank, Converter={StaticResource RankToColorConverter}}"
+										Text="{Binding Rank, Converter={StaticResource RankToTextConverter}}" />
+								</Canvas>
 								<Grid.Styles>
 									<Style Selector="TextBlock">
 										<Setter Property="Foreground" Value="White" />

@@ -28,6 +28,10 @@
 		<converters:BoolToChatItemConverter x:Key="BoolToChatItemConverter" />
 		<converters:BoolToAlignConverter x:Key="BoolToAlignConverter" />
 		<converters:MessageWidthConverter  x:Key="MessageWidthConverter" />
+		<converters:StarRatingToBrushConverter x:Key="StarRatingToBrushConverter" />
+		<converters:RankedStatusToBrushConverter x:Key="RankedStatusToBrushConverter" />
+		<converters:RankToColorConverter x:Key="RankToColorConverter" />
+		<converters:RankToTextConverter x:Key="RankToTextConverter" />
 		<vm:ViewModelLocator x:Key="Locator" />
 	</Application.Resources>
 </Application>

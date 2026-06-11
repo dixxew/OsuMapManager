@@ -1,6 +1,7 @@
 ﻿using ReactiveUI;
 using System.Diagnostics;
 using System;
+using System.Reactive;
 using System.Threading.Tasks;
 using MapManager.GUI.Services;
 using System.Collections.Generic;
@@ -14,11 +15,14 @@ namespace MapManager.GUI.ViewModels;
 public class SettingsViewModel : ViewModelBase
 {
     private readonly SettingsService _settingsService;
+    private readonly CacheService _cacheService;
 
+    public ReactiveCommand<Unit, Unit> InvalidateCacheCommand { get; }
 
-    public SettingsViewModel(SettingsService settingsService)
+    public SettingsViewModel(SettingsService settingsService, CacheService cacheService)
     {
         _settingsService = settingsService;
+        _cacheService = cacheService;
 
         OsuClientSecret = _settingsService.OsuClientSecret;
         OsuClientId = _settingsService.OsuClientId;
@@ -26,7 +30,22 @@ public class SettingsViewModel : ViewModelBase
         IrcNickname = _settingsService.IrcNickname;
         IrcPassword = _settingsService.IrcPassword;
 
+        InvalidateCacheCommand = ReactiveCommand.CreateFromTask(InvalidateCacheAsync);
+
         CreateThemes();
+    }
+
+    private bool _cacheInvalidated;
+    public bool CacheInvalidated
+    {
+        get => _cacheInvalidated;
+        private set => this.RaiseAndSetIfChanged(ref _cacheInvalidated, value);
+    }
+
+    private async Task InvalidateCacheAsync()
+    {
+        await _cacheService.InvalidateAllAsync();
+        CacheInvalidated = true;
     }
 
 

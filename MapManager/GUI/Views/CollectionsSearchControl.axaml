@@ -3,6 +3,7 @@
 	xmlns="https://github.com/avaloniaui"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:iconPacks="https://github.com/MahApps/IconPacks.Avalonia"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
 	d:DesignHeight="450"
@@ -16,29 +17,52 @@
 			<TextBox
 				FlowDirection="LeftToRight"
 				Text="{Binding SearchCollectionText}"
-				Watermark="Search" />
-			<DockPanel>
+				Watermark="Search">
+				<TextBox.InnerLeftContent>
+					<iconPacks:PackIconFontAwesome
+						Height="13"
+						Margin="8,0,0,0"
+						VerticalAlignment="Center"
+						Foreground="Gray"
+						Kind="MagnifyingGlassSolid" />
+				</TextBox.InnerLeftContent>
+			</TextBox>
+			<DockPanel Margin="0,4,0,0">
 				<TextBlock
 					VerticalAlignment="Center"
-					FontSize="16"
-					FontWeight="550">
+					FontSize="12"
+					Foreground="LightGray">
 					<Run Text="{Binding CollectionsCount}" />
-					<Run Text="Collections" />
+					<Run Text="collections" />
 				</TextBlock>
 				<StackPanel
 					HorizontalAlignment="Right"
 					Orientation="Horizontal"
 					Spacing="4">
 					<Button
-						Padding="8,2"
+						Padding="8,4"
 						Classes="Rounded"
-						Command="{Binding AddCollection}"
-						Content="Add" />
+						Command="{Binding AddCollection}">
+						<StackPanel Orientation="Horizontal" Spacing="4">
+							<iconPacks:PackIconFontAwesome
+								Height="10"
+								VerticalAlignment="Center"
+								Kind="PlusSolid" />
+							<TextBlock VerticalAlignment="Center" Text="Add" />
+						</StackPanel>
+					</Button>
 					<Button
-						Padding="8,2"
+						Padding="8,4"
 						Classes="Rounded"
-						Click="ImportClick"
-						Content="Import" />
+						Click="ImportClick">
+						<StackPanel Orientation="Horizontal" Spacing="4">
+							<iconPacks:PackIconFontAwesome
+								Height="10"
+								VerticalAlignment="Center"
+								Kind="FileImportSolid" />
+							<TextBlock VerticalAlignment="Center" Text="Import" />
+						</StackPanel>
+					</Button>
 				</StackPanel>
 			</DockPanel>
 		</StackPanel>

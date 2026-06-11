@@ -243,6 +243,28 @@ public class SearchFiltersViewModel : ViewModelBase
     }
 
 
+    public void AddTag(string tag)
+    {
+        var list = (_tagList ?? []).Where(t => !string.IsNullOrWhiteSpace(t)).ToList();
+        if (!list.Contains(tag, StringComparer.OrdinalIgnoreCase))
+            list.Add(tag);
+        _tags = string.Join(", ", list);
+        this.RaisePropertyChanged(nameof(Tags));
+        TagList = list;
+    }
+
+    public void RemoveTag(string tag)
+    {
+        var list = (_tagList ?? []).Where(t => !string.IsNullOrWhiteSpace(t)).ToList();
+        list.RemoveAll(t => string.Equals(t, tag, StringComparison.OrdinalIgnoreCase));
+        _tags = string.Join(", ", list);
+        this.RaisePropertyChanged(nameof(Tags));
+        TagList = list;
+    }
+
+    public bool HasTag(string tag) =>
+        _tagList?.Any(t => string.Equals(t, tag, StringComparison.OrdinalIgnoreCase)) ?? false;
+
     private void OnFiltersChanged() =>
         _beatmapDataService.Search();
 }

@@ -53,6 +53,7 @@ namespace MapManager
 
                     services.AddSingleton(appSettings);
 
+                    services.AddSingleton<CacheService>();
                     services.AddSingleton<OsuApiService>();
                     services.AddSingleton<SettingsService>();
                     services.AddSingleton<AppInitializationService>();
@@ -64,6 +65,7 @@ namespace MapManager
                     services.AddSingleton<CollectionService>();
                     services.AddSingleton<NavigationService>();
                     services.AddSingleton<OsuDataService>();
+                    services.AddSingleton<ThumbnailService>();
                     services.AddSingleton<IrcClient>();
                     services.AddSingleton<ChatService>();
                     services.AddSingleton<AvatarService>();

@@ -80,6 +80,39 @@ public class Score : ReactiveObject
         Accuracy = CalculateAccuracy(count300, count100, count50, countMiss);
     }
 
+    public string Rank
+    {
+        get
+        {
+            int total = Count300 + Count100 + Count50 + CountMiss;
+            if (total == 0) return "D";
+
+            double ratio300 = (double)Count300 / total;
+            double ratio50  = (double)Count50  / total;
+
+            string baseRank;
+            if (ratio300 == 1.0)
+                baseRank = "X";
+            else if (ratio300 > 0.9 && ratio50 <= 0.01 && CountMiss == 0)
+                baseRank = "S";
+            else if ((ratio300 > 0.8 && CountMiss == 0) || ratio300 > 0.9)
+                baseRank = "A";
+            else if ((ratio300 > 0.7 && CountMiss == 0) || ratio300 > 0.8)
+                baseRank = "B";
+            else if (ratio300 > 0.6)
+                baseRank = "C";
+            else
+                baseRank = "D";
+
+            // XH / SH для Hidden или Flashlight
+            bool silver = Mods.Contains("hd") || Mods.Contains("fl");
+            if (silver && (baseRank == "X" || baseRank == "S"))
+                return baseRank + "H";
+
+            return baseRank;
+        }
+    }
+
     public static double CalculateAccuracy(ushort count300, ushort count100, ushort count50, ushort countMiss)
     {
         // Числитель формулы

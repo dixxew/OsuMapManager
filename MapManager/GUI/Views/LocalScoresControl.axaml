@@ -3,6 +3,7 @@
 	xmlns="https://github.com/avaloniaui"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:iconPacks="https://github.com/MahApps/IconPacks.Avalonia"
 	xmlns:lottie="clr-namespace:Avalonia.Labs.Lottie;assembly=Avalonia.Labs.Lottie"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
@@ -14,13 +15,23 @@
 	</UserControl.DataContext>
 	<Grid>
 
-		<TextBlock
+		<StackPanel
 			HorizontalAlignment="Center"
 			VerticalAlignment="Center"
-			FontSize="50"
-			Foreground="LightGray"
 			IsVisible="{Binding IsSelectedBeatmapScoresEmpty}"
-			Text="Empty" />
+			Spacing="10">
+			<iconPacks:PackIconFontAwesome
+				Height="42"
+				Width="42"
+				HorizontalAlignment="Center"
+				Foreground="LightGray"
+				Kind="InboxSolid" />
+			<TextBlock
+				HorizontalAlignment="Center"
+				FontSize="18"
+				Foreground="LightGray"
+				Text="No local scores yet" />
+		</StackPanel>
 		<ScrollViewer IsVisible="{Binding !IsSelectedBeatmapScoresEmpty}">
 			<ItemsControl ItemsSource="{Binding SelectedBeatmap.Scores}">
 				<ItemsControl.ItemTemplate>
@@ -30,6 +41,22 @@
 							Padding="14,6"
 							IsInteractive="True">
 							<Grid>
+								<Canvas
+									Width="0"
+									Height="0"
+									HorizontalAlignment="Right"
+									VerticalAlignment="Center"
+									IsHitTestVisible="False"
+									Margin="0,0,50,0">
+									<TextBlock
+										Canvas.Left="-90"
+										Canvas.Top="-50"
+										FontSize="90"
+										FontWeight="900"
+										Opacity="0.12"
+										Foreground="{Binding Rank, Converter={StaticResource RankToColorConverter}}"
+										Text="{Binding Rank, Converter={StaticResource RankToTextConverter}}" />
+								</Canvas>
 								<Grid.Styles>
 									<Style Selector="TextBlock">
 										<Setter Property="Foreground" Value="White" />
@@ -43,7 +70,7 @@
 											Text="#" />
 										<Run FontSize="36" Text="{Binding Index}" />
 									</TextBlock>
-									<StackPanel Orientation="Vertical">
+											<StackPanel Orientation="Vertical">
 										<StackPanel Orientation="Horizontal" Spacing="8">
 
 											<TextBlock

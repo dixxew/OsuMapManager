@@ -1,8 +1,10 @@
 ﻿using Avalonia.Media.Imaging;
+using MapManager.GUI.Services;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace MapManager.GUI.Models;
 
@@ -160,7 +162,7 @@ public class GlobalUserCompact : ReactiveObject
         set
         {
             this.RaiseAndSetIfChanged(ref _avatarUrl, value);
-            LoadAvatarAsync();
+            _ = LoadAvatarAsync();
         }
     }
 
@@ -250,7 +252,7 @@ public class GlobalUserCompact : ReactiveObject
     }
     private static readonly HttpClient _httpClient = new();
 
-    private async void LoadAvatarAsync()
+    private async Task LoadAvatarAsync()
     {
         if (_avatarUrl == null)
         {
@@ -259,14 +261,33 @@ public class GlobalUserCompact : ReactiveObject
         }
         try
         {
-            using var response = await _httpClient.GetAsync(_avatarUrl);
-            response.EnsureSuccessStatusCode();
-            using var stream = await response.Content.ReadAsStreamAsync();
-            Avatar = new Bitmap(stream);
+            var cacheKey = $"avatar_{_id}";
+            var cacheService = CacheService.Current;
+            Bitmap? bitmap;
+            if (cacheService != null)
+                bitmap = await cacheService.GetImageAsync(cacheKey, () => DownloadBitmapAsync(_avatarUrl));
+            else
+                bitmap = await DownloadBitmapAsync(_avatarUrl);
+            Avatar = bitmap;
         }
         catch
         {
             Avatar = null;
+        }
+    }
+
+    private static async Task<Bitmap?> DownloadBitmapAsync(Uri url)
+    {
+        try
+        {
+            using var response = await _httpClient.GetAsync(url);
+            response.EnsureSuccessStatusCode();
+            using var stream = await response.Content.ReadAsStreamAsync();
+            return new Bitmap(stream);
+        }
+        catch
+        {
+            return null;
         }
     }
 

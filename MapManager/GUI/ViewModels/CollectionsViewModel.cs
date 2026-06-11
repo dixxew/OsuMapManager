@@ -2,6 +2,7 @@
 using Avalonia.Platform.Storage;
 using MapManager.GUI.Models;
 using MapManager.GUI.Services;
+using ReactiveUI;
 using SukiUI.Dialogs;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -18,7 +19,10 @@ public class CollectionsViewModel : ViewModelBase
     {
         _beatmapDataService = beatmapDataService;
         _collectionService = collectionService;
+        _beatmapDataService.OnLoadingChanged += () => this.RaisePropertyChanged(nameof(IsLoading));
     }
+
+    public bool IsLoading => _beatmapDataService.IsLoading;
 
     public ObservableCollection<Collection> Collections => _beatmapDataService.Collections;
 

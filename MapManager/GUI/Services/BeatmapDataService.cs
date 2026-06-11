@@ -28,6 +28,9 @@ public class BeatmapDataService
     private string _queryText;
     private BeatmapsSearchModeEnum _searchMode;
     private Beatmap? _referenceBeatmap = null;
+    private bool _isLoading = true;
+
+    public bool IsLoading => _isLoading;
 
     public string QueryText
     {
@@ -107,6 +110,11 @@ public class BeatmapDataService
 
     public void Search()
     {
+        if (_isLoading)
+        {
+            _isLoading = false;
+            OnLoadingChanged?.Invoke();
+        }
         switch (SearchMode)
         {
             case BeatmapsSearchModeEnum.QUERY:
@@ -350,6 +358,7 @@ public class BeatmapDataService
 
 
 
+    public Action OnLoadingChanged;
     public Action OnFiltesChanged;
 
     private void FiltesChanged()

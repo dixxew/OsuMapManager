@@ -15,5 +15,6 @@ public class AppSettings
     public int? IrcPort { get; set; } = 6667;
     public string? IrcNickname { get; set; }
     public string? IrcPassword { get; set; }
+    public DateTime? CacheInvalidatedAt { get; set; }
 }
 

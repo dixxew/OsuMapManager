@@ -185,8 +185,12 @@
 					VerticalAlignment="Center"
 					Orientation="Horizontal"
 					Spacing="8">
-					<TextBlock VerticalAlignment="Center" Text="Speed" />
-					<ComboBox SelectedValue="{Binding SelectedPlaybackRate}" SelectedValueBinding="{Binding Text}">
+					<iconPacks:PackIconFontAwesome
+						Height="14"
+						VerticalAlignment="Center"
+						Kind="GaugeHighSolid"
+						ToolTip.Tip="Playback speed" />
+					<ComboBox SelectedValue="{Binding SelectedPlaybackRate}" SelectedValueBinding="{Binding Text}" ToolTip.Tip="Playback speed">
 						<ComboBox.Styles>
 							<Style Selector="TextBlock">
 								<Setter Property="Foreground" Value="White" />
