@@ -206,8 +206,17 @@ public class AudioPlayerService
         _wavePlayer.Play();
     }
 
+    private bool _isFirstSelection = true;
+
     private void OnSelectedBeatmapChanged()
     {
+        if (_isFirstSelection)
+        {
+            // первая селекция — это автовыбор карты при загрузке приложения,
+            // трек загружаем, но звук не включаем, пока пользователь сам не нажмёт play
+            _isFirstSelection = false;
+            IsPaused = true;
+        }
         SetSongAndPlay(_beatmapDataService.SelectedBeatmapSet, _beatmapDataService.SelectedBeatmap.BeatmapId);
     }
     public event Action<bool, double> OnSongChanged;

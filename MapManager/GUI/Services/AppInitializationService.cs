@@ -4,6 +4,7 @@ using MapManager.GUI.Models;
 using Microsoft.Extensions.Hosting;
 using osu_database_reader.Components.Beatmaps;
 using osu_database_reader.Components.Player;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -31,6 +32,10 @@ public class AppInitializationService : IHostedService
         {
             _beatmapDataService.Search();
         });
+        
+        GC.Collect(2, GCCollectionMode.Forced);
+        GC.WaitForPendingFinalizers();
+        GC.Collect(2, GCCollectionMode.Forced);
     }
 
     public Task StopAsync(CancellationToken cancellationToken)

@@ -67,6 +67,8 @@ namespace MapManager
                     services.AddSingleton<IrcClient>();
                     services.AddSingleton<ChatService>();
                     services.AddSingleton<AvatarService>();
+                    
+                    
 
                     services.AddSingleton<ViewLocator>(sp =>
                     {

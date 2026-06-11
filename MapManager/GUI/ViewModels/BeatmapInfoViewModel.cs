@@ -89,8 +89,11 @@ public class BeatmapInfoViewModel : ViewModelBase
     {
         this.RaisePropertyChanged(nameof(SelectedBeatmap));
 
+        var oldBackground = _mapBackground;
         var beatmapData = _beatmapService.GetBeatmapPresentationData(SelectedBeatmap);
         MapBackground = beatmapData.bitmap;
+        oldBackground?.Dispose();
+
         SelectedBeatmapCollections = beatmapData.collections;
         this.RaisePropertyChanged(nameof(SelectedBeatmapCollectionsCount));
     }

@@ -248,6 +248,8 @@ public class GlobalUserCompact : ReactiveObject
         get => _avatar;
         set => this.RaiseAndSetIfChanged(ref _avatar, value);
     }
+    private static readonly HttpClient _httpClient = new();
+
     private async void LoadAvatarAsync()
     {
         if (_avatarUrl == null)
@@ -255,22 +257,16 @@ public class GlobalUserCompact : ReactiveObject
             Avatar = null;
             return;
         }
-        var _httpClient = new HttpClient();
         try
         {
-            // Загрузка данных аватарки
             using var response = await _httpClient.GetAsync(_avatarUrl);
             response.EnsureSuccessStatusCode();
-
-            // Чтение данных как поток
             using var stream = await response.Content.ReadAsStreamAsync();
-
-            // Создание Bitmap из потока
             Avatar = new Bitmap(stream);
         }
-        catch (Exception ex)
+        catch
         {
-            Avatar = null; // Сбрасываем аватарку в случае ошибки
+            Avatar = null;
         }
     }
 

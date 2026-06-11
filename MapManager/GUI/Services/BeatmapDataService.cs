@@ -282,9 +282,9 @@ public class BeatmapDataService
                     b.TagsList.Any(tag => tag.Contains(filterTag, StringComparison.OrdinalIgnoreCase))) : true)
             ).ToList();
 
-            // Если битмапы прошли фильтры, добавляем сет в результирующий список
-            if (filteredBeatmaps.Any())
-            {
+            if (filteredBeatmaps.Count == beatmapSet.Beatmaps.Count)
+                filtered.Add(beatmapSet);
+            else if (filteredBeatmaps.Count > 0)
                 filtered.Add(new BeatmapSet
                 {
                     Id = beatmapSet.Id,
@@ -294,7 +294,6 @@ public class BeatmapDataService
                     Beatmaps = filteredBeatmaps,
                     IsFavorite = beatmapSet.IsFavorite,
                 });
-            }
         }
 
         // Обновляем только изменённые элементы

@@ -10,15 +10,20 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 
 namespace MapManager.GUI.Views;
 
 public partial class GreetingsControl : UserControl
 {
-    private List<Bitmap> frames;
-    private int currentFrame = 0;
+    // Кадры декодируются в фоне небольшим окном вперёд, проигранные — диспозятся.
+    // Держать все 240 кадров 1000x1000 в памяти нельзя: это ~960 МБ нативной кучи.
+    private const int PrefetchWindow = 10;
+    private const int DecodeWidth = 800; // Image 400x400 при ScaleX/Y до 2.0 → максимум 800px
+
     private DispatcherTimer frameTimer;
+    private Bitmap previousFrame;
 
     public GreetingsControl()
     {
@@ -30,14 +35,28 @@ public partial class GreetingsControl : UserControl
     {
         var introImage = this.FindControl<Image>("IntroImage");
 
-        frames = Directory.GetFiles("GUI/Assets/greetings", "*.png")
+        var files = Directory.GetFiles("GUI/Assets/greetings", "*.png")
             .OrderBy(x => x)
-            .Select(x => new Bitmap(x))
-            .ToList();
+            .ToArray();
 
-        introImage.Source = frames[0];
+        if (files.Length == 0)
+            return;
 
-        // �������� ��������������� ������� ����� ������
+        var channel = Channel.CreateBounded<Bitmap>(PrefetchWindow);
+        _ = Task.Run(async () =>
+        {
+            foreach (var file in files)
+            {
+                using var stream = File.OpenRead(file);
+                var bitmap = Bitmap.DecodeToWidth(stream, DecodeWidth);
+                await channel.Writer.WriteAsync(bitmap);
+            }
+            channel.Writer.Complete();
+        });
+
+        introImage.Source = await channel.Reader.ReadAsync();
+
+        // плавное масштабирование первого кадра
         if (introImage.RenderTransform is ScaleTransform scale)
         {
             var scaleStartTime = DateTime.Now;
@@ -65,30 +84,39 @@ public partial class GreetingsControl : UserControl
             };
 
             scaleTimer.Start();
-            
         }
 
-        // �����
+        // кадры
         frameTimer = new DispatcherTimer
         {
             Interval = TimeSpan.FromMilliseconds(8)
         };
 
-        frameTimer.Tick += async (_, _) =>
+        frameTimer.Tick += (_, _) =>
         {
-            currentFrame++;
-            if (currentFrame >= frames.Count)
+            if (!channel.Reader.TryRead(out var nextFrame))
             {
+                if (!channel.Reader.Completion.IsCompleted)
+                    return; // декодер не успел — ждём следующий тик
+
                 frameTimer.Stop();
 
-                
                 this.Opacity = 0;
                 if (this.Parent is ContentControl parent)
                     parent.Content = null;
+
+                previousFrame?.Dispose();
+                previousFrame = null;
+                var last = introImage.Source as Bitmap;
+                introImage.Source = null;
+                last?.Dispose();
                 return;
             }
 
-            introImage.Source = frames[currentFrame];
+            // диспозим кадр, который уже точно не на экране (N-2)
+            previousFrame?.Dispose();
+            previousFrame = introImage.Source as Bitmap;
+            introImage.Source = nextFrame;
         };
 
         frameTimer.Start();

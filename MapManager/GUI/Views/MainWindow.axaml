@@ -8,7 +8,9 @@
 	xmlns:model="using:MapManager.GUI.Models"
 	xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
 	xmlns:view="using:MapManager.GUI.Views"
-	xmlns:vm="using:MapManager.GUI.ViewModels"
+	xmlns:vm="using:MapManager.GUI.ViewModels"                                                                                                                                                                                                                                                                                       
+	BackgroundAnimationEnabled="False"
+	BackgroundStyle="Flat"
 	TitleFontSize="18">
 	<sukiUi:SukiWindow.Title>
 		<Binding Path="BeatmapInfoViewModel.SelectedBeatmap.Title" Source="{StaticResource Locator}" />
@@ -60,6 +62,6 @@
 	<Grid>
 
 		<ContentControl Content="{Binding Content}" />
-		<ContentControl Content="{Binding DialogContent}" />
+		<!-- <ContentControl Content="{Binding DialogContent}" /> -->
 	</Grid>
 </sukiUi:SukiWindow>

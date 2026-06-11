@@ -28,9 +28,19 @@ namespace MapManager.GUI
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
                 var mainWindowVM = AppHost.Services.GetRequiredService<MainWindowViewModel>();
-                desktop.MainWindow = new MainWindow
+                desktop.MainWindow = new MainWindow()
                 {
                     DataContext = mainWindowVM,
+                };
+
+                desktop.MainWindow.Closed += (_, _) =>
+                {
+                    AppHost.Services.GetRequiredService<Services.AudioPlayerService>().Stop();
+                    AppHost.Services.GetRequiredService<Services.ChatService>().Disconnect();
+                    AppHost.StopAsync().Wait(TimeSpan.FromSeconds(2));
+                    desktop.Shutdown();
+                    // добиваем не-фоновые потоки (NAudio/IRC), которые иначе держат процесс живым
+                    Environment.Exit(0);
                 };
             }
             ThreadPool.QueueUserWorkItem(_ =>

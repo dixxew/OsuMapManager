@@ -19,9 +19,7 @@ public class OsuDataService
     private string scoresDbPath;
     private string collectionsDbPath;
 
-    private OsuDb _osuDb;
     private CollectionDb _collectionDb;
-    private ScoresDb _scoresDb;
 
     public OsuDataService(AppSettings appSettings)
     {
@@ -39,9 +37,8 @@ public class OsuDataService
 
     public List<BeatmapEntry> GetBeatmapList()
     {
-        _osuDb = OsuDb.Read(osuDbPath);
-
-        return _osuDb.Beatmaps;
+        var osuDb = OsuDb.Read(osuDbPath);
+        return osuDb.Beatmaps;
     }
 
     public List<Collection> GetCollectionsList()
@@ -52,9 +49,8 @@ public class OsuDataService
     }
     public List<Replay> GetScoresList()
     {
-        _scoresDb = ScoresDb.Read(scoresDbPath);
-
-        return _scoresDb.Scores.ToList();
+        var scoresDb = ScoresDb.Read(scoresDbPath);
+        return scoresDb.Scores.ToList();
     }
 
 
