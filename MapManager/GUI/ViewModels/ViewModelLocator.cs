@@ -59,6 +59,9 @@ public class ViewModelLocator
     public MainBlockBeatmapViewModel MainBlockBetmapViewModel =>
         App.AppHost.Services.GetRequiredService<MainBlockBeatmapViewModel>();
 
+    public BeatmapCommentsViewModel BeatmapCommentsViewModel =>
+        App.AppHost.Services.GetRequiredService<BeatmapCommentsViewModel>();
+
     public object GetByType(Type type)
     {
         var prop = GetType()

@@ -47,7 +47,7 @@
 								<TextBlock
 									FontSize="18"
 									FontWeight="Bold"
-									Text="Maps" />
+									Text="Sets" />
 							</StackPanel>
 						</TabItem.Header>
 						<Grid RowDefinitions="auto, *">

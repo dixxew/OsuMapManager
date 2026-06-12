@@ -40,7 +40,6 @@
 								Height="11"
 								VerticalAlignment="Center"
 								Kind="FilterSolid" />
-							<TextBlock VerticalAlignment="Center" Text="Filters" />
 						</StackPanel>
 						<DropDownButton.Flyout>
 							<Flyout>

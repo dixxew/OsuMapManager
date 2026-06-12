@@ -40,6 +40,7 @@
     <PackageReference Include="OsuSharp.JsonModels" Version="6.4.1" />-->
     <PackageReference Include="SoundTouch.Net" Version="2.3.2" />
     <PackageReference Include="SoundTouch.Net.NAudioSupport.Core" Version="2.3.2" />
+    <PackageReference Include="SkiaSharp" Version="2.88.9" />
     <PackageReference Include="SukiUI" Version="6.0.0-rc" />
   </ItemGroup>
 

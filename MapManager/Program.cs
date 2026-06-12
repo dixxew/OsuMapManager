@@ -101,6 +101,7 @@ namespace MapManager
                     services.AddSingleton<BeatmapInfoViewModel>();
                     services.AddSingleton<LocalScoresViewModel>();
                     services.AddSingleton<GlobalScoresViewModel>();
+                    services.AddSingleton<BeatmapCommentsViewModel>();
                     services.AddSingleton<GreetingsViewModel>();
                     services.AddSingleton<ChatViewModel>();
                     services.AddSingleton<MainBlockBeatmapViewModel>();

@@ -1,10 +1,10 @@
-using Avalonia;
+using Avalonia.Media.Imaging;
+using SkiaSharp;
 using System;
 using System.Collections.Concurrent;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Avalonia.Media.Imaging;
 
 namespace MapManager.GUI.Services;
 
@@ -17,7 +17,8 @@ public class ThumbnailService
     private readonly ConcurrentDictionary<string, Bitmap?> _memoryCache = new();
     private readonly SemaphoreSlim _semaphore = new(4, 4);
 
-    private const int TargetWidth = 300;
+    private const int TargetWidth = 160;
+    private const int JpegQuality = 55;
 
     public ThumbnailService(OsuDataService osuDataService)
     {
@@ -38,7 +39,7 @@ public class ThumbnailService
             if (_memoryCache.TryGetValue(folderName, out cached))
                 return cached;
 
-            var diskPath = Path.Combine(_thumbsDir, SanitizeKey(folderName) + ".png");
+            var diskPath = Path.Combine(_thumbsDir, SanitizeKey(folderName) + ".jpg");
 
             if (File.Exists(diskPath))
             {
@@ -58,18 +59,25 @@ public class ThumbnailService
                     var imgPath = _osuDataService.GetBeatmapImage(folderName, beatmapFileName);
                     if (!File.Exists(imgPath)) return null;
 
-                    using var original = new Bitmap(imgPath);
-                    var h = (int)(original.PixelSize.Height * (TargetWidth / (double)original.PixelSize.Width));
-                    h = Math.Clamp(h, 40, 200);
+                    using var original = SKBitmap.Decode(imgPath);
+                    if (original == null) return null;
 
-                    var scaled = original.CreateScaledBitmap(
-                        new PixelSize(TargetWidth, h),
-                        BitmapInterpolationMode.MediumQuality);
+                    var targetH = (int)(original.Height * (TargetWidth / (double)original.Width));
+                    targetH = Math.Clamp(targetH, 20, 100);
 
-                    try { scaled.Save(diskPath); } catch { }
+                    using var scaled = original.Resize(
+                        new SKImageInfo(TargetWidth, targetH),
+                        SKFilterQuality.Medium);
+                    if (scaled == null) return null;
 
-                    _memoryCache[folderName] = scaled;
-                    return scaled;
+                    using var image = SKImage.FromBitmap(scaled);
+                    using var encoded = image.Encode(SKEncodedImageFormat.Jpeg, JpegQuality);
+                    using (var fs = File.OpenWrite(diskPath))
+                        encoded.SaveTo(fs);
+
+                    var bitmap = new Bitmap(diskPath);
+                    _memoryCache[folderName] = bitmap;
+                    return bitmap;
                 }
                 catch
                 {

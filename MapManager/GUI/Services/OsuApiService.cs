@@ -1,11 +1,16 @@
 ﻿using Avalonia.Media.Imaging;
+using MapManager.GUI.Models;
 using OsuSharp;
 using OsuSharp.Domain;
 using OsuSharp.Interfaces;
 using OsuSharp.Legacy;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace MapManager.GUI.Services;
@@ -23,6 +28,7 @@ public class OsuApiService
     }
 
     private readonly HttpClient _httpClient = new HttpClient();
+    private static readonly JsonSerializerOptions _jsonOptions = new() { PropertyNameCaseInsensitive = true };
 
 
 
@@ -94,5 +100,90 @@ public class OsuApiService
         }
         catch { }
         return null;
+    }
+
+    public async Task<List<BeatmapCommentCacheEntry>> GetBeatmapsetCommentsAsync(long beatmapSetId)
+    {
+        try
+        {
+            var token = await _client.GetOrUpdateAccessTokenAsync();
+            using var request = new HttpRequestMessage(HttpMethod.Get,
+                $"https://osu.ppy.sh/api/v2/comments?commentable_type=beatmapset&commentable_id={beatmapSetId}");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token.AccessToken);
+
+            using var response = await _httpClient.SendAsync(request);
+            if (!response.IsSuccessStatusCode) return [];
+
+            var json = await response.Content.ReadAsStringAsync();
+            var bundle = JsonSerializer.Deserialize<CommentBundleJson>(json, _jsonOptions);
+            if (bundle == null) return [];
+
+            var userMap = bundle.Users.ToDictionary(u => u.Id);
+
+            return bundle.Comments
+                .Where(c => c.DeletedAt == null)
+                .Select(c =>
+                {
+                    userMap.TryGetValue(c.UserId ?? 0, out var u);
+                    return new BeatmapCommentCacheEntry
+                    {
+                        Id = c.Id,
+                        ParentId = c.ParentId,
+                        Message = c.Message ?? "",
+                        CreatedAt = c.CreatedAt,
+                        VotesCount = c.VotesCount,
+                        RepliesCount = c.RepliesCount,
+                        Pinned = c.Pinned,
+                        UserId = c.UserId,
+                        Username = u?.Username,
+                        AvatarUrl = u?.AvatarUrl,
+                    };
+                })
+                .ToList();
+        }
+        catch
+        {
+            return [];
+        }
+    }
+
+    private class CommentBundleJson
+    {
+        [JsonPropertyName("comments")]
+        public List<CommentJson> Comments { get; set; } = [];
+        [JsonPropertyName("users")]
+        public List<CommentUserJson> Users { get; set; } = [];
+    }
+
+    private class CommentJson
+    {
+        [JsonPropertyName("id")]
+        public long Id { get; set; }
+        [JsonPropertyName("parent_id")]
+        public long? ParentId { get; set; }
+        [JsonPropertyName("user_id")]
+        public long? UserId { get; set; }
+        [JsonPropertyName("message")]
+        public string? Message { get; set; }
+        [JsonPropertyName("created_at")]
+        public DateTimeOffset CreatedAt { get; set; }
+        [JsonPropertyName("votes_count")]
+        public int VotesCount { get; set; }
+        [JsonPropertyName("replies_count")]
+        public int RepliesCount { get; set; }
+        [JsonPropertyName("pinned")]
+        public bool Pinned { get; set; }
+        [JsonPropertyName("deleted_at")]
+        public DateTimeOffset? DeletedAt { get; set; }
+    }
+
+    private class CommentUserJson
+    {
+        [JsonPropertyName("id")]
+        public long Id { get; set; }
+        [JsonPropertyName("username")]
+        public string Username { get; set; } = "";
+        [JsonPropertyName("avatar_url")]
+        public string AvatarUrl { get; set; } = "";
     }
 }

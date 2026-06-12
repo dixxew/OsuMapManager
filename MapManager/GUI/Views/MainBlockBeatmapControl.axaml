@@ -28,22 +28,7 @@
 					<view:GlobalScoresControl />
 				</TabItem>
 				<TabItem Header="Comments">
-					<StackPanel
-						HorizontalAlignment="Center"
-						VerticalAlignment="Center"
-						Spacing="10">
-						<iconPacks:PackIconFontAwesome
-							Height="42"
-							Width="42"
-							HorizontalAlignment="Center"
-							Foreground="LightGray"
-							Kind="PersonDiggingSolid" />
-						<TextBlock
-							HorizontalAlignment="Center"
-							FontSize="18"
-							Foreground="LightGray"
-							Text="Coming soon" />
-					</StackPanel>
+					<view:BeatmapCommentsControl />
 				</TabItem>
 			</TabControl>
 		</sukiUi:GlassCard>

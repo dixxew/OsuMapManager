@@ -19,14 +19,14 @@ public partial class BeatmapsControl : UserControl
             var listBox = this.FindControl<ListBox>("BeatmapsListBox");
             var vm = DataContext as BeatmapsViewModel;
 
-            vm.SelectedBeatmapSetChanged += () =>
-            {
-                Dispatcher.UIThread.Post(() =>
-                {
-                    if (listBox != null)
-                        listBox!.Scroll.Offset = new Vector(0, 0);
-                });
-            };
+            // vm.SelectedBeatmapSetChanged += () =>
+            // {
+            //     Dispatcher.UIThread.Post(() =>
+            //     {
+            //         if (listBox != null)
+            //             listBox!.Scroll.Offset = new Vector(0, 0);
+            //     });
+            // };
         };
     }
 }

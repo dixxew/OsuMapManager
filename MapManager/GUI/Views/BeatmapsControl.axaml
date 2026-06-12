@@ -21,8 +21,12 @@
 			Foreground="White"
 			ItemsSource="{Binding FilteredBeatmapSets}"
 			ScrollViewer.VerticalScrollBarVisibility="Hidden"
+			
 			SelectedItem="{Binding SelectedBeatmapSet}">
 			<ListBox.Styles>
+				<Style Selector="ListBoxItem">
+					<Setter Property="Padding" Value="-2" />
+				</Style>
 				<Style Selector="ListBoxItem /template/ PathIcon#CheckSelected">
 					<Setter Property="IsVisible" Value="False" />
 				</Style>
@@ -53,7 +57,7 @@
 								Width="{Binding $parent[Canvas].Bounds.Width}"
 								Height="{Binding $parent[Canvas].Bounds.Height}"
 								CornerRadius="6"
-								Opacity="0.7"
+								Opacity="0.9"
 								ClipToBounds="True">
 								<Image Source="{Binding Thumbnail}" Stretch="UniformToFill" HorizontalAlignment="Center" VerticalAlignment="Center" />
 								<Border.OpacityMask>
@@ -70,7 +74,7 @@
 						<Ellipse
 							Width="8"
 							Height="8"
-							Margin="0,0,8,0"
+							Margin="4,0,8,0"
 							VerticalAlignment="Center"
 							Fill="{Binding Beatmaps[0].RankedStatus, Converter={StaticResource RankedStatusToBrushConverter}}"
 							ToolTip.Tip="{Binding Beatmaps[0].RankedStatus}" />

@@ -1,278 +1,363 @@
 <UserControl
-	x:Class="MapManager.GUI.Views.SearchFiltersControl"
-	xmlns="https://github.com/avaloniaui"
-	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-	xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
-	d:DesignHeight="450"
-	d:DesignWidth="800"
-	mc:Ignorable="d">
-	<UserControl.DataContext>
-		<Binding Path="SearchFiltersViewModel" Source="{StaticResource Locator}" />
-	</UserControl.DataContext>
-	<Grid>
-		<StackPanel Orientation="Vertical" Spacing="4">
-			<TextBlock
-				Margin="0,6"
-				HorizontalAlignment="Center"
-				FontSize="18"
-				Foreground="White"
-				Text="Search filters" />
-			<StackPanel Orientation="Horizontal" Spacing="6">
-				<StackPanel.Styles>
-					<Style Selector="TextBlock">
-						<Setter Property="Foreground" Value="White" />
-						<Setter Property="FontSize" Value="16" />
-						<Setter Property="VerticalAlignment" Value="Center" />
-					</Style>
-					<Style Selector="TextBox">
-						<Setter Property="Foreground" Value="White" />
-						<Setter Property="FontSize" Value="16" />
-						<Setter Property="VerticalAlignment" Value="Center" />
-						<Setter Property="Padding" Value="0 -2 6 0" />
-					</Style>
-				</StackPanel.Styles>
-				<sukiUi:GlassCard>
-					<StackPanel Orientation="Vertical" Spacing="4">
-						
-						<StackPanel Orientation="Horizontal">
-							<TextBlock Text="MaxDuration" />
-							<MaskedTextBox Mask="00:00" Text="{Binding MaxDuration, Converter={StaticResource TimeSpanToStringConverter}}" />
-						</StackPanel>
-						<StackPanel Orientation="Horizontal">
-							<TextBlock Text="MinDuration" />
-							<MaskedTextBox Mask="00:00" Text="{Binding MinDuration, Converter={StaticResource TimeSpanToStringConverter}}" />
-						</StackPanel>
-						<StackPanel Orientation="Horizontal">
-							<StackPanel VerticalAlignment="Center" Orientation="Vertical">
-								<TextBlock
-									HorizontalAlignment="Right"
-									VerticalAlignment="Bottom"
-									FontSize="10"
-									Foreground="LightGray"
-									Text="{Binding MinStarRating, StringFormat={}{0:F1}}" />
-								<TextBlock Text="StarRating" />
-								<TextBlock
-									HorizontalAlignment="Right"
-									VerticalAlignment="Top"
-									FontSize="10"
-									Foreground="LightGray"
-									Text="{Binding MaxStarRating, StringFormat={}{0:F1}}" />
-							</StackPanel>
-							<StackPanel Width="140" Orientation="Vertical">
-								<Slider
-									IsSnapToTickEnabled="True"
-									Maximum="{Binding MaxStarRating}"
-									Minimum="0"
-									TickFrequency="0.1"
-									Value="{Binding MinStarRating}" />
-								<Slider
-									IsSnapToTickEnabled="True"
-									Maximum="10"
-									Minimum="0"
-									TickFrequency="0.1"
-									Value="{Binding MaxStarRating}" />
-							</StackPanel>
-						</StackPanel>
-						<StackPanel Orientation="Horizontal">
-							<TextBlock Text="Status" />
-							<ComboBox ItemsSource="{Binding TargetRankedStatusesList}" SelectedItem="{Binding TargetRankedStatus}" MaxDropDownHeight="200"/>
-						</StackPanel>
-					</StackPanel>
-				</sukiUi:GlassCard>
-				<sukiUi:GlassCard>
-					<StackPanel
-						VerticalAlignment="Center"
-						Orientation="Vertical"
-						Spacing="4">
-						<StackPanel Orientation="Horizontal" Spacing="14">
-							<StackPanel Orientation="Vertical" Spacing="14">
-								<StackPanel Orientation="Horizontal">
-									<StackPanel Width="140" Orientation="Vertical">
-										<StackPanel
-											HorizontalAlignment="Center"
-											Orientation="Horizontal"
-											Spacing="4">
-											<TextBlock
-												HorizontalAlignment="Right"
-												VerticalAlignment="Bottom"
-												FontSize="10"
-												Foreground="LightGray"
-												Text="{Binding MinAR, StringFormat={}{0:F1}}" />
-											<TextBlock
-												HorizontalAlignment="Center"
-												FontSize="18"
-												Text="AR" />
-											<TextBlock
-												HorizontalAlignment="Left"
-												VerticalAlignment="Bottom"
-												FontSize="10"
-												Foreground="LightGray"
-												Text="{Binding MaxAR, StringFormat={}{0:F1}}" />
-										</StackPanel>
-										<Slider
-											IsSnapToTickEnabled="True"
-											Maximum="{Binding MaxAR}"
-											Minimum="0"
-											TickFrequency="0.1"
-											Value="{Binding MinAR}" />
-										<Slider
-											IsSnapToTickEnabled="True"
-											Maximum="10"
-											Minimum="0"
-											TickFrequency="0.1"
-											Value="{Binding MaxAR}" />
-									</StackPanel>
-								</StackPanel>
-								<StackPanel Orientation="Horizontal">
-									<StackPanel Width="140" Orientation="Vertical">
-										<StackPanel
-											HorizontalAlignment="Center"
-											Orientation="Horizontal"
-											Spacing="4">
-											<TextBlock
-												HorizontalAlignment="Right"
-												VerticalAlignment="Bottom"
-												FontSize="10"
-												Foreground="LightGray"
-												Text="{Binding MinCS, StringFormat={}{0:F1}}" />
-											<TextBlock
-												HorizontalAlignment="Center"
-												FontSize="18"
-												Text="CS" />
-											<TextBlock
-												HorizontalAlignment="Left"
-												VerticalAlignment="Bottom"
-												FontSize="10"
-												Foreground="LightGray"
-												Text="{Binding MaxCS, StringFormat={}{0:F1}}" />
-										</StackPanel>
-										<Slider
-											IsSnapToTickEnabled="True"
-											Maximum="{Binding MaxCS}"
-											Minimum="0"
-											TickFrequency="0.1"
-											Value="{Binding MinCS}" />
-										<Slider
-											IsSnapToTickEnabled="True"
-											Maximum="10"
-											Minimum="0"
-											TickFrequency="0.1"
-											Value="{Binding MaxCS}" />
-									</StackPanel>
-								</StackPanel>
-							</StackPanel>
-							<StackPanel Orientation="Vertical" Spacing="14">
-								<StackPanel Orientation="Horizontal">
-									<StackPanel Width="140" Orientation="Vertical">
-										<StackPanel
-											HorizontalAlignment="Center"
-											Orientation="Horizontal"
-											Spacing="4">
-											<TextBlock
-												HorizontalAlignment="Right"
-												VerticalAlignment="Bottom"
-												FontSize="10"
-												Foreground="LightGray"
-												Text="{Binding MinHP, StringFormat={}{0:F1}}" />
-											<TextBlock
-												HorizontalAlignment="Center"
-												FontSize="18"
-												Text="HP" />
-											<TextBlock
-												HorizontalAlignment="Left"
-												VerticalAlignment="Bottom"
-												FontSize="10"
-												Foreground="LightGray"
-												Text="{Binding MaxHP, StringFormat={}{0:F1}}" />
-										</StackPanel>
-										<Slider
-											IsSnapToTickEnabled="True"
-											Maximum="{Binding MaxHP}"
-											Minimum="0"
-											TickFrequency="0.1"
-											Value="{Binding MinHP}" />
-										<Slider
-											IsSnapToTickEnabled="True"
-											Maximum="10"
-											Minimum="0"
-											TickFrequency="0.1"
-											Value="{Binding MaxHP}" />
-									</StackPanel>
-								</StackPanel>
-								<StackPanel Orientation="Horizontal">
-									<StackPanel Width="140" Orientation="Vertical">
-										<StackPanel
-											HorizontalAlignment="Center"
-											Orientation="Horizontal"
-											Spacing="4">
-											<TextBlock
-												HorizontalAlignment="Right"
-												VerticalAlignment="Bottom"
-												FontSize="10"
-												Foreground="LightGray"
-												Text="{Binding MinOD, StringFormat={}{0:F1}}" />
-											<TextBlock
-												HorizontalAlignment="Center"
-												FontSize="18"
-												Text="OD" />
-											<TextBlock
-												HorizontalAlignment="Left"
-												VerticalAlignment="Bottom"
-												FontSize="10"
-												Foreground="LightGray"
-												Text="{Binding MaxOD, StringFormat={}{0:F1}}" />
-										</StackPanel>
-										<Slider
-											IsSnapToTickEnabled="True"
-											Maximum="{Binding MaxOD}"
-											Minimum="0"
-											TickFrequency="0.1"
-											Value="{Binding MinOD}" />
-										<Slider
-											IsSnapToTickEnabled="True"
-											Maximum="10"
-											Minimum="0"
-											TickFrequency="0.1"
-											Value="{Binding MaxOD}" />
-									</StackPanel>
-								</StackPanel>
-							</StackPanel>
-						</StackPanel>
+    x:Class="MapManager.GUI.Views.SearchFiltersControl"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:iconPacks="https://github.com/MahApps/IconPacks.Avalonia"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mc:Ignorable="d">
+    <UserControl.DataContext>
+        <Binding Path="SearchFiltersViewModel" Source="{StaticResource Locator}" />
+    </UserControl.DataContext>
 
-					</StackPanel>
-				</sukiUi:GlassCard>
-			</StackPanel>
-			<sukiUi:GlassCard>
-				<StackPanel Orientation="Vertical" Spacing="4">
-					<Grid ColumnDefinitions="*,*,*">
-						<StackPanel Grid.Column="0" Orientation="Vertical">
-							<TextBlock HorizontalAlignment="Center" Text="Artist" />
-							<TextBox />
-						</StackPanel>
-						<StackPanel Grid.Column="1" Orientation="Vertical">
-							<TextBlock HorizontalAlignment="Center" Text="Title" />
-							<TextBox />
-						</StackPanel>
-						<StackPanel Grid.Column="2" Orientation="Vertical">
-							<TextBlock HorizontalAlignment="Center" Text="Mapper" />
-							<TextBox />
-						</StackPanel>
-					</Grid>
-					<StackPanel Orientation="Vertical">
-						<TextBlock HorizontalAlignment="Center" Text="Tags" />
-						<TextBox Text="{Binding Tags}" Watermark="ex: bass, dnb, tv size..." />
-					</StackPanel>
-				</StackPanel>
-			</sukiUi:GlassCard>
-			<sukiUi:GlassCard>
-				<StackPanel>
+    <UserControl.Styles>
+        <Style Selector="TextBlock.section">
+            <Setter Property="FontSize" Value="10" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="Gray" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style Selector="TextBlock.stat-label">
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Width" Value="26" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style Selector="TextBlock.range-val">
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="Foreground" Value="LightGray" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+    </UserControl.Styles>
 
-					<CheckBox Content="Have scores" IsChecked="{Binding IsHaveScores}" />
-					<CheckBox Content="Unplayed" IsChecked="{Binding IsUnplayed}" />
-				</StackPanel>
-			</sukiUi:GlassCard>
-		</StackPanel>
-	</Grid>
+    <StackPanel Orientation="Vertical" Spacing="6">
+
+        <StackPanel Orientation="Horizontal" Spacing="6">
+
+            <!--  General: Duration / Star Rating / Status  -->
+            <sukiUi:GlassCard MinWidth="210">
+                <StackPanel Orientation="Vertical" Spacing="10">
+
+                    <StackPanel Orientation="Horizontal" Spacing="5">
+                        <iconPacks:PackIconFontAwesome
+                            Height="10"
+                            VerticalAlignment="Center"
+                            Foreground="Gray"
+                            Kind="ClockRegular" />
+                        <TextBlock Classes="section" Text="DURATION" />
+                    </StackPanel>
+
+                    <Grid ColumnDefinitions="Auto,*,Auto,*">
+                        <TextBlock
+                            Grid.Column="0"
+                            Margin="0,0,5,0"
+                            FontSize="11"
+                            Foreground="Gray"
+                            VerticalAlignment="Center"
+                            Text="from" />
+                        <MaskedTextBox
+                            Grid.Column="1"
+                            Mask="00:00"
+                            Padding="4,1"
+                            FontSize="13"
+                            Foreground="White"
+                            Text="{Binding MinDuration, Converter={StaticResource TimeSpanToStringConverter}}" />
+                        <TextBlock
+                            Grid.Column="2"
+                            Margin="8,0,5,0"
+                            FontSize="11"
+                            Foreground="Gray"
+                            VerticalAlignment="Center"
+                            Text="to" />
+                        <MaskedTextBox
+                            Grid.Column="3"
+                            Mask="00:00"
+                            Padding="4,1"
+                            FontSize="13"
+                            Foreground="White"
+                            Text="{Binding MaxDuration, Converter={StaticResource TimeSpanToStringConverter}}" />
+                    </Grid>
+
+                    <Rectangle Height="1" Fill="#33ffffff" />
+
+                    <Grid ColumnDefinitions="Auto,*,Auto">
+                        <StackPanel
+                            Grid.Column="0"
+                            Orientation="Horizontal"
+                            Spacing="5">
+                            <iconPacks:PackIconFontAwesome
+                                Height="10"
+                                VerticalAlignment="Center"
+                                Foreground="Gray"
+                                Kind="StarSolid" />
+                            <TextBlock Classes="section" Text="STAR RATING" />
+                        </StackPanel>
+                        <StackPanel
+                            Grid.Column="2"
+                            Orientation="Horizontal"
+                            Spacing="3">
+                            <TextBlock Classes="range-val" Text="{Binding MinStarRating, StringFormat={}{0:F1}}" />
+                            <TextBlock
+                                Classes="range-val"
+                                Opacity="0.5"
+                                Text="–" />
+                            <TextBlock Classes="range-val" Text="{Binding MaxStarRating, StringFormat={}{0:F1}}" />
+                        </StackPanel>
+                    </Grid>
+                    <Slider
+                        IsSnapToTickEnabled="True"
+                        Maximum="{Binding MaxStarRating}"
+                        Minimum="0"
+                        TickFrequency="0.1"
+                        ToolTip.Tip="Shift+← →: ±0.5  |  Ctrl+Shift: ±1.0"
+                        Value="{Binding MinStarRating}" />
+                    <Slider
+                        IsSnapToTickEnabled="True"
+                        Maximum="10"
+                        Minimum="0"
+                        TickFrequency="0.1"
+                        ToolTip.Tip="Shift+← →: ±0.5  |  Ctrl+Shift: ±1.0"
+                        Value="{Binding MaxStarRating}" />
+
+                    <Rectangle Height="1" Fill="#33ffffff" />
+
+                    <StackPanel Orientation="Horizontal" Spacing="5">
+                        <iconPacks:PackIconFontAwesome
+                            Height="10"
+                            VerticalAlignment="Center"
+                            Foreground="Gray"
+                            Kind="TrophySolid" />
+                        <TextBlock Classes="section" Text="STATUS" />
+                    </StackPanel>
+                    <ComboBox
+                        HorizontalAlignment="Stretch"
+                        ItemsSource="{Binding TargetRankedStatusesList}"
+                        MaxDropDownHeight="200"
+                        SelectedItem="{Binding TargetRankedStatus}" />
+
+                </StackPanel>
+            </sukiUi:GlassCard>
+
+            <!--  Difficulty: AR / CS / HP / OD  -->
+            <sukiUi:GlassCard>
+                <StackPanel Orientation="Vertical" Spacing="8" MinWidth="175">
+
+                    <StackPanel Orientation="Horizontal" Spacing="5">
+                        <iconPacks:PackIconFontAwesome
+                            Height="10"
+                            VerticalAlignment="Center"
+                            Foreground="Gray"
+                            Kind="ChartBarSolid" />
+                        <TextBlock
+                            Classes="section"
+                            Text="DIFFICULTY"
+                            ToolTip.Tip="Shift+← →: ±0.5 steps  |  Ctrl+Shift: ±1.0 steps" />
+                    </StackPanel>
+
+                    <!--  AR  -->
+                    <StackPanel Orientation="Vertical" Spacing="1">
+                        <Grid ColumnDefinitions="26,*,Auto">
+                            <TextBlock Grid.Column="0" Classes="stat-label" Text="AR" />
+                            <StackPanel
+                                Grid.Column="2"
+                                Orientation="Horizontal"
+                                Spacing="3">
+                                <TextBlock Classes="range-val" Text="{Binding MinAR, StringFormat={}{0:F1}}" />
+                                <TextBlock
+                                    Classes="range-val"
+                                    Opacity="0.5"
+                                    Text="–" />
+                                <TextBlock Classes="range-val" Text="{Binding MaxAR, StringFormat={}{0:F1}}" />
+                            </StackPanel>
+                        </Grid>
+                        <Slider
+                            IsSnapToTickEnabled="True"
+                            Maximum="{Binding MaxAR}"
+                            Minimum="0"
+                            TickFrequency="0.1"
+                            Value="{Binding MinAR}" />
+                        <Slider
+                            IsSnapToTickEnabled="True"
+                            Maximum="10"
+                            Minimum="0"
+                            TickFrequency="0.1"
+                            Value="{Binding MaxAR}" />
+                    </StackPanel>
+
+                    <!--  CS  -->
+                    <StackPanel Orientation="Vertical" Spacing="1">
+                        <Grid ColumnDefinitions="26,*,Auto">
+                            <TextBlock Grid.Column="0" Classes="stat-label" Text="CS" />
+                            <StackPanel
+                                Grid.Column="2"
+                                Orientation="Horizontal"
+                                Spacing="3">
+                                <TextBlock Classes="range-val" Text="{Binding MinCS, StringFormat={}{0:F1}}" />
+                                <TextBlock
+                                    Classes="range-val"
+                                    Opacity="0.5"
+                                    Text="–" />
+                                <TextBlock Classes="range-val" Text="{Binding MaxCS, StringFormat={}{0:F1}}" />
+                            </StackPanel>
+                        </Grid>
+                        <Slider
+                            IsSnapToTickEnabled="True"
+                            Maximum="{Binding MaxCS}"
+                            Minimum="0"
+                            TickFrequency="0.1"
+                            Value="{Binding MinCS}" />
+                        <Slider
+                            IsSnapToTickEnabled="True"
+                            Maximum="10"
+                            Minimum="0"
+                            TickFrequency="0.1"
+                            Value="{Binding MaxCS}" />
+                    </StackPanel>
+
+                    <!--  HP  -->
+                    <StackPanel Orientation="Vertical" Spacing="1">
+                        <Grid ColumnDefinitions="26,*,Auto">
+                            <TextBlock Grid.Column="0" Classes="stat-label" Text="HP" />
+                            <StackPanel
+                                Grid.Column="2"
+                                Orientation="Horizontal"
+                                Spacing="3">
+                                <TextBlock Classes="range-val" Text="{Binding MinHP, StringFormat={}{0:F1}}" />
+                                <TextBlock
+                                    Classes="range-val"
+                                    Opacity="0.5"
+                                    Text="–" />
+                                <TextBlock Classes="range-val" Text="{Binding MaxHP, StringFormat={}{0:F1}}" />
+                            </StackPanel>
+                        </Grid>
+                        <Slider
+                            IsSnapToTickEnabled="True"
+                            Maximum="{Binding MaxHP}"
+                            Minimum="0"
+                            TickFrequency="0.1"
+                            Value="{Binding MinHP}" />
+                        <Slider
+                            IsSnapToTickEnabled="True"
+                            Maximum="10"
+                            Minimum="0"
+                            TickFrequency="0.1"
+                            Value="{Binding MaxHP}" />
+                    </StackPanel>
+
+                    <!--  OD  -->
+                    <StackPanel Orientation="Vertical" Spacing="1">
+                        <Grid ColumnDefinitions="26,*,Auto">
+                            <TextBlock Grid.Column="0" Classes="stat-label" Text="OD" />
+                            <StackPanel
+                                Grid.Column="2"
+                                Orientation="Horizontal"
+                                Spacing="3">
+                                <TextBlock Classes="range-val" Text="{Binding MinOD, StringFormat={}{0:F1}}" />
+                                <TextBlock
+                                    Classes="range-val"
+                                    Opacity="0.5"
+                                    Text="–" />
+                                <TextBlock Classes="range-val" Text="{Binding MaxOD, StringFormat={}{0:F1}}" />
+                            </StackPanel>
+                        </Grid>
+                        <Slider
+                            IsSnapToTickEnabled="True"
+                            Maximum="{Binding MaxOD}"
+                            Minimum="0"
+                            TickFrequency="0.1"
+                            Value="{Binding MinOD}" />
+                        <Slider
+                            IsSnapToTickEnabled="True"
+                            Maximum="10"
+                            Minimum="0"
+                            TickFrequency="0.1"
+                            Value="{Binding MaxOD}" />
+                    </StackPanel>
+
+                </StackPanel>
+            </sukiUi:GlassCard>
+
+        </StackPanel>
+
+        <!--  Text search  -->
+        <sukiUi:GlassCard>
+            <StackPanel Orientation="Vertical" Spacing="8">
+
+                <StackPanel Orientation="Horizontal" Spacing="5">
+                    <iconPacks:PackIconFontAwesome
+                        Height="10"
+                        VerticalAlignment="Center"
+                        Foreground="Gray"
+                        Kind="MagnifyingGlassSolid" />
+                    <TextBlock Classes="section" Text="TEXT FILTERS" />
+                </StackPanel>
+
+                <Grid ColumnDefinitions="*,*,*">
+                    <StackPanel Grid.Column="0" Margin="0,0,4,0" Orientation="Vertical" Spacing="3">
+                        <TextBlock FontSize="11" Foreground="Gray" Text="Artist" />
+                        <TextBox FontSize="13" Text="{Binding Artist}" Watermark="Artist…" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Margin="4,0,4,0" Orientation="Vertical" Spacing="3">
+                        <TextBlock FontSize="11" Foreground="Gray" Text="Title" />
+                        <TextBox FontSize="13" Text="{Binding Title}" Watermark="Title…" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="2" Margin="4,0,0,0" Orientation="Vertical" Spacing="3">
+                        <TextBlock FontSize="11" Foreground="Gray" Text="Mapper" />
+                        <TextBox FontSize="13" Text="{Binding Mapper}" Watermark="Mapper…" />
+                    </StackPanel>
+                </Grid>
+
+                <StackPanel Orientation="Vertical" Spacing="3">
+                    <TextBlock FontSize="11" Foreground="Gray" Text="Tags" />
+                    <TextBox
+                        FontSize="13"
+                        Text="{Binding Tags}"
+                        Watermark="ex: bass, dnb, tv size…" />
+                </StackPanel>
+
+            </StackPanel>
+        </sukiUi:GlassCard>
+
+        <!--  Play state  -->
+        <sukiUi:GlassCard>
+            <StackPanel Orientation="Vertical" Spacing="8">
+
+                <StackPanel Orientation="Horizontal" Spacing="5">
+                    <iconPacks:PackIconFontAwesome
+                        Height="10"
+                        VerticalAlignment="Center"
+                        Foreground="Gray"
+                        Kind="GamepadSolid" />
+                    <TextBlock Classes="section" Text="PLAY STATE" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Spacing="16">
+                    <CheckBox IsChecked="{Binding IsHaveScores}">
+                        <StackPanel Orientation="Horizontal" Spacing="5">
+                            <iconPacks:PackIconFontAwesome
+                                Height="10"
+                                VerticalAlignment="Center"
+                                Kind="TrophySolid" />
+                            <TextBlock Text="Have scores" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </CheckBox>
+                    <CheckBox IsChecked="{Binding IsUnplayed}">
+                        <StackPanel Orientation="Horizontal" Spacing="5">
+                            <iconPacks:PackIconFontAwesome
+                                Height="10"
+                                VerticalAlignment="Center"
+                                Kind="CircleDotRegular" />
+                            <TextBlock Text="Unplayed" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </CheckBox>
+                </StackPanel>
+
+            </StackPanel>
+        </sukiUi:GlassCard>
+
+    </StackPanel>
 </UserControl>
