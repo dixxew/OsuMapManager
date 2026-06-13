@@ -1,106 +1,98 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows10.0.18362.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
-      <ApplicationIcon>GUI/Assets/mm_logo.ico</ApplicationIcon>
-	  <Version>0.1.0</Version>
-  </PropertyGroup>
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net8.0-windows10.0.18362.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+        <ApplicationManifest>app.manifest</ApplicationManifest>
+        <ApplicationIcon>GUI/Assets/mm_logo.ico</ApplicationIcon>
+        <Version>0.1.0</Version>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <AvaloniaResource Include="GUI\Assets\**" />
-  </ItemGroup>
+    <ItemGroup>
+        <AvaloniaResource Include="GUI\Assets\**"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="13.0.1" />
-    <PackageReference Include="Avalonia" Version="11.2.3" />
-    <PackageReference Include="Avalonia.Desktop" Version="11.2.3" />
-    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.3" />
-    <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-    <PackageReference Include="Avalonia.Diagnostics" Version="11.2.3">
-      <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
-      <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="Avalonia.Labs.Lottie" Version="11.2.0" />
-    <PackageReference Include="Avalonia.ReactiveUI" Version="11.2.3" />
-    <PackageReference Include="HoLLy.osu.DatabaseReader" Version="3.3.0" />
-    <PackageReference Include="IconPacks.Avalonia.FontAwesome" Version="1.0.0" />
-    <PackageReference Include="IconPacks.Avalonia.ForkAwesome" Version="1.0.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.1" />
-    <PackageReference Include="NAudio" Version="2.2.1" />
-    <PackageReference Include="NAudio.Core" Version="2.2.1" />
-    <PackageReference Include="NAudio.Vorbis" Version="1.5.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="SmartIrc4net" Version="1.1.0" />
-    <!--<PackageReference Include="OsuSharp" Version="6.4.1" />
-    <PackageReference Include="OsuSharp.JsonModels" Version="6.4.1" />-->
-    <PackageReference Include="SoundTouch.Net" Version="2.3.2" />
-    <PackageReference Include="SoundTouch.Net.NAudioSupport.Core" Version="2.3.2" />
-    <PackageReference Include="SkiaSharp" Version="2.88.9" />
-    <PackageReference Include="SukiUI" Version="6.0.0-rc" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="AutoMapper" Version="13.0.1"/>
+        <PackageReference Include="Avalonia" Version="11.2.3"/>
+        <PackageReference Include="Avalonia.Desktop" Version="11.2.3"/>
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.3"/>
+        <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
+        <PackageReference Include="Avalonia.Diagnostics" Version="11.2.3">
+            <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
+            <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="Avalonia.Labs.Lottie" Version="11.2.0"/>
+        <PackageReference Include="Avalonia.ReactiveUI" Version="11.2.3"/>
+        <PackageReference Include="HoLLy.osu.DatabaseReader" Version="3.3.0"/>
+        <PackageReference Include="IconPacks.Avalonia.FontAwesome" Version="1.0.0"/>
+        <PackageReference Include="IconPacks.Avalonia.ForkAwesome" Version="1.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.1"/>
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.1"/>
+        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.1"/>
+        <PackageReference Include="NAudio" Version="2.2.1"/>
+        <PackageReference Include="NAudio.Core" Version="2.2.1"/>
+        <PackageReference Include="NAudio.Vorbis" Version="1.5.0"/>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
+        <PackageReference Include="SmartIrc4net" Version="1.1.0"/>
+        <!--<PackageReference Include="OsuSharp" Version="6.4.1" />
+        <PackageReference Include="OsuSharp.JsonModels" Version="6.4.1" />-->
+        <PackageReference Include="SoundTouch.Net" Version="2.3.2"/>
+        <PackageReference Include="SoundTouch.Net.NAudioSupport.Core" Version="2.3.2"/>
+        <PackageReference Include="SkiaSharp" Version="2.88.9"/>
+        <PackageReference Include="SukiUI" Version="6.0.0-rc"/>
+    </ItemGroup>
 
-	<ItemGroup>
-    <EditorConfigFiles Remove="C:\Users\ayrat\source\repos\MapManager\MapManager\.editorconfig" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\OsuSharp-dev\src\OsuSharp.Domain\OsuSharp.Domain.csproj"/>
+        <ProjectReference Include="..\OsuSharp-dev\src\OsuSharp.JsonModels\OsuSharp.JsonModels.csproj"/>
+        <ProjectReference Include="..\OsuSharp-dev\src\OsuSharp.Legacy.Oppai\OsuSharp.Legacy.Oppai.csproj"/>
+        <ProjectReference Include="..\OsuSharp-dev\src\OsuSharp.Legacy\OsuSharp.Legacy.csproj"/>
+        <ProjectReference Include="..\OsuSharp-dev\src\OsuSharp\OsuSharp.csproj"/>
+    </ItemGroup>
 
-	<ItemGroup>
-    <None Include="C:\Users\ayrat\source\repos\MapManager\MapManager\.editorconfig" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\OsuSharp-dev\src\OsuSharp.Domain\OsuSharp.Domain.csproj" />
-    <ProjectReference Include="..\OsuSharp-dev\src\OsuSharp.JsonModels\OsuSharp.JsonModels.csproj" />
-    <ProjectReference Include="..\OsuSharp-dev\src\OsuSharp.Legacy.Oppai\OsuSharp.Legacy.Oppai.csproj" />
-    <ProjectReference Include="..\OsuSharp-dev\src\OsuSharp.Legacy\OsuSharp.Legacy.csproj" />
-    <ProjectReference Include="..\OsuSharp-dev\src\OsuSharp\OsuSharp.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-  <None Update="GUI\Assets\**">
-    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-  </None>
-</ItemGroup>
+    <ItemGroup>
+        <None Update="GUI\Assets\**">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
 
 
-  <ItemGroup>
-    <Compile Update="GUI\Views\MainBlockBeatmapControl.axaml.cs">
-      <DependentUpon>MainBlockBeatmapControl.axaml</DependentUpon>
-    </Compile>
-    <Compile Update="GUI\Views\BeatmapsControl.axaml.cs">
-      <DependentUpon>BeatmapsControl.axaml</DependentUpon>
-    </Compile>
-    <Compile Update="GUI\Views\BeatmapInfoControl.axaml.cs">
-      <DependentUpon>BeatmapInfoControl.axaml</DependentUpon>
-    </Compile>
-    <Compile Update="GUI\Views\Chat\ChatControl.axaml.cs">
-      <DependentUpon>ChatControl.axaml</DependentUpon>
-    </Compile>
-    <Compile Update="GUI\Views\GlobalScoresControl.axaml.cs">
-      <DependentUpon>GlobalScoresControl.axaml</DependentUpon>
-    </Compile>
-    <Compile Update="GUI\Views\LocalScoresControl.axaml.cs">
-      <DependentUpon>LocalScoresControl.axaml</DependentUpon>
-    </Compile>
-    <Compile Update="GUI\Dialogs\TextBoxDialogView.axaml.cs">
-      <DependentUpon>TextBoxDialogView.axaml</DependentUpon>
-    </Compile>
-    <Compile Update="GUI\Views\SearchOptionsControl.axaml.cs">
-      <DependentUpon>SearchOptionsControl.axaml</DependentUpon>
-    </Compile>
-  </ItemGroup>
+    <ItemGroup>
+        <Compile Update="GUI\Views\MainBlockBeatmapControl.axaml.cs">
+            <DependentUpon>MainBlockBeatmapControl.axaml</DependentUpon>
+        </Compile>
+        <Compile Update="GUI\Views\BeatmapsControl.axaml.cs">
+            <DependentUpon>BeatmapsControl.axaml</DependentUpon>
+        </Compile>
+        <Compile Update="GUI\Views\BeatmapInfoControl.axaml.cs">
+            <DependentUpon>BeatmapInfoControl.axaml</DependentUpon>
+        </Compile>
+        <Compile Update="GUI\Views\Chat\ChatControl.axaml.cs">
+            <DependentUpon>ChatControl.axaml</DependentUpon>
+        </Compile>
+        <Compile Update="GUI\Views\GlobalScoresControl.axaml.cs">
+            <DependentUpon>GlobalScoresControl.axaml</DependentUpon>
+        </Compile>
+        <Compile Update="GUI\Views\LocalScoresControl.axaml.cs">
+            <DependentUpon>LocalScoresControl.axaml</DependentUpon>
+        </Compile>
+        <Compile Update="GUI\Dialogs\TextBoxDialogView.axaml.cs">
+            <DependentUpon>TextBoxDialogView.axaml</DependentUpon>
+        </Compile>
+        <Compile Update="GUI\Views\SearchOptionsControl.axaml.cs">
+            <DependentUpon>SearchOptionsControl.axaml</DependentUpon>
+        </Compile>
+    </ItemGroup>
 
 
-  <ItemGroup>
-    <Reference Include="Avalonia.Base">
-      <HintPath>bin\Debug\net8.0\Avalonia.Base.dll</HintPath>
-    </Reference>
-    <Reference Include="Avalonia.Controls">
-      <HintPath>bin\Debug\net8.0\Avalonia.Controls.dll</HintPath>
-    </Reference>
-  </ItemGroup>
+    <ItemGroup>
+        <Reference Include="Avalonia.Base">
+            <HintPath>bin\Debug\net8.0\Avalonia.Base.dll</HintPath>
+        </Reference>
+        <Reference Include="Avalonia.Controls">
+            <HintPath>bin\Debug\net8.0\Avalonia.Controls.dll</HintPath>
+        </Reference>
+    </ItemGroup>
 </Project>

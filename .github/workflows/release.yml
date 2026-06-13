@@ -1,0 +1,57 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Extract version from tag
+        id: ver
+        shell: pwsh
+        run: |
+          $version = "${{ github.ref_name }}".TrimStart('v')
+          "VERSION=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+
+      - name: Patch csproj version
+        shell: pwsh
+        run: |
+          $v = "${{ steps.ver.outputs.VERSION }}"
+          $file = "MapManager/MapManager.csproj"
+          (Get-Content $file) -replace '<Version>.*?</Version>', "<Version>$v</Version>" |
+            Set-Content $file
+
+      - name: Publish
+        run: >
+          dotnet publish MapManager/MapManager.csproj
+          -c Release
+          -r win-x64
+          --no-self-contained
+          -o publish/
+
+      - name: Zip
+        shell: pwsh
+        run: |
+          $v = "${{ steps.ver.outputs.VERSION }}"
+          Compress-Archive -Path publish\* -DestinationPath "MapManager-win-x64-v$v.zip"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: MapManager v${{ steps.ver.outputs.VERSION }}
+          generate_release_notes: true
+          files: MapManager-win-x64-v${{ steps.ver.outputs.VERSION }}.zip
