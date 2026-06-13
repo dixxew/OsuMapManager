@@ -6,8 +6,7 @@
 	xmlns:local="using:MapManager.GUI"
 	xmlns:sukiUi="clr-namespace:SukiUI;assembly=SukiUI"
 	xmlns:vm="using:MapManager.GUI.ViewModels"
-	RequestedThemeVariant="Default">
-	<!--  "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options.  -->
+	RequestedThemeVariant="Dark">
 
 	<Application.DataTemplates>
 		<local:ViewLocator />

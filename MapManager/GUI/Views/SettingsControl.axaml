@@ -175,10 +175,55 @@
 						</StackPanel>
 					</DockPanel>
 				</sukiUi:GlassCard>
-				<TextBlock
-					HorizontalAlignment="Right"
-					FontSize="10"
-					Text="{Binding AppVersion, StringFormat='appVer: {0}'}" />
+				<StackPanel HorizontalAlignment="Right" Orientation="Horizontal" Spacing="8">
+					<TextBlock
+						VerticalAlignment="Center"
+						FontSize="10"
+						Foreground="Gray"
+						Text="{Binding AppVersion, StringFormat='v{0}'}" />
+					<TextBlock
+						VerticalAlignment="Center"
+						FontSize="10"
+						Foreground="Gray"
+						IsVisible="{Binding IsCheckingUpdate}"
+						Text="checking for updates…" />
+					<TextBlock
+						VerticalAlignment="Center"
+						FontSize="10"
+						Foreground="#4caf50"
+						IsVisible="{Binding IsUpToDate}"
+						Text="up to date" />
+					<Button
+						Classes="Basic"
+						Command="{Binding OpenReleasePageCommand}"
+						IsVisible="{Binding HasUpdate}"
+						ToolTip.Tip="Open releases page">
+						<StackPanel Orientation="Horizontal" Spacing="4">
+							<iconPacks:PackIconFontAwesome
+								Width="10"
+								Height="10"
+								VerticalAlignment="Center"
+								Foreground="#ff9800"
+								Kind="ArrowUpSolid" />
+							<TextBlock
+								VerticalAlignment="Center"
+								FontSize="10"
+								Foreground="#ff9800"
+								Text="{Binding LatestVersion, StringFormat='v{0} available'}" />
+						</StackPanel>
+					</Button>
+					<Button
+						Classes="Basic"
+						Command="{Binding CheckUpdateCommand}"
+						IsVisible="{Binding !IsCheckingUpdate}"
+						ToolTip.Tip="Check for updates">
+						<iconPacks:PackIconFontAwesome
+							Width="10"
+							Height="10"
+							Foreground="Gray"
+							Kind="ArrowsRotateSolid" />
+					</Button>
+				</StackPanel>
 			</StackPanel>
 		</ScrollViewer>
 	</Grid>

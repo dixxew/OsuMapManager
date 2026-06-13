@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace MapManager.GUI.Services;
@@ -24,7 +25,17 @@ public class SettingsService
     }
 
 
-    public string AppVersion => typeof(App).Assembly.GetName().Version.ToString();
+    public string AppVersion
+    {
+        get
+        {
+            var ver = typeof(App).Assembly
+                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+                ?.InformationalVersion ?? "unknown";
+            var plus = ver.IndexOf('+');
+            return plus >= 0 ? ver[..plus] : ver;
+        }
+    }
     public string? OsuClientSecret
     {
         get => _appSettings.OsuClientSecret;

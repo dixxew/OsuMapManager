@@ -68,6 +68,7 @@ namespace MapManager
                     services.AddSingleton(appSettings);
 
                     services.AddSingleton<CacheService>();
+                    services.AddSingleton<AppStartupGate>();
                     services.AddSingleton<OsuApiService>();
                     services.AddSingleton<SettingsService>();
                     services.AddSingleton<AppInitializationService>();

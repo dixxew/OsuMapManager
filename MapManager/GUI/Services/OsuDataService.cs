@@ -14,42 +14,33 @@ public class OsuDataService
 {
     private readonly AppSettings _appSettings;
 
-    private string osuDirectory;
-    private string osuDbPath;
-    private string scoresDbPath;
-    private string collectionsDbPath;
+    private string OsuDirectory       => _appSettings.OsuDirectory ?? "";
+    private string OsuDbPath          => Path.Combine(OsuDirectory, "osu!.db");
+    private string ScoresDbPath       => Path.Combine(OsuDirectory, "scores.db");
+    private string CollectionsDbPath  => Path.Combine(OsuDirectory, "collection.db");
 
     private CollectionDb _collectionDb;
 
     public OsuDataService(AppSettings appSettings)
     {
         _appSettings = appSettings;
-        osuDirectory = appSettings.OsuDirectory;
-        osuDbPath = Path.Combine(osuDirectory, "osu!.db");
-        scoresDbPath = Path.Combine(osuDirectory, "scores.db");
-        collectionsDbPath = Path.Combine(osuDirectory, "collection.db");
-    }
-    public void UpdateSettings(AppSettings updatedSettings)
-    {
-        // Set new settings
-        osuDirectory = updatedSettings.OsuDirectory;
     }
 
     public List<BeatmapEntry> GetBeatmapList()
     {
-        var osuDb = OsuDb.Read(osuDbPath);
+        var osuDb = OsuDb.Read(OsuDbPath);
         return osuDb.Beatmaps;
     }
 
     public List<Collection> GetCollectionsList()
     {
-        _collectionDb = CollectionDb.Read(collectionsDbPath);
-
+        _collectionDb = CollectionDb.Read(CollectionsDbPath);
         return _collectionDb.Collections;
     }
+
     public List<Replay> GetScoresList()
     {
-        var scoresDb = ScoresDb.Read(scoresDbPath);
+        var scoresDb = ScoresDb.Read(ScoresDbPath);
         return scoresDb.Scores.ToList();
     }
 
@@ -57,10 +48,10 @@ public class OsuDataService
 
     private void BackupCollectionDb()
     {
-        if (File.Exists(collectionsDbPath))
+        if (File.Exists(CollectionsDbPath))
         {
             var timestamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
-            File.Copy(collectionsDbPath, collectionsDbPath + $".{timestamp}.bak");
+            File.Copy(CollectionsDbPath, CollectionsDbPath + $".{timestamp}.bak");
         }
     }
 
@@ -76,7 +67,7 @@ public class OsuDataService
             _collectionDb.Collections.Add(collection);
 
             BackupCollectionDb();
-            using (var stream = new FileStream(collectionsDbPath, FileMode.Create, FileAccess.Write))
+            using (var stream = new FileStream(CollectionsDbPath, FileMode.Create, FileAccess.Write))
             {
                 var writer = new SerializationWriter(stream);
                 _collectionDb.WriteToStream(writer);
@@ -98,7 +89,7 @@ public class OsuDataService
             _collectionDb.Collections.AddRange(newCollections);
 
             BackupCollectionDb();
-            using var stream = new FileStream(collectionsDbPath, FileMode.Create, FileAccess.Write);
+            using var stream = new FileStream(CollectionsDbPath, FileMode.Create, FileAccess.Write);
             var writer = new SerializationWriter(stream);
             _collectionDb.WriteToStream(writer);
         });
@@ -115,7 +106,7 @@ public class OsuDataService
             _collectionDb.Collections.First(c => c.Name == collectionName).BeatmapHashes.Add(md5);
 
             BackupCollectionDb();
-            using (var stream = new FileStream(collectionsDbPath, FileMode.Create, FileAccess.Write))
+            using (var stream = new FileStream(CollectionsDbPath, FileMode.Create, FileAccess.Write))
             {
                 var writer = new SerializationWriter(stream);
                 _collectionDb.WriteToStream(writer);
@@ -131,7 +122,7 @@ public class OsuDataService
 
             _collectionDb.Collections.First(c => c.Name == collectionName).BeatmapHashes.Remove(md5);
             BackupCollectionDb();
-            using (var stream = new FileStream(collectionsDbPath, FileMode.Create, FileAccess.Write))
+            using (var stream = new FileStream(CollectionsDbPath, FileMode.Create, FileAccess.Write))
             {
                 var writer = new SerializationWriter(stream);
                 _collectionDb.WriteToStream(writer);
@@ -147,7 +138,7 @@ public class OsuDataService
 
             _collectionDb.Collections.Remove(_collectionDb.Collections.First(c => c.Name == collectionName));
             BackupCollectionDb();
-            using (var stream = new FileStream(collectionsDbPath, FileMode.Create, FileAccess.Write))
+            using (var stream = new FileStream(CollectionsDbPath, FileMode.Create, FileAccess.Write))
             {
                 var writer = new SerializationWriter(stream);
                 _collectionDb.WriteToStream(writer);
@@ -176,7 +167,7 @@ public class OsuDataService
     {
         List<Collection> res = new();
         foreach (var path in paths)
-            res.AddRange(CollectionDb.Read(collectionsDbPath).Collections);
+            res.AddRange(CollectionDb.Read(CollectionsDbPath).Collections);
 
         return res;
 
@@ -185,7 +176,7 @@ public class OsuDataService
     public string GetBeatmapImage(string beatmapFolder, string beatmapFileName)
     {
         // Путь к файлу карты
-        var beatmapPath = Path.Combine(osuDirectory, "Songs", beatmapFolder, beatmapFileName);
+        var beatmapPath = Path.Combine(OsuDirectory, "Songs", beatmapFolder, beatmapFileName);
 
         // Список допустимых расширений изображений
         var imageExtensions = new[] { ".jpg", ".png", ".jpeg" };
@@ -216,7 +207,7 @@ public class OsuDataService
                                 var relativeImagePath = line.Substring(startIndex, endIndex - startIndex);
 
                                 // Полный путь к картинке
-                                var fullImagePath = Path.Combine(osuDirectory, "Songs", beatmapFolder, relativeImagePath);
+                                var fullImagePath = Path.Combine(OsuDirectory, "Songs", beatmapFolder, relativeImagePath);
 
                                 if (File.Exists(fullImagePath))
                                 {
@@ -229,7 +220,7 @@ public class OsuDataService
             }
 
             // Если путь из файла .osu не найден, ищем картинку по названию в папке
-            var imageFiles = Directory.GetFiles(Path.Combine(osuDirectory, "Songs", beatmapFolder), "*.*", SearchOption.AllDirectories)
+            var imageFiles = Directory.GetFiles(Path.Combine(OsuDirectory, "Songs", beatmapFolder), "*.*", SearchOption.AllDirectories)
                                       .Where(file => imageExtensions.Contains(Path.GetExtension(file).ToLower()));
 
             // Находим файл с наибольшим размером

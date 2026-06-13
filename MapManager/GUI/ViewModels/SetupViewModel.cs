@@ -15,12 +15,14 @@ public class SetupViewModel : ViewModelBase
     private readonly SettingsService _settingsService;
     private readonly NavigationService _navigationService;
     private readonly AppSettings _appSettings;
+    private readonly AppStartupGate _gate;
 
-    public SetupViewModel(SettingsService settingsService, NavigationService navigationService, AppSettings appSettings)
+    public SetupViewModel(SettingsService settingsService, NavigationService navigationService, AppSettings appSettings, AppStartupGate gate)
     {
         _settingsService = settingsService;
         _navigationService = navigationService;
         _appSettings = appSettings;
+        _gate = gate;
 
         // Pre-fill: existing setting, else auto-detect, else empty
         var existingPath = _settingsService.OsuDirPath;
@@ -119,6 +121,8 @@ public class SetupViewModel : ViewModelBase
     {
         _appSettings.SetupCompleted = true;
         await AppSettingsManager.SaveSettingsAsync(_appSettings);
+
+        _gate.SignalReady();
 
         // MainViewModel constructor registers the MainBlockContent subscriber,
         // so we must set MainContent first, then MainBlockContent.
