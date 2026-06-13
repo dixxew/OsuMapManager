@@ -61,6 +61,21 @@ public class ChatViewModel : ViewModelBase
         _service.StatusChanged += OnStatusChanged;
         OnStatusChanged(_service.Status);
 
+        OpenPrivateChat = ReactiveCommand.Create<ChatUser>(user =>
+            SelectedChannel = _service.OpenPrivateChat(user.Name));
+
+        MentionUser = ReactiveCommand.Create<ChatUser>(user =>
+            AppendMention(user.Name));
+
+        OpenProfileInBrowser = ReactiveCommand.Create<ChatUser>(user =>
+        {
+            try { Process.Start(new ProcessStartInfo { FileName = $"https://osu.ppy.sh/u/{Uri.EscapeDataString(user.Name)}", UseShellExecute = true }); }
+            catch { }
+        });
+
+        MuteUser = ReactiveCommand.Create<ChatUser>(user =>
+            Debug.WriteLine($"Mute requested for {user.Name} (not implemented)"));
+
         OpenPrivateChatWith = ReactiveCommand.Create<string>(name =>
             SelectedChannel = _service.OpenPrivateChat(name));
 
@@ -201,34 +216,10 @@ public class ChatViewModel : ViewModelBase
 
     // ── user actions ────────────────────────────────────────────────────────
 
-    public void OpenPrivateChat(ChatUser user)
-    {
-        SelectedChannel = _service.OpenPrivateChat(user.Name);
-    }
-
-    public void MentionUser(ChatUser user)
-    {
-        AppendMention(user.Name);
-    }
-
-    public void OpenProfileInBrowser(ChatUser user)
-    {
-        try
-        {
-            Process.Start(new ProcessStartInfo
-            {
-                FileName = $"https://osu.ppy.sh/u/{Uri.EscapeDataString(user.Name)}",
-                UseShellExecute = true,
-            });
-        }
-        catch { }
-    }
-
-    // Заглушка: реального мьюта пока нет.
-    public void MuteUser(ChatUser user)
-    {
-        Debug.WriteLine($"Mute requested for {user.Name} (not implemented)");
-    }
+    public ReactiveCommand<ChatUser, Unit> OpenPrivateChat { get; }
+    public ReactiveCommand<ChatUser, Unit> MentionUser { get; }
+    public ReactiveCommand<ChatUser, Unit> OpenProfileInBrowser { get; }
+    public ReactiveCommand<ChatUser, Unit> MuteUser { get; }
 
     // ReactiveCommand variants used by message-avatar flyout (DataContext = ChatMessage, param = string)
     public ReactiveCommand<string, Unit> OpenPrivateChatWith { get; }

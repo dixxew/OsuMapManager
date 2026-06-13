@@ -79,30 +79,37 @@ public class OsuApiService
     {
         return await _client.GetBeatmapsetAsync(id);
     }
-    public async Task<string> GetUserAvatarUrlAsync(string username)
-    {
-        var user = await _client.GetUserAsync(username);
-
-        return user.AvatarUrl.ToString();
-    }
-
-    public async Task<Bitmap?> GetAvatarAsync(string username)
+    public async Task<string?> GetUserAvatarUrlAsync(string username)
     {
         try
         {
-            var url = await GetUserAvatarUrlAsync(username);
+            var user = await _client.GetUserAsync(username);
+            var url = user?.AvatarUrl?.ToString();
             Debug.WriteLine($"[OsuApi] avatar URL for '{username}': {url}");
+            return url;
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[OsuApi] GetUserAsync failed for '{username}': {ex.GetType().Name}: {ex.Message}");
+            return null;
+        }
+    }
+
+    public async Task<Bitmap?> DownloadAvatarFromUrlAsync(string url)
+    {
+        try
+        {
             var response = await _httpClient.GetAsync(url);
             if (response.IsSuccessStatusCode)
             {
                 using var stream = await response.Content.ReadAsStreamAsync();
                 return new Bitmap(stream);
             }
-            Debug.WriteLine($"[OsuApi] avatar HTTP {(int)response.StatusCode} for '{username}'");
+            Debug.WriteLine($"[OsuApi] avatar HTTP {(int)response.StatusCode} for URL: {url}");
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"[OsuApi] GetAvatarAsync failed for '{username}': {ex.GetType().Name}: {ex.Message}");
+            Debug.WriteLine($"[OsuApi] DownloadAvatarFromUrlAsync failed: {ex.GetType().Name}: {ex.Message}");
         }
         return null;
     }

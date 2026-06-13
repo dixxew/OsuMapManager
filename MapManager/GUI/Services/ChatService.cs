@@ -391,7 +391,7 @@ public class ChatService
                 .Where(u => !string.IsNullOrWhiteSpace(u))
                 .Distinct()
                 .Where(u => !existing.Contains(u))
-                .Select(u => new ChatUser(_avatarService, this) { Name = u })
+                .Select(u => new ChatUser(_avatarService) { Name = u })
                 .ToList();
 
             if (newUsers.Count > 0)

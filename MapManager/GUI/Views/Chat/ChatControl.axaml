@@ -545,6 +545,7 @@
                 <ListBox
                     x:Name="UsersList"
                     Grid.Row="2"
+                    ScrollViewer.VerticalScrollBarVisibility="Hidden"
                     ItemsSource="{Binding DisplayedUsers}"
                     SelectionMode="Single">
                     <ListBox.Styles>
@@ -558,28 +559,32 @@
                                 <Grid.ContextFlyout>
                                     <MenuFlyout>
                                         <MenuItem
-                                            Command="{Binding OpenPrivateChat}"
+                                            Command="{Binding ChatViewModel.OpenPrivateChat, Source={StaticResource Locator}}"
+                                            CommandParameter="{Binding}"
                                             Header="Open private chat">
                                             <MenuItem.Icon>
                                                 <iconPacks:PackIconFontAwesome Kind="CommentSolid" />
                                             </MenuItem.Icon>
                                         </MenuItem>
                                         <MenuItem
-                                            Command="{Binding MentionUser}"
+                                            Command="{Binding ChatViewModel.MentionUser, Source={StaticResource Locator}}"
+                                            CommandParameter="{Binding}"
                                             Header="Mention">
                                             <MenuItem.Icon>
                                                 <iconPacks:PackIconFontAwesome Kind="AtSolid" />
                                             </MenuItem.Icon>
                                         </MenuItem>
                                         <MenuItem
-                                            Command="{Binding OpenProfileInBrowser}"
+                                            Command="{Binding ChatViewModel.OpenProfileInBrowser, Source={StaticResource Locator}}"
+                                            CommandParameter="{Binding}"
                                             Header="Open profile in browser">
                                             <MenuItem.Icon>
                                                 <iconPacks:PackIconFontAwesome Kind="ArrowUpRightFromSquareSolid" />
                                             </MenuItem.Icon>
                                         </MenuItem>
                                         <MenuItem
-                                            Command="{Binding MuteUser}"
+                                            Command="{Binding ChatViewModel.MuteUser, Source={StaticResource Locator}}"
+                                            CommandParameter="{Binding}"
                                             Header="Mute">
                                             <MenuItem.Icon>
                                                 <iconPacks:PackIconFontAwesome Kind="VolumeXmarkSolid" />
