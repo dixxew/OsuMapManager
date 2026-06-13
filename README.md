@@ -11,42 +11,51 @@ osu! profile: [dixxew](https://osu.ppy.sh/users/13928601)
 
 ## 📦 Features
 
-- View and edit:
-  - `osu!.db`
-  - `collection.db`
-  - `scores.db`
-- Create, edit, delete collections
-- Import/export collections
-- Built-in beatmap player
-- Filter maps by various attributes
-- Display local & global scores
-- Open selected map in client
+- View and manage local osu! databases:
+  - `osu!.db` — beatmap library
+  - `collection.db` — collections
+  - `scores.db` — local scores
+- Create, edit, delete and import/export collections
+- Built-in beatmap player with audio controls
+- Filter and search maps by various attributes
+- Beatmap thumbnails and rich beatmap info panel
+- Display local & global scores with rank icons
+- Open selected map in osu! client
 - Find similar maps (based on tags)
 - Favorites feature
+- osu! IRC chat with clickable mentions and channels
 
 ---
 
-## 🚀 Usage
+## ⚙️ Requirements
 
-1. Set your osu! installation directory in settings
-2. For osu! API access:
-   - Generate `Client ID` and `Client Secret`
-   - Create an app at [osu! OAuth](https://osu.ppy.sh/home/account/edit)
-   - Or just click the button in settings of MapManager
+- Windows 10 (1903) or later
+- [.NET 8 Runtime](https://dotnet.microsoft.com/download/dotnet/8.0) (Desktop Runtime)
+
+---
+
+## 🚀 Installation
+
+1. Download the latest `MapManager-win-x64-vX.X.X.zip` from [Releases](../../releases/latest)
+2. Extract anywhere
+3. Run `MapManager.exe`
+4. Set your osu! installation directory in settings
+5. For osu! API access — generate `Client ID` and `Client Secret` at [osu! OAuth](https://osu.ppy.sh/home/account/edit) (or click the button in settings)
 
 ---
 
 ## 🧠 Suggestions for future
 
 - Stats by genre/artist/difficulty/etc.
-- Scores additional data.
+- Scores additional data
 - UI improvements (drag & drop, mod icons, previews)
-- 
+
 ---
 
 ## 🐞 Bugs / Feedback
 
-There might be bugs — feel free to contact me via:
+Feel free to contact me via:
+- [GitHub Issues](../../issues)
 - [osu! PM](https://osu.ppy.sh/users/13928601)
 - Telegram: [@Dixxew](https://t.me/Dixxew)
 
