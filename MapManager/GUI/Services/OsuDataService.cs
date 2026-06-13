@@ -55,6 +55,15 @@ public class OsuDataService
 
 
 
+    private void BackupCollectionDb()
+    {
+        if (File.Exists(collectionsDbPath))
+        {
+            var timestamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
+            File.Copy(collectionsDbPath, collectionsDbPath + $".{timestamp}.bak");
+        }
+    }
+
     public void AddCollection(string name, List<string> md5hashes)
     {
         Task.Run(() =>
@@ -66,6 +75,7 @@ public class OsuDataService
             };
             _collectionDb.Collections.Add(collection);
 
+            BackupCollectionDb();
             using (var stream = new FileStream(collectionsDbPath, FileMode.Create, FileAccess.Write))
             {
                 var writer = new SerializationWriter(stream);
@@ -87,6 +97,7 @@ public class OsuDataService
 
             _collectionDb.Collections.AddRange(newCollections);
 
+            BackupCollectionDb();
             using var stream = new FileStream(collectionsDbPath, FileMode.Create, FileAccess.Write);
             var writer = new SerializationWriter(stream);
             _collectionDb.WriteToStream(writer);
@@ -103,6 +114,7 @@ public class OsuDataService
 
             _collectionDb.Collections.First(c => c.Name == collectionName).BeatmapHashes.Add(md5);
 
+            BackupCollectionDb();
             using (var stream = new FileStream(collectionsDbPath, FileMode.Create, FileAccess.Write))
             {
                 var writer = new SerializationWriter(stream);
@@ -118,6 +130,7 @@ public class OsuDataService
                 return;
 
             _collectionDb.Collections.First(c => c.Name == collectionName).BeatmapHashes.Remove(md5);
+            BackupCollectionDb();
             using (var stream = new FileStream(collectionsDbPath, FileMode.Create, FileAccess.Write))
             {
                 var writer = new SerializationWriter(stream);
@@ -133,6 +146,7 @@ public class OsuDataService
                 return;
 
             _collectionDb.Collections.Remove(_collectionDb.Collections.First(c => c.Name == collectionName));
+            BackupCollectionDb();
             using (var stream = new FileStream(collectionsDbPath, FileMode.Create, FileAccess.Write))
             {
                 var writer = new SerializationWriter(stream);
