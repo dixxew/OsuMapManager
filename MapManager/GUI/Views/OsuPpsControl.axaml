@@ -1,0 +1,200 @@
+<UserControl
+	x:Class="MapManager.GUI.Views.OsuPpsControl"
+	xmlns="https://github.com/avaloniaui"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:iconPacks="https://github.com/MahApps/IconPacks.Avalonia"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+	xmlns:vm="using:MapManager.GUI.ViewModels"
+	d:DesignHeight="600"
+	d:DesignWidth="400"
+	mc:Ignorable="d">
+	<UserControl.DataContext>
+		<Binding Path="OsuPpsViewModel" Source="{StaticResource Locator}" />
+	</UserControl.DataContext>
+
+	<Grid>
+		<ListBox
+			x:Name="PpsList"
+			FontWeight="550"
+			Foreground="White"
+			ItemsSource="{Binding Items}"
+			ScrollViewer.VerticalScrollBarVisibility="Hidden"
+			SelectionChanged="OnListSelectionChanged">
+			<ListBox.Styles>
+				<Style Selector="ListBoxItem">
+					<Setter Property="Padding" Value="-2" />
+				</Style>
+				<Style Selector="ListBoxItem /template/ PathIcon#CheckSelected">
+					<Setter Property="IsVisible" Value="False" />
+				</Style>
+			</ListBox.Styles>
+			<ListBox.ItemTemplate>
+				<DataTemplate DataType="vm:OsuPpsEntryViewModel">
+					<!--
+						Two separate blocks side by side:
+						  [thumb 4:3] | [info card]
+						Outer Border clips both to rounded corners.
+					-->
+					<Border
+						Margin="0,1"
+						ClipToBounds="True"
+						CornerRadius="7"
+						Opacity="{Binding RowOpacity}">
+						<!--
+							MinHeight="60" forces the row to be at least 60px tall.
+							The thumbnail is in a separate nested Grid so it doesn't contribute
+							to the outer row's height measurement — it stretches to whatever
+							height the info block determines.
+						-->
+						<Grid ColumnDefinitions="80, *" MinHeight="60">
+
+							<!--  Left block: thumbnail stretched to full row height  -->
+							<Grid Grid.Column="0" Width="80">
+								<Image
+									Source="{Binding Thumbnail}"
+									Stretch="UniformToFill"
+									HorizontalAlignment="Stretch"
+									VerticalAlignment="Stretch" />
+							</Grid>
+
+							<!--  Right block: info — determines row height  -->
+							<Border
+								Grid.Column="1"
+								Background="#14ffffff"
+								Padding="8,6,6,6">
+								<Grid ColumnDefinitions="*, auto">
+
+									<!--  Left: 3 rows  -->
+									<StackPanel
+										Grid.Column="0"
+										VerticalAlignment="Center"
+										Orientation="Vertical"
+										Spacing="2">
+
+										<!--  Row 1: #rank  Title — Artist  -->
+										<StackPanel Orientation="Horizontal" Spacing="5">
+											<TextBlock
+												VerticalAlignment="Center"
+												FontSize="11"
+												Foreground="Gray"
+												Text="{Binding RankLabel}" />
+											<TextBlock
+												FontSize="13"
+												FontWeight="Bold"
+												Foreground="White"
+												Text="{Binding Title}"
+												TextTrimming="CharacterEllipsis" />
+											<TextBlock
+												VerticalAlignment="Center"
+												FontSize="11"
+												Foreground="Gray"
+												Text="—" />
+											<TextBlock
+												VerticalAlignment="Center"
+												FontSize="11"
+												Foreground="Gray"
+												Text="{Binding Artist}"
+												TextTrimming="CharacterEllipsis" />
+										</StackPanel>
+
+										<!--  Row 2: difficulty name  -->
+										<TextBlock
+											FontSize="12"
+											Foreground="LightGray"
+											Text="{Binding Version}"
+											TextTrimming="CharacterEllipsis" />
+
+										<!--  Row 3: star rating + mods  -->
+										<StackPanel Orientation="Horizontal" Spacing="5">
+											<TextBlock
+												VerticalAlignment="Center"
+												FontSize="11"
+												Foreground="#ffcc44"
+												Text="{Binding StarRatingLabel}" />
+											<Border
+												Padding="5,1"
+												VerticalAlignment="Center"
+												Background="#552255aa"
+												CornerRadius="4"
+												IsVisible="{Binding HasMods}">
+												<TextBlock
+													FontSize="11"
+													FontWeight="Bold"
+													Foreground="#aaccff"
+													Text="{Binding ModsString}" />
+											</Border>
+										</StackPanel>
+
+									</StackPanel>
+
+									<!--  Right: PP value + action buttons  -->
+									<StackPanel
+										Grid.Column="1"
+										Margin="8,0,0,0"
+										VerticalAlignment="Center"
+										Orientation="Horizontal"
+										Spacing="6">
+
+										<!--  PP block  -->
+										<StackPanel VerticalAlignment="Center">
+											<TextBlock
+												FontSize="22"
+												FontWeight="Bold"
+												Foreground="White"
+												HorizontalAlignment="Right"
+												Text="{Binding Pp99, StringFormat={}{0:0}}" />
+											<TextBlock
+												FontSize="10"
+												Foreground="Gray"
+												HorizontalAlignment="Right"
+												Text="pp" />
+										</StackPanel>
+
+										<!--  Direct / Web buttons — non-local only  -->
+										<StackPanel
+											IsVisible="{Binding !IsLocal}"
+											Orientation="Vertical"
+											VerticalAlignment="Center"
+											Spacing="3">
+											<Button
+												Classes="Basic"
+												Command="{Binding OpenDirectCommand}"
+												Padding="5,3"
+												ToolTip.Tip="osu!direct — download into game">
+												<iconPacks:PackIconFontAwesome
+													Height="10"
+													VerticalAlignment="Center"
+													Foreground="White"
+													Kind="DownloadSolid" />
+											</Button>
+											<Button
+												Classes="Basic"
+												Command="{Binding OpenWebCommand}"
+												Padding="5,3"
+												ToolTip.Tip="Open on osu! website">
+												<iconPacks:PackIconFontAwesome
+													Height="10"
+													VerticalAlignment="Center"
+													Foreground="White"
+													Kind="UpRightFromSquareSolid" />
+											</Button>
+										</StackPanel>
+
+									</StackPanel>
+								</Grid>
+							</Border>
+
+						</Grid>  <!--  outer ColumnDefinitions grid  -->
+					</Border>
+				</DataTemplate>
+			</ListBox.ItemTemplate>
+		</ListBox>
+
+		<sukiUi:Loading
+			HorizontalAlignment="Center"
+			VerticalAlignment="Center"
+			IsVisible="{Binding IsLoading}" />
+	</Grid>
+</UserControl>

@@ -62,6 +62,15 @@ public class ViewModelLocator
     public BeatmapCommentsViewModel BeatmapCommentsViewModel =>
         App.AppHost.Services.GetRequiredService<BeatmapCommentsViewModel>();
 
+    public OsuPpsViewModel OsuPpsViewModel =>
+        App.AppHost.Services.GetRequiredService<OsuPpsViewModel>();
+
+    public OsuPpsFiltersViewModel OsuPpsFiltersViewModel =>
+        App.AppHost.Services.GetRequiredService<OsuPpsFiltersViewModel>();
+
+    public SetupViewModel SetupViewModel =>
+        App.AppHost.Services.GetRequiredService<SetupViewModel>();
+
     public object GetByType(Type type)
     {
         var prop = GetType()

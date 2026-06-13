@@ -1,0 +1,192 @@
+<UserControl
+	x:Class="MapManager.GUI.Views.OsuPpsFiltersControl"
+	xmlns="https://github.com/avaloniaui"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:iconPacks="https://github.com/MahApps/IconPacks.Avalonia"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+	xmlns:vm="using:MapManager.GUI.ViewModels"
+	d:DesignHeight="60"
+	d:DesignWidth="400"
+	mc:Ignorable="d">
+	<UserControl.DataContext>
+		<Binding Path="OsuPpsFiltersViewModel" Source="{StaticResource Locator}" />
+	</UserControl.DataContext>
+
+	<UserControl.Styles>
+		<!--  Compact mod toggle style  -->
+		<Style Selector="ToggleButton.mod">
+			<Setter Property="Padding" Value="7,3" />
+			<Setter Property="FontSize" Value="11" />
+			<Setter Property="FontWeight" Value="Bold" />
+			<Setter Property="Foreground" Value="Gray" />
+			<Setter Property="BorderBrush" Value="#44ffffff" />
+			<Setter Property="Background" Value="Transparent" />
+			<Setter Property="CornerRadius" Value="4" />
+		</Style>
+		<Style Selector="ToggleButton.mod:checked /template/ ContentPresenter">
+			<Setter Property="Background" Value="#44337799" />
+			<Setter Property="BorderBrush" Value="#5599ff" />
+			<Setter Property="Foreground" Value="#88ccff" />
+		</Style>
+		<Style Selector="ToggleButton.mod /template/ ContentPresenter">
+			<Setter Property="Background" Value="Transparent" />
+		</Style>
+		<Style Selector="ToggleButton.mod:pointerover /template/ ContentPresenter">
+			<Setter Property="Background" Value="#22ffffff" />
+		</Style>
+		<Style Selector="TextBlock.filter-label">
+			<Setter Property="FontSize" Value="10" />
+			<Setter Property="Foreground" Value="Gray" />
+			<Setter Property="FontWeight" Value="SemiBold" />
+			<Setter Property="VerticalAlignment" Value="Center" />
+		</Style>
+		<Style Selector="TextBlock.filter-val">
+			<Setter Property="FontSize" Value="11" />
+			<Setter Property="Foreground" Value="LightGray" />
+			<Setter Property="VerticalAlignment" Value="Center" />
+			<Setter Property="MinWidth" Value="30" />
+		</Style>
+	</UserControl.Styles>
+
+	<sukiUi:GlassCard Padding="10,6" Classes="Primary">
+		<DockPanel>
+
+			<!--  Right: flyout for PP + Length ranges  -->
+			<DropDownButton
+				DockPanel.Dock="Right"
+				Padding="8,6"
+				VerticalAlignment="Center"
+				ToolTip.Tip="PP and Length filters">
+				<iconPacks:PackIconFontAwesome
+					Height="12"
+					VerticalAlignment="Center"
+					Foreground="Gray"
+					Kind="FilterSolid" />
+				<DropDownButton.Flyout>
+					<Flyout>
+						<Panel>
+							<Border
+								Margin="20"
+								BoxShadow="{DynamicResource SukiPopupShadow}"
+								CornerRadius="20" />
+							<Border
+								MinWidth="280"
+								Margin="20"
+								Background="{DynamicResource SukiCardBackground}"
+								BorderBrush="{DynamicResource SukiLightBorderBrush}"
+								BorderThickness="1"
+								ClipToBounds="True"
+								CornerRadius="15">
+								<Border Padding="16" Background="{DynamicResource PopupGradientBrush}">
+									<StackPanel Orientation="Vertical" Spacing="14">
+
+										<!--  PP range  -->
+										<StackPanel Orientation="Vertical" Spacing="4">
+											<Grid ColumnDefinitions="*, Auto">
+												<StackPanel Orientation="Horizontal" Spacing="5">
+													<iconPacks:PackIconFontAwesome
+														Height="10"
+														VerticalAlignment="Center"
+														Foreground="Gray"
+														Kind="ChartBarSolid" />
+													<TextBlock Classes="filter-label" Text="PP RANGE" />
+												</StackPanel>
+												<StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
+													<TextBlock Classes="filter-val" Text="{Binding MinPp, StringFormat={}{0:0}}" />
+													<TextBlock Classes="filter-val" Opacity="0.5" Text="–" />
+													<TextBlock Classes="filter-val" Text="{Binding MaxPp, StringFormat={}{0:0}}" />
+												</StackPanel>
+											</Grid>
+											<Slider
+												IsSnapToTickEnabled="True"
+												Maximum="{Binding MaxPp}"
+												Minimum="0"
+												TickFrequency="10"
+												Value="{Binding MinPp}" />
+											<Slider
+												IsSnapToTickEnabled="True"
+												Maximum="2000"
+												Minimum="0"
+												TickFrequency="10"
+												Value="{Binding MaxPp}" />
+										</StackPanel>
+
+										<Rectangle Height="1" Fill="#33ffffff" />
+
+										<!--  Length range  -->
+										<StackPanel Orientation="Vertical" Spacing="4">
+											<Grid ColumnDefinitions="*, Auto">
+												<StackPanel Orientation="Horizontal" Spacing="5">
+													<iconPacks:PackIconFontAwesome
+														Height="10"
+														VerticalAlignment="Center"
+														Foreground="Gray"
+														Kind="ClockRegular" />
+													<TextBlock Classes="filter-label" Text="LENGTH" />
+												</StackPanel>
+												<StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
+													<TextBlock Classes="filter-val" Text="{Binding MinLengthLabel}" />
+													<TextBlock Classes="filter-val" Opacity="0.5" Text="–" />
+													<TextBlock Classes="filter-val" Text="{Binding MaxLengthLabel}" />
+												</StackPanel>
+											</Grid>
+											<Slider
+												IsSnapToTickEnabled="True"
+												Maximum="{Binding MaxLength}"
+												Minimum="0"
+												TickFrequency="5"
+												Value="{Binding MinLength}" />
+											<Slider
+												IsSnapToTickEnabled="True"
+												Maximum="900"
+												Minimum="0"
+												TickFrequency="5"
+												Value="{Binding MaxLength}" />
+										</StackPanel>
+
+										<Rectangle Height="1" Fill="#33ffffff" />
+
+										<!--  Reset  -->
+										<Button
+											HorizontalAlignment="Right"
+											Classes="Basic"
+											Command="{Binding ResetCommand}"
+											Padding="12,6">
+											<StackPanel Orientation="Horizontal" Spacing="6">
+												<iconPacks:PackIconFontAwesome
+													Height="10"
+													VerticalAlignment="Center"
+													Kind="ArrowRotateLeftSolid" />
+												<TextBlock FontSize="12" Text="Reset all" />
+											</StackPanel>
+										</Button>
+
+									</StackPanel>
+								</Border>
+							</Border>
+						</Panel>
+					</Flyout>
+				</DropDownButton.Flyout>
+			</DropDownButton>
+
+			<!--  Center: mods toggle buttons  -->
+			<StackPanel
+				HorizontalAlignment="Left"
+				VerticalAlignment="Center"
+				Orientation="Horizontal"
+				Spacing="4">
+				<ToggleButton Classes="mod" IsChecked="{Binding ModNm}">NM</ToggleButton>
+				<ToggleButton Classes="mod" IsChecked="{Binding ModHd}">HD</ToggleButton>
+				<ToggleButton Classes="mod" IsChecked="{Binding ModHr}">HR</ToggleButton>
+				<ToggleButton Classes="mod" IsChecked="{Binding ModDt}">DT</ToggleButton>
+				<ToggleButton Classes="mod" IsChecked="{Binding ModHdDt}">HDDT</ToggleButton>
+				<ToggleButton Classes="mod" IsChecked="{Binding ModHt}">HT</ToggleButton>
+				<ToggleButton Classes="mod" IsChecked="{Binding ModEz}">EZ</ToggleButton>
+				<ToggleButton Classes="mod" IsChecked="{Binding ModFl}">FL</ToggleButton>
+			</StackPanel>
+
+		</DockPanel>
+	</sukiUi:GlassCard>
+</UserControl>

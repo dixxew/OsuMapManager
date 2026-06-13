@@ -36,6 +36,7 @@ public class MainViewModel : ViewModelBase
     private bool _isLocalBeatmapsVisible;
     private bool _isGlobalBeatmapsVisible;
     private UserControl _mainBlockContent;
+    private int _selectedMainTab;
     #endregion
 
 
@@ -46,6 +47,12 @@ public class MainViewModel : ViewModelBase
         get => _mainBlockContent;
         set => this.RaiseAndSetIfChanged(ref _mainBlockContent, value);
     }
+    public int SelectedMainTab
+    {
+        get => _selectedMainTab;
+        set => this.RaiseAndSetIfChanged(ref _selectedMainTab, value);
+    }
+
     public bool IsGlobalBeatmapsVisible
     {
         get => _isGlobalBeatmapsVisible;

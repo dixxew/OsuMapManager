@@ -1,0 +1,184 @@
+<UserControl
+	x:Class="MapManager.GUI.Views.SetupControl"
+	xmlns="https://github.com/avaloniaui"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+	xmlns:vm="using:MapManager.GUI.ViewModels"
+	d:DesignHeight="700"
+	d:DesignWidth="800"
+	mc:Ignorable="d">
+	<UserControl.DataContext>
+		<Binding Path="SetupViewModel" Source="{StaticResource Locator}" />
+	</UserControl.DataContext>
+
+	<Grid>
+		<sukiUi:SukiBackground />
+
+		<ScrollViewer VerticalScrollBarVisibility="Auto">
+			<StackPanel
+				MaxWidth="620"
+				Margin="24,32,24,32"
+				HorizontalAlignment="Center"
+				Spacing="14">
+
+				<!--  Header  -->
+				<StackPanel Margin="4,0,0,4" Spacing="6">
+					<TextBlock
+						FontSize="30"
+						FontWeight="Bold"
+						Foreground="White"
+						Text="Welcome to MapManager" />
+					<TextBlock
+						FontSize="13"
+						Foreground="Gray"
+						Text="Set up the basics to get started. You can change any of these later in ⚙ Settings."
+						TextWrapping="Wrap" />
+				</StackPanel>
+
+				<!--  ── Section 1: osu! path ─────────────────────────────────────────  -->
+				<sukiUi:GlassCard>
+					<StackPanel Spacing="10">
+						<StackPanel Orientation="Horizontal" Spacing="6">
+							<TextBlock
+								VerticalAlignment="Center"
+								FontSize="15"
+								FontWeight="SemiBold"
+								Foreground="White"
+								Text="osu! Installation" />
+						</StackPanel>
+						<TextBlock
+							FontSize="12"
+							Foreground="Gray"
+							Text="The folder that contains osu!.exe — needed to read your local beatmaps."
+							TextWrapping="Wrap" />
+
+						<Grid ColumnDefinitions="*, auto">
+							<TextBox
+								Grid.Column="0"
+								Text="{Binding OsuPath}"
+								Watermark="Path to osu! folder…" />
+							<Button
+								Grid.Column="1"
+								VerticalAlignment="Center"
+								Click="OnBrowseOsuPath">
+								Browse…
+							</Button>
+						</Grid>
+
+						<TextBlock
+							FontSize="12"
+							Foreground="#66cc66"
+							IsVisible="{Binding OsuPathValid}"
+							Text="{Binding OsuPathStatusText}" />
+						<TextBlock
+							FontSize="12"
+							Foreground="#cc4444"
+							IsVisible="{Binding OsuPathInvalid}"
+							Text="{Binding OsuPathStatusText}" />
+					</StackPanel>
+				</sukiUi:GlassCard>
+
+				<!--  ── Section 2: osu! API ─────────────────────────────────────────  -->
+				<sukiUi:GlassCard>
+					<StackPanel Spacing="10">
+						<Grid ColumnDefinitions="*, auto">
+							<TextBlock
+								VerticalAlignment="Center"
+								FontSize="15"
+								FontWeight="SemiBold"
+								Foreground="White"
+								Text="osu! API" />
+							<Button
+								Grid.Column="1"
+								Classes="Basic"
+								Command="{Binding OpenApiPageCommand}"
+								FontSize="12"
+								Padding="8,4">
+								Get credentials ↗
+							</Button>
+						</Grid>
+						<TextBlock
+							FontSize="12"
+							Foreground="Gray"
+							Text="Required for scores, beatmap data and avatar loading. Create an OAuth application at osu! account settings."
+							TextWrapping="Wrap" />
+
+						<TextBox
+							Text="{Binding ClientId}"
+							Watermark="Client ID" />
+						<TextBox
+							PasswordChar="•"
+							Text="{Binding ClientSecret}"
+							Watermark="Client Secret" />
+					</StackPanel>
+				</sukiUi:GlassCard>
+
+				<!--  ── Section 3: IRC ────────────────────────────────────────────  -->
+				<sukiUi:GlassCard>
+					<StackPanel Spacing="10">
+						<Grid ColumnDefinitions="*, auto">
+							<TextBlock
+								VerticalAlignment="Center"
+								FontSize="15"
+								FontWeight="SemiBold"
+								Foreground="White"
+								Text="IRC Chat" />
+							<Button
+								Grid.Column="1"
+								Classes="Basic"
+								Command="{Binding OpenIrcPageCommand}"
+								FontSize="12"
+								Padding="8,4">
+								Get IRC password ↗
+							</Button>
+						</Grid>
+						<TextBlock
+							FontSize="12"
+							Foreground="Gray"
+							Text="Enables the in-app osu! chat. IRC password is different from your account password — get it from your osu! settings."
+							TextWrapping="Wrap" />
+
+						<TextBox
+							Text="{Binding IrcNickname}"
+							Watermark="osu! username" />
+						<TextBox
+							PasswordChar="•"
+							Text="{Binding IrcPassword}"
+							Watermark="IRC Password" />
+					</StackPanel>
+				</sukiUi:GlassCard>
+
+				<!--  ── Bottom bar ──────────────────────────────────────────────────  -->
+				<Grid Margin="4,4,0,0" ColumnDefinitions="*, auto">
+					<TextBlock
+						VerticalAlignment="Center"
+						FontSize="12"
+						Foreground="Gray"
+						Text="All of this can be changed at any time via ⚙ in the top-right corner."
+						TextWrapping="Wrap" />
+
+					<StackPanel
+						Grid.Column="1"
+						Orientation="Horizontal"
+						Spacing="10">
+						<Button
+							Classes="Basic"
+							Command="{Binding SkipCommand}"
+							Padding="14,8">
+							Skip
+						</Button>
+						<Button
+							Classes="Accent"
+							Command="{Binding SaveAndContinueCommand}"
+							Padding="14,8">
+							Save &amp; Continue →
+						</Button>
+					</StackPanel>
+				</Grid>
+
+			</StackPanel>
+		</ScrollViewer>
+	</Grid>
+</UserControl>

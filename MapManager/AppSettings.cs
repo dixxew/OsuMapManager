@@ -18,6 +18,8 @@ public class AppSettings
     public DateTime? CacheInvalidatedAt { get; set; }
     public List<string>? OpenedChannels { get; set; }
 
+    public bool SetupCompleted { get; set; } = false;
+
     public bool NotificationsEnabled { get; set; } = true;
     public bool NotificationSoundEnabled { get; set; } = true;
     public List<string> HighlightKeywords { get; set; } = [];

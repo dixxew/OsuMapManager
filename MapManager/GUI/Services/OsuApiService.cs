@@ -6,6 +6,7 @@ using OsuSharp.Interfaces;
 using OsuSharp.Legacy;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -90,15 +91,19 @@ public class OsuApiService
         try
         {
             var url = await GetUserAvatarUrlAsync(username);
+            Debug.WriteLine($"[OsuApi] avatar URL for '{username}': {url}");
             var response = await _httpClient.GetAsync(url);
             if (response.IsSuccessStatusCode)
             {
                 using var stream = await response.Content.ReadAsStreamAsync();
-                var bitmap = new Bitmap(stream);
-                return bitmap;
+                return new Bitmap(stream);
             }
+            Debug.WriteLine($"[OsuApi] avatar HTTP {(int)response.StatusCode} for '{username}'");
         }
-        catch { }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[OsuApi] GetAvatarAsync failed for '{username}': {ex.GetType().Name}: {ex.Message}");
+        }
         return null;
     }
 

@@ -84,6 +84,10 @@ namespace MapManager
                     services.AddSingleton<ChatService>();
                     services.AddSingleton<AvatarService>();
                     services.AddSingleton<NotificationService>();
+                    services.AddSingleton<OsuPpsService>();
+                    services.AddSingleton<OsuPpsFiltersViewModel>();
+                    services.AddSingleton<OsuPpsViewModel>();
+                    services.AddSingleton<SetupViewModel>();
                     
                     
 
@@ -95,6 +99,7 @@ namespace MapManager
                         locator.Register<MainViewModel, MainControl>();
                         locator.Register<ChatViewModel, ChatControl>();
                         locator.Register<MainBlockBeatmapViewModel, MainBlockBeatmapControl>();
+                        locator.Register<SetupViewModel, SetupControl>();
 
                         return locator;
                     });

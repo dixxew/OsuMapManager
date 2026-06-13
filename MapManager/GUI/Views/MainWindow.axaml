@@ -58,8 +58,7 @@
 		</StackPanel>
 	</sukiUi:SukiWindow.RightWindowTitleBarControls>
 	<Grid>
-
 		<ContentControl Content="{Binding Content}" />
-		<!-- <ContentControl Content="{Binding DialogContent}" /> -->
+		<ContentControl Content="{Binding DialogContent}" IsHitTestVisible="False" />
 	</Grid>
 </sukiUi:SukiWindow>

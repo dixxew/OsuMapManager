@@ -80,6 +80,29 @@
 							</Grid>
 						</Grid>
 					</TabItem>
+						<TabItem>
+							<TabItem.Header>
+								<StackPanel
+									Margin="8,0"
+									Orientation="Horizontal"
+									Spacing="8">
+									<iconPacks:PackIconFontAwesome
+										Height="15"
+										VerticalAlignment="Center"
+										Kind="FireSolid" />
+									<TextBlock
+										FontSize="18"
+										FontWeight="Bold"
+										Text="osu!pps" />
+								</StackPanel>
+							</TabItem.Header>
+							<Grid RowDefinitions="auto, *">
+								<view:OsuPpsFiltersControl />
+								<Grid Grid.Row="1">
+									<view:OsuPpsControl />
+								</Grid>
+							</Grid>
+						</TabItem>
 				</TabControl>
 			</Grid>
 
