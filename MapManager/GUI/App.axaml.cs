@@ -36,8 +36,7 @@ namespace MapManager.GUI
                 desktop.MainWindow.Closed += (_, _) =>
                 {
                     AppHost.Services.GetRequiredService<Services.AudioPlayerService>().Stop();
-                    AppHost.Services.GetRequiredService<Services.ChatService>().Disconnect();
-                    AppHost.StopAsync().Wait(TimeSpan.FromSeconds(2));
+                    AppHost.Services.GetRequiredService<Services.ChatService>();
                     desktop.Shutdown();
                     // добиваем не-фоновые потоки (NAudio/IRC), которые иначе держат процесс живым
                     Environment.Exit(0);

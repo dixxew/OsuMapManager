@@ -8,22 +8,28 @@ using MapManager.GUI.Views;
 using Meebey.SmartIrc4net;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using OsuSharp;
 using OsuSharp.Extensions;
 using OsuSharp.Legacy;
 using System;
 using System.Net.Http;
+using System.Runtime.InteropServices;
 
 namespace MapManager
 {
     internal sealed class Program
     {
+        [DllImport("shell32.dll", CharSet = CharSet.Unicode)]
+        private static extern int SetCurrentProcessExplicitAppUserModelID(string AppID);
+
         // Initialization code. Don't use any Avalonia, third-party APIs or any
         // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
         // yet and stuff might break.
         [STAThread]
         public static void Main(string[] args)
         {
+            SetCurrentProcessExplicitAppUserModelID("MapManager.App");
             BuildAvaloniaApp()
                 .StartWithClassicDesktopLifetime(args);
         }
@@ -50,6 +56,14 @@ namespace MapManager
                 })
                 .ConfigureServices((context, services) =>
                 {
+                    services.AddLogging(b =>
+                    {
+                        b.AddConsole();                              // или AddSimpleConsole / AddDebug
+                        b.SetMinimumLevel(LogLevel.Error);     // глобальный потолок
+                        // b.AddFilter("MapManager.GUI.Services.ChatService", LogLevel.Trace);  // сырьё IRC видно
+                        // b.AddFilter("Microsoft", LogLevel.Warning);  // заглушить хостинг-шум
+                        // b.AddFilter("OsuSharp", LogLevel.Warning);
+                    });
 
                     services.AddSingleton(appSettings);
 
@@ -69,6 +83,7 @@ namespace MapManager
                     services.AddSingleton<IrcClient>();
                     services.AddSingleton<ChatService>();
                     services.AddSingleton<AvatarService>();
+                    services.AddSingleton<NotificationService>();
                     
                     
 

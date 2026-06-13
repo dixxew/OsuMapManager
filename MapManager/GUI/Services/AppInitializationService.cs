@@ -16,15 +16,19 @@ public class AppInitializationService : IHostedService
     private readonly OsuDataService OsuDataReader;
     private readonly RankingService _rankingService;
     private readonly BeatmapDataService _beatmapDataService;
+    private readonly ChatService _chatService;
 
-    public AppInitializationService(OsuDataService osuDataReader, RankingService rankingService, BeatmapDataService beatmapDataService, ThumbnailService _)
+    public AppInitializationService(OsuDataService osuDataReader, RankingService rankingService, BeatmapDataService beatmapDataService, ThumbnailService _, ChatService chatService, NotificationService __)
     {
         OsuDataReader = osuDataReader;
         _rankingService = rankingService;
         _beatmapDataService = beatmapDataService;
+        _chatService = chatService;
     }
     public async Task StartAsync(CancellationToken cancellationToken)
     {
+        _chatService.Start();
+
         var scores = LoadScores();
         await LoadBeatmaps(scores);
         _beatmapDataService.LoadFavoriteBeatmaps();

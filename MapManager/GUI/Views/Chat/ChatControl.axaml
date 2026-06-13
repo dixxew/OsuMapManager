@@ -2,94 +2,493 @@
     x:Class="MapManager.GUI.Views.ChatControl"
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:behaviors="clr-namespace:MapManager.GUI.Behaviors"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:iconPacks="https://github.com/MahApps/IconPacks.Avalonia"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
     d:DesignHeight="450"
     d:DesignWidth="800"
-    Loaded="ChatLoaded"
     mc:Ignorable="d">
+    <UserControl.Styles>
+        <Style Selector="Button.InlineLink">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0,0,0,1" />
+            <Setter Property="BorderBrush" Value="#4fc3f7" />
+            <Setter Property="Foreground" Value="#4fc3f7" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="VerticalAlignment" Value="Bottom" />
+        </Style>
+        <Style Selector="Button.InlineLink:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="#81d4fa" />
+        </Style>
+        <Style Selector="Button.InlineMention">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0,0,0,1" />
+            <Setter Property="BorderBrush" Value="#a3e635" />
+            <Setter Property="Foreground" Value="#a3e635" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="VerticalAlignment" Value="Bottom" />
+        </Style>
+        <Style Selector="Button.InlineMention:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="#d9f99d" />
+        </Style>
+        <Style Selector="Button.InlineChannel">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0,0,0,1" />
+            <Setter Property="BorderBrush" Value="#22d3ee" />
+            <Setter Property="Foreground" Value="#22d3ee" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="VerticalAlignment" Value="Bottom" />
+        </Style>
+        <Style Selector="Button.InlineChannel:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="#67e8f9" />
+        </Style>
+    </UserControl.Styles>
     <UserControl.DataContext>
         <Binding Path="ChatViewModel" Source="{StaticResource Locator}" />
     </UserControl.DataContext>
+
     <Grid ColumnDefinitions="3* 7* 2*">
+
+        <!--  Channels panel  -->
         <sukiUi:GlassCard Grid.Column="0">
-            <Grid RowDefinitions="Auto *">
-                <DockPanel>
-                    <TextBlock
-                        VerticalAlignment="Center"
-                        FontSize="18"
-                        Text="Channels" />
-                    <Button
-                        Padding="9,4"
+            <Grid RowDefinitions="Auto * Auto">
+
+                <!--  Header + status  -->
+                <DockPanel Margin="0,0,0,6">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <Ellipse
+                            Width="8"
+                            Height="8"
+                            VerticalAlignment="Center"
+                            Fill="{Binding StatusColor}" />
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            FontSize="11"
+                            Foreground="Gray"
+                            Text="{Binding StatusText}" />
+                    </StackPanel>
+                    <StackPanel
                         HorizontalAlignment="Right"
-                        Classes="Outlined Rounded"
-                        Content="+" />
+                        Orientation="Horizontal"
+                        Spacing="6">
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            FontSize="18"
+                            Text="Channels" />
+                        <Button
+                            Padding="6"
+                            VerticalAlignment="Center"
+                            Classes="Basic"
+                            Command="{Binding OpenChannelPicker}"
+                            ToolTip.Tip="Join channel">
+                            <iconPacks:PackIconFontAwesome
+                                Width="14"
+                                Height="14"
+                                Kind="PlusSolid" />
+                        </Button>
+                    </StackPanel>
                 </DockPanel>
+
                 <ListBox
                     Grid.Row="1"
-                    ItemsSource="{Binding Channels}"
+                    ItemsSource="{Binding SortedChannels}"
                     SelectedItem="{Binding SelectedChannel}">
+                    <ListBox.Styles>
+                        <Style Selector="ListBoxItem /template/ PathIcon#CheckSelected">
+                            <Setter Property="IsVisible" Value="False" />
+                        </Style>
+                        <Style Selector="ListBoxItem">
+                            <Setter Property="Padding" Value="4,2" />
+                        </Style>
+                    </ListBox.Styles>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <TextBlock
-                                Margin="8,4"
-                                FontSize="18"
-                                FontWeight="600"
-                                Foreground="White"
-                                Text="{Binding Name}"
-                                TextWrapping="Wrap" />
+                            <Grid ColumnDefinitions="Auto * Auto">
+                                <!--  Channel icon  -->
+                                <Border
+                                    Width="32"
+                                    Height="32"
+                                    Margin="0,0,6,0"
+                                    VerticalAlignment="Center"
+                                    IsVisible="{Binding IsChannel}">
+                                    <iconPacks:PackIconFontAwesome
+                                        Width="16"
+                                        Height="16"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        Kind="HashtagSolid"
+                                        Opacity="0.7" />
+                                </Border>
+                                <!--  Private chat avatar  -->
+                                <Border
+                                    Width="32"
+                                    Height="32"
+                                    Margin="0,0,6,0"
+                                    VerticalAlignment="Center"
+                                    IsVisible="{Binding IsPrivate}">
+                                    <Panel Width="32" Height="32">
+                                        <Border
+                                            Width="32"
+                                            Height="32"
+                                            CornerRadius="16"
+                                            Background="{Binding PlaceholderColor}"
+                                            IsVisible="{Binding HasNoAvatar}">
+                                            <TextBlock
+                                                Text="{Binding AvatarInitial}"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"
+                                                FontSize="14"
+                                                FontWeight="Bold"
+                                                Foreground="White" />
+                                        </Border>
+                                        <Border
+                                            Width="32"
+                                            Height="32"
+                                            ClipToBounds="True"
+                                            CornerRadius="32"
+                                            IsVisible="{Binding HasAvatar}">
+                                            <Image
+                                                Width="32"
+                                                Height="32"
+                                                Source="{Binding Avatar}" />
+                                        </Border>
+                                    </Panel>
+                                </Border>
+                                <!--  Name + user count  -->
+                                <StackPanel
+                                    Grid.Column="1"
+                                    VerticalAlignment="Center"
+                                    Orientation="Vertical">
+                                    <TextBlock
+                                        FontSize="14"
+                                        FontWeight="600"
+                                        Foreground="White"
+                                        Text="{Binding DisplayName}"
+                                        TextTrimming="CharacterEllipsis" />
+                                    <TextBlock
+                                        FontSize="11"
+                                        Foreground="Gray"
+                                        IsVisible="{Binding IsChannel}"
+                                        Text="{Binding Users.Count, StringFormat='{}{0} users'}" />
+                                </StackPanel>
+                                <!--  Close button  -->
+                                <Button
+                                    Grid.Column="2"
+                                    Width="22"
+                                    Height="22"
+                                    Padding="0"
+                                    VerticalAlignment="Center"
+                                    Classes="Basic"
+                                    Command="{Binding ChatViewModel.LeaveChannel, Source={StaticResource Locator}}"
+                                    CommandParameter="{Binding}"
+                                    Opacity="0.5"
+                                    ToolTip.Tip="Close">
+                                    <iconPacks:PackIconFontAwesome
+                                        Width="10"
+                                        Height="10"
+                                        Kind="XmarkSolid" />
+                                </Button>
+                            </Grid>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ListBox>
+
+                <!--  Notification hotbar  -->
+                <Border
+                    Grid.Row="2"
+                    Margin="0,6,0,0"
+                    HorizontalAlignment="Right"
+                    BorderBrush="{DynamicResource SukiCardBorderBrush}"
+                    BorderThickness="0,1,0,0">
+                    <StackPanel
+                        Margin="0,6,0,0"
+                        HorizontalAlignment="Center"
+                        Orientation="Horizontal"
+                        Spacing="4">
+
+                        <!--  Bell: global on/off  -->
+                        <Button
+                            Padding="8,5"
+                            Classes="Basic"
+                            Foreground="{DynamicResource SukiText}"
+                            Command="{Binding ToggleNotifications}"
+                            ToolTip.Tip="{Binding NotificationsEnabled, StringFormat='Notifications: {0}'}">
+                            <Panel>
+                                <iconPacks:PackIconFontAwesome
+                                    Width="14"
+                                    Height="14"
+                                    Foreground="{DynamicResource SukiText}"
+                                    IsVisible="{Binding NotificationsEnabled}"
+                                    Kind="BellSolid" />
+                                <iconPacks:PackIconFontAwesome
+                                    Width="14"
+                                    Height="14"
+                                    Foreground="Gray"
+                                    IsVisible="{Binding NotificationsDisabled}"
+                                    Kind="BellSlashSolid" />
+                            </Panel>
+                        </Button>
+
+                        <!--  Volume: sound on/off  -->
+                        <Button
+                            Padding="8,5"
+                            Classes="Basic"
+                            Command="{Binding ToggleSound}"
+                            ToolTip.Tip="{Binding SoundEnabled, StringFormat='Sound: {0}'}">
+                            <Panel>
+                                <iconPacks:PackIconFontAwesome
+                                    Width="14"
+                                    Height="14"
+                                    Foreground="{DynamicResource SukiText}"
+                                    IsVisible="{Binding SoundEnabled}"
+                                    Kind="VolumeHighSolid" />
+                                <iconPacks:PackIconFontAwesome
+                                    Width="14"
+                                    Height="14"
+                                    Foreground="Gray"
+                                    IsVisible="{Binding SoundDisabled}"
+                                    Kind="VolumeXmarkSolid" />
+                            </Panel>
+                        </Button>
+
+                        <!--  Gear: settings flyout  -->
+                        <Button
+                            Padding="8,5"
+                            Classes="Basic"
+                            Foreground="{DynamicResource SukiText}"
+                            ToolTip.Tip="Notification settings">
+                            <Button.Flyout>
+                                <Flyout Placement="Top">
+                                    <Border 
+                                        CornerRadius="15"
+                                        BorderThickness="1"
+                                        Padding="8"
+                                        Background="{DynamicResource SukiCardBackground}"
+                                        BorderBrush="{DynamicResource SukiLightBorderBrush}">
+                                        <StackPanel MinWidth="250" Spacing="8">
+                                            <TextBlock
+                                                FontSize="13"
+                                                FontWeight="600"
+                                                Text="Notification Settings" />
+
+                                            <!--  Enable toggle  -->
+                                            <sukiUi:GlassCard>
+                                                <StackPanel Spacing="8">
+                                                    <Grid ColumnDefinitions="* Auto">
+                                                        <TextBlock VerticalAlignment="Center" Text="Enable notifications" />
+                                                        <CheckBox
+                                                            Grid.Column="1"
+                                                            HorizontalAlignment="Right"
+                                                            IsChecked="{Binding NotificationsEnabled}" />
+                                                    </Grid>
+
+                                                    <!--  Sound toggle  -->
+                                                    <Grid ColumnDefinitions="* Auto">
+                                                        <TextBlock VerticalAlignment="Center" Text="Sound" />
+                                                        <CheckBox
+                                                            Grid.Column="1"
+                                                            HorizontalAlignment="Right"
+                                                            IsChecked="{Binding SoundEnabled}" />
+                                                    </Grid>
+                                                </StackPanel>
+                                            </sukiUi:GlassCard>
+
+                                            
+                                            <!--  Highlight keywords  -->
+                                            <sukiUi:GlassCard>
+                                                <StackPanel Spacing="8">
+                                                    <TextBlock
+                                                        FontSize="11"
+                                                        Text="Highlight keywords (comma-separated)" />
+                                                    <TextBlock
+                                                        FontSize="11"
+                                                        Text="Your nickname is always included automatically."
+                                                        TextWrapping="Wrap" />
+                                                    <TextBox
+                                                        FontSize="13"
+                                                        Text="{Binding HighlightKeywordsText}"
+                                                        Watermark="keyword1, keyword2, ..." />
+
+                                                    <Border
+                                                        Height="1"
+                                                        Background="{DynamicResource SukiCardBorderBrush}" />
+
+                                                    <!--  Muted users (PM only)  -->
+                                                    <TextBlock
+                                                        FontSize="11"
+                                                        Text="Muted users — no PM notifications (comma-separated)" />
+                                                    <TextBox
+                                                        FontSize="13"
+                                                        Text="{Binding MutedUsersText}"
+                                                        Watermark="user1, user2, ..." />
+                                                </StackPanel>
+                                            </sukiUi:GlassCard>
+                                        </StackPanel>
+                                    </Border>
+                                </Flyout>
+                            </Button.Flyout>
+                            <iconPacks:PackIconFontAwesome
+                                Width="14"
+                                Height="14"
+                                Foreground="{DynamicResource SukiText}"
+                                Kind="GearSolid" />
+                        </Button>
+
+                    </StackPanel>
+                </Border>
+
             </Grid>
         </sukiUi:GlassCard>
+
+        <!--  Messages panel  -->
         <sukiUi:GlassCard Grid.Column="1">
             <Grid RowDefinitions="auto * auto">
                 <TextBlock FontSize="28" Text="{Binding SelectedChannel.Name}" />
+
                 <ScrollViewer
                     x:Name="MessagesScroll"
                     Grid.Row="1"
                     VerticalScrollBarVisibility="Auto">
-                    <ItemsControl ItemsSource="{Binding SelectedChannel.Messages}">
+                    <ItemsControl
+                        x:Name="MessagesList"
+                        ItemsSource="{Binding SelectedChannel.Messages}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
-                                    <Border
+                                    <Button
                                         Width="48"
                                         Height="48"
-                                        ClipToBounds="True"
-                                        CornerRadius="48">
-
-                                        <Image
-                                            Width="48"
-                                            Height="48"
-                                            Source="{Binding Avatar}" />
-                                    </Border>
+                                        Padding="0"
+                                        VerticalAlignment="Top"
+                                        Classes="Basic">
+                                        <Button.Flyout>
+                                            <MenuFlyout>
+                                                <MenuItem
+                                                    Command="{Binding ChatViewModel.OpenPrivateChatWith, Source={StaticResource Locator}}"
+                                                    CommandParameter="{Binding Sender}"
+                                                    Header="Open private chat">
+                                                    <MenuItem.Icon>
+                                                        <iconPacks:PackIconFontAwesome Kind="CommentSolid" />
+                                                    </MenuItem.Icon>
+                                                </MenuItem>
+                                                <MenuItem
+                                                    Command="{Binding ChatViewModel.MentionUserNamed, Source={StaticResource Locator}}"
+                                                    CommandParameter="{Binding Sender}"
+                                                    Header="Mention">
+                                                    <MenuItem.Icon>
+                                                        <iconPacks:PackIconFontAwesome Kind="AtSolid" />
+                                                    </MenuItem.Icon>
+                                                </MenuItem>
+                                                <MenuItem
+                                                    Command="{Binding ChatViewModel.OpenProfileInBrowserFor, Source={StaticResource Locator}}"
+                                                    CommandParameter="{Binding Sender}"
+                                                    Header="Open profile in browser">
+                                                    <MenuItem.Icon>
+                                                        <iconPacks:PackIconFontAwesome
+                                                            Kind="ArrowUpRightFromSquareSolid" />
+                                                    </MenuItem.Icon>
+                                                </MenuItem>
+                                            </MenuFlyout>
+                                        </Button.Flyout>
+                                        <Panel Width="48" Height="48">
+                                            <Border
+                                                Width="48"
+                                                Height="48"
+                                                CornerRadius="24"
+                                                Background="{Binding NickColor}"
+                                                IsVisible="{Binding HasNoAvatar}">
+                                                <TextBlock
+                                                    Text="{Binding AvatarInitial}"
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center"
+                                                    FontSize="20"
+                                                    FontWeight="Bold"
+                                                    Foreground="White" />
+                                            </Border>
+                                            <Border
+                                                Width="48"
+                                                Height="48"
+                                                ClipToBounds="True"
+                                                CornerRadius="48"
+                                                IsVisible="{Binding HasAvatar}">
+                                                <Image
+                                                    Width="48"
+                                                    Height="48"
+                                                    Source="{Binding Avatar}" />
+                                            </Border>
+                                        </Panel>
+                                    </Button>
                                     <sukiUi:GlassCard
                                         Margin="5"
                                         Padding="16,8"
                                         HorizontalAlignment="Left">
+                                        <sukiUi:GlassCard.ContextFlyout>
+                                            <MenuFlyout>
+                                                <MenuItem
+                                                    Command="{Binding ChatViewModel.CopyToClipboard, Source={StaticResource Locator}}"
+                                                    CommandParameter="{Binding Message}"
+                                                    Header="Copy message">
+                                                    <MenuItem.Icon>
+                                                        <iconPacks:PackIconFontAwesome Kind="CopySolid" />
+                                                    </MenuItem.Icon>
+                                                </MenuItem>
+                                            </MenuFlyout>
+                                        </sukiUi:GlassCard.ContextFlyout>
                                         <StackPanel Orientation="Vertical">
+                                            <!--  Regular message sender  -->
                                             <TextBlock
+                                                IsVisible="{Binding IsRegular}"
                                                 FontSize="12"
                                                 FontWeight="650"
                                                 Foreground="{Binding NickColor}"
                                                 Text="{Binding Sender}"
                                                 TextWrapping="Wrap" />
+                                            <!--  Action message sender: * Sender  -->
                                             <TextBlock
+                                                IsVisible="{Binding IsAction}"
+                                                FontSize="12"
+                                                FontStyle="Italic"
+                                                FontWeight="650"
+                                                TextWrapping="Wrap">
+                                                <Run Text="* " />
+                                                <Run Foreground="{Binding NickColor}" Text="{Binding Sender}" />
+                                            </TextBlock>
+                                            <!--  Regular message body  -->
+                                            <TextBlock
+                                                IsVisible="{Binding IsRegular}"
                                                 FontSize="18"
                                                 Foreground="White"
                                                 MaxWidth="{Binding $parent[Grid].Bounds.Width, Converter={StaticResource MessageWidthConverter}}"
-                                                Text="{Binding Message}"
-                                                TextWrapping="Wrap" />
+                                                TextWrapping="Wrap"
+                                                behaviors:InlineFormatterBehavior.Segments="{Binding Segments}"
+                                                behaviors:InlineFormatterBehavior.LinkCommand="{Binding ChatViewModel.HandleLink, Source={StaticResource Locator}}"
+                                                behaviors:InlineFormatterBehavior.MentionCommand="{Binding ChatViewModel.HandleMention, Source={StaticResource Locator}}"
+                                                behaviors:InlineFormatterBehavior.ChannelCommand="{Binding ChatViewModel.HandleChannel, Source={StaticResource Locator}}" />
+                                            <!--  Action message body (italic)  -->
+                                            <TextBlock
+                                                IsVisible="{Binding IsAction}"
+                                                FontSize="18"
+                                                FontStyle="Italic"
+                                                Foreground="#d0d0d0"
+                                                MaxWidth="{Binding $parent[Grid].Bounds.Width, Converter={StaticResource MessageWidthConverter}}"
+                                                TextWrapping="Wrap"
+                                                behaviors:InlineFormatterBehavior.Segments="{Binding Segments}"
+                                                behaviors:InlineFormatterBehavior.LinkCommand="{Binding ChatViewModel.HandleLink, Source={StaticResource Locator}}"
+                                                behaviors:InlineFormatterBehavior.MentionCommand="{Binding ChatViewModel.HandleMention, Source={StaticResource Locator}}"
+                                                behaviors:InlineFormatterBehavior.ChannelCommand="{Binding ChatViewModel.HandleChannel, Source={StaticResource Locator}}" />
                                             <TextBlock
                                                 HorizontalAlignment="Right"
                                                 FontSize="12"
                                                 Foreground="LightGray"
                                                 Text="{Binding Timestamp, StringFormat='{}{0:HH:mm}'}" />
-
                                         </StackPanel>
                                     </sukiUi:GlassCard>
                                 </StackPanel>
@@ -97,65 +496,165 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                 </ScrollViewer>
+
+                <!--  Input row  -->
                 <Grid Grid.Row="2" ColumnDefinitions="* Auto">
                     <TextBox
-                        Margin="0 0 0 -5"
-                        Padding="20 8"
+                        x:Name="MessageInput"
+                        Margin="0,0,0,-5"
+                        Padding="16,8"
                         CornerRadius="20"
-                        FontSize="22"
+                        FontSize="18"
                         MaxHeight="180"
-                        TextWrapping="Wrap"
-                        VerticalAlignment="Bottom"
                         Opacity="1"
                         Text="{Binding InputMessage}"
-                        Watermark="Input message..." />
+                        TextWrapping="Wrap"
+                        VerticalAlignment="Bottom"
+                        Watermark="Message…" />
                     <Button
                         Grid.Column="1"
+                        Padding="12,8"
                         HorizontalAlignment="Right"
                         VerticalAlignment="Bottom"
-                        FontSize="20"
                         Classes="Outlined Rounded"
-                        Command="{Binding Send}"
-                        Content="Send" />
-
+                        Command="{Binding Send}">
+                        <iconPacks:PackIconFontAwesome
+                            Height="20"
+                            VerticalAlignment="Center"
+                            Kind="PaperPlaneSolid" />
+                    </Button>
                 </Grid>
             </Grid>
         </sukiUi:GlassCard>
+
+        <!--  Users panel  -->
         <sukiUi:GlassCard Grid.Column="2">
-            <Grid RowDefinitions="Auto *">
+            <Grid RowDefinitions="Auto Auto *">
                 <TextBlock>
                     <Run Text="Users: " />
                     <Run Text="{Binding SelectedChannel.Users.Count}" />
                 </TextBlock>
-                <ListBox
+                <TextBox
                     Grid.Row="1"
-                    ItemsSource="{Binding SelectedChannel.Users}">
+                    Margin="0,6"
+                    Padding="10,4"
+                    CornerRadius="14"
+                    FontSize="13"
+                    Text="{Binding UserSearchText}"
+                    Watermark="Search users…" />
+                <ListBox
+                    x:Name="UsersList"
+                    Grid.Row="2"
+                    ItemsSource="{Binding DisplayedUsers}"
+                    SelectionMode="Single">
+                    <ListBox.Styles>
+                        <Style Selector="ListBoxItem /template/ PathIcon#CheckSelected">
+                            <Setter Property="IsVisible" Value="False" />
+                        </Style>
+                    </ListBox.Styles>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <StackPanel Orientation="Horizontal">
-                                <Border
-                                    Width="24"
-                                    Height="24"
-                                    ClipToBounds="True"
-                                    CornerRadius="24">
-
-                                    <Image
+                            <Grid Background="Transparent" ColumnDefinitions="Auto * Auto Auto">
+                                <Grid.ContextFlyout>
+                                    <MenuFlyout>
+                                        <MenuItem
+                                            Command="{Binding OpenPrivateChat}"
+                                            Header="Open private chat">
+                                            <MenuItem.Icon>
+                                                <iconPacks:PackIconFontAwesome Kind="CommentSolid" />
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                        <MenuItem
+                                            Command="{Binding MentionUser}"
+                                            Header="Mention">
+                                            <MenuItem.Icon>
+                                                <iconPacks:PackIconFontAwesome Kind="AtSolid" />
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                        <MenuItem
+                                            Command="{Binding OpenProfileInBrowser}"
+                                            Header="Open profile in browser">
+                                            <MenuItem.Icon>
+                                                <iconPacks:PackIconFontAwesome Kind="ArrowUpRightFromSquareSolid" />
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                        <MenuItem
+                                            Command="{Binding MuteUser}"
+                                            Header="Mute">
+                                            <MenuItem.Icon>
+                                                <iconPacks:PackIconFontAwesome Kind="VolumeXmarkSolid" />
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                    </MenuFlyout>
+                                </Grid.ContextFlyout>
+                                <Panel Width="24" Height="24">
+                                    <Border
                                         Width="24"
                                         Height="24"
-                                        Source="{Binding Avatar}" />
-                                </Border>
+                                        CornerRadius="12"
+                                        Background="{Binding PlaceholderColor}"
+                                        IsVisible="{Binding HasNoAvatar}">
+                                        <TextBlock
+                                            Text="{Binding AvatarInitial}"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            FontSize="11"
+                                            FontWeight="Bold"
+                                            Foreground="White" />
+                                    </Border>
+                                    <Border
+                                        Width="24"
+                                        Height="24"
+                                        ClipToBounds="True"
+                                        CornerRadius="24"
+                                        IsVisible="{Binding HasAvatar}">
+                                        <Image
+                                            Width="24"
+                                            Height="24"
+                                            Source="{Binding Avatar}" />
+                                    </Border>
+                                </Panel>
                                 <TextBlock
-                                    Margin="8,4"
-                                    FontSize="16"
+                                    Grid.Column="1"
+                                    Margin="6,0,0,0"
+                                    VerticalAlignment="Center"
+                                    FontSize="14"
                                     FontWeight="600"
                                     Foreground="White"
                                     Text="{Binding Name}"
-                                    TextWrapping="Wrap" />
-                            </StackPanel>
+                                    TextTrimming="CharacterEllipsis" />
+                                <Button
+                                    Grid.Column="2"
+                                    Padding="5,2"
+                                    VerticalAlignment="Center"
+                                    Classes="Basic"
+                                    Command="{Binding ChatViewModel.MentionUser, Source={StaticResource Locator}}"
+                                    CommandParameter="{Binding}"
+                                    ToolTip.Tip="Mention">
+                                    <TextBlock
+                                        FontSize="13"
+                                        FontWeight="700"
+                                        Text="@" />
+                                </Button>
+                                <Button
+                                    Grid.Column="3"
+                                    Padding="5,2"
+                                    VerticalAlignment="Center"
+                                    Classes="Basic"
+                                    Command="{Binding ChatViewModel.OpenPrivateChat, Source={StaticResource Locator}}"
+                                    CommandParameter="{Binding}"
+                                    ToolTip.Tip="Private chat">
+                                    <iconPacks:PackIconFontAwesome
+                                        Width="13"
+                                        Height="13"
+                                        Kind="CommentSolid" />
+                                </Button>
+                            </Grid>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ListBox>
             </Grid>
         </sukiUi:GlassCard>
+
     </Grid>
 </UserControl>

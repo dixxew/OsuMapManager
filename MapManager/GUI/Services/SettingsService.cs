@@ -1,6 +1,7 @@
 ﻿using MapManager;
 using System.Diagnostics;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace MapManager.GUI.Services;
@@ -85,6 +86,40 @@ public class SettingsService
             _appSettings.IrcPassword = value; 
             IrcSettingsChanged();
         }
+    }
+
+    public List<string>? OpenedChannels
+    {
+        get => _appSettings.OpenedChannels;
+        set
+        {
+            _appSettings.OpenedChannels = value;
+            _ = SaveAsync();
+        }
+    }
+
+    public bool NotificationsEnabled
+    {
+        get => _appSettings.NotificationsEnabled;
+        set { _appSettings.NotificationsEnabled = value; _ = SaveAsync(); }
+    }
+
+    public bool NotificationSoundEnabled
+    {
+        get => _appSettings.NotificationSoundEnabled;
+        set { _appSettings.NotificationSoundEnabled = value; _ = SaveAsync(); }
+    }
+
+    public List<string> HighlightKeywords
+    {
+        get => _appSettings.HighlightKeywords ??= [];
+        set { _appSettings.HighlightKeywords = value; _ = SaveAsync(); }
+    }
+
+    public List<string> MutedUsers
+    {
+        get => _appSettings.MutedUsers ??= [];
+        set { _appSettings.MutedUsers = value; _ = SaveAsync(); }
     }
 
     public async Task UpdateSettings(string propName, object? value)

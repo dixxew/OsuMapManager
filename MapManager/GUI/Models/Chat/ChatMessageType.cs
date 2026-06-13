@@ -6,5 +6,6 @@ public enum ChatMessageType
     Channel,
     Private,
     System,
-    Error
+    Error,
+    Action,
 }

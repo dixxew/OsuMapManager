@@ -1,11 +1,15 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using MapManager.GUI.Models.Chat;
 using MapManager.GUI.ViewModels;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -18,6 +22,11 @@ public partial class ChatControl : UserControl
     private ItemsControl? _messagesList;
     private bool _isUserAtBottom = true;
 
+    // Tab completion state
+    private string? _lastCompletion;
+    private int _tabCycleIndex;
+    private List<string> _tabCandidates = [];
+
     public ChatControl()
     {
         InitializeComponent();
@@ -26,19 +35,19 @@ public partial class ChatControl : UserControl
         {
             _scroller = this.FindControl<ScrollViewer>("MessagesScroll");
             _messagesList = this.FindControl<ItemsControl>("MessagesList");
+            var messageInput = this.FindControl<TextBox>("MessageInput");
+
+            if (messageInput != null)
+                messageInput.AddHandler(KeyDownEvent, OnInputKeyDown, RoutingStrategies.Tunnel);
 
             if (_scroller != null)
             {
                 Task.Run(async () =>
                 {
-                    // íàéä¸ì âåðòèêàëüíûé ScrollBar èç øàáëîíà
-                    _vScrollBar = _scroller
-                        .GetVisualDescendants()
-                        .OfType<ScrollBar>()
-                        .FirstOrDefault(sb => sb.Orientation == Orientation.Vertical);
+                    _vScrollBar = null;
                     while (_vScrollBar == null)
                     {
-                        await Task.Delay(1000);
+                        await Task.Delay(200);
                         await Dispatcher.UIThread.InvokeAsync(() =>
                         {
                             _vScrollBar = _scroller
@@ -47,69 +56,110 @@ public partial class ChatControl : UserControl
                                 .FirstOrDefault(sb => sb.Orientation == Orientation.Vertical);
                         });
                     }
-                    
-                    if (_vScrollBar != null)
-                        _vScrollBar.ValueChanged += OnScrollBarValueChanged;
+                    _vScrollBar.ValueChanged += OnScrollBarValueChanged;
                 });
             }
 
-            // ïîäïèñêà íà íîâûå ñîîáùåíèÿ
             if (DataContext is ChatViewModel vm)
+            {
                 vm.CurrentChannelMessageReceived += OnMessageReceived;
+                vm.SelectedChannelChanged += OnChannelChanged;
+            }
         };
-
-        var vm = DataContext as ChatViewModel;
-        if (vm != null)
-        {
-            vm.CurrentChannelMessageReceived += ScrollToEnd;
-        }
     }
+
+    // â”€â”€ input key handling â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+    private void OnInputKeyDown(object? sender, KeyEventArgs e)
+    {
+        if (sender is not TextBox tb) return;
+        var vm = DataContext as ChatViewModel;
+        if (vm == null) return;
+
+        if (e.Key == Key.Enter && !e.KeyModifiers.HasFlag(KeyModifiers.Shift))
+        {
+            vm.Send();
+            _lastCompletion = null;
+            e.Handled = true;
+            return;
+        }
+
+        if (e.Key == Key.Tab)
+        {
+            e.Handled = true;
+            DoTabComplete(tb, vm);
+            return;
+        }
+
+        // Any other key resets tab completion cycle
+        _lastCompletion = null;
+    }
+
+    private void DoTabComplete(TextBox tb, ChatViewModel vm)
+    {
+        var text = tb.Text ?? "";
+        var caret = tb.CaretIndex;
+        var beforeCaret = text[..Math.Min(caret, text.Length)];
+
+        var atIdx = beforeCaret.LastIndexOf('@');
+        if (atIdx < 0) return;
+
+        var currentWord = beforeCaret[(atIdx + 1)..];
+
+        // Detect cycling: current word matches the last completed nick (case-insensitive)
+        bool isCycling = _lastCompletion != null
+            && currentWord.Equals(_lastCompletion, StringComparison.OrdinalIgnoreCase);
+
+        if (!isCycling)
+        {
+            _tabCandidates = (vm.SelectedChannel?.Users ?? [])
+                .Select(u => u.Name)
+                .Where(n => n.StartsWith(currentWord, StringComparison.OrdinalIgnoreCase))
+                .OrderBy(n => n, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+            _tabCycleIndex = 0;
+        }
+        else
+        {
+            _tabCycleIndex = (_tabCycleIndex + 1) % Math.Max(1, _tabCandidates.Count);
+        }
+
+        if (_tabCandidates.Count == 0) return;
+
+        var candidate = _tabCandidates[_tabCycleIndex];
+        _lastCompletion = candidate;
+
+        var afterCaret = text[Math.Min(caret, text.Length)..].TrimStart();
+        var newText = text[..atIdx] + "@" + candidate + " " + afterCaret;
+        var newCaret = atIdx + 1 + candidate.Length + 1;
+
+        vm.InputMessage = newText;
+        tb.Text = newText;
+        tb.CaretIndex = Math.Min(newCaret, newText.Length);
+    }
+
+    // â”€â”€ scroll handling â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     private void OnScrollBarValueChanged(object? sender, RangeBaseValueChangedEventArgs e)
     {
         if (_vScrollBar == null) return;
-        // ñ÷èòàåì, ÷òî âíèçó, êîãäà ïîëçóíîê ìàêñèìàëüíî áëèçêî ê êîíöó
         _isUserAtBottom = _vScrollBar.Value >= _vScrollBar.Maximum - 0.5;
     }
 
-// ïðè íîâîì ñîîáùåíèè
     private void OnMessageReceived()
     {
-        if (!_isUserAtBottom || _messagesList == null)
-            return;
-
-        Dispatcher.UIThread.InvokeAsync(() =>
-        {
-            // ïîëó÷àåì êîíòåéíåð ïîñëåäíåãî ýëåìåíòà
-            var idx = _messagesList.Items.Count - 1;
-            var container = _messagesList
-                .ItemContainerGenerator
-                .ContainerFromIndex(idx);
-            container?.BringIntoView(); // ñêðîëëèì ê íåìó
-        }, DispatcherPriority.Background);
+        if (!_isUserAtBottom) return;
+        ScrollToBottom();
     }
 
-    private void ScrollToEnd()
+    private void OnChannelChanged()
     {
-        Dispatcher.UIThread.InvokeAsync(() =>
-        {
-            if (_scroller == null)
-                return;
-
-            if (_isUserAtBottom)
-            {
-                _scroller.Offset = new Vector(0, _scroller.Extent.Height - _scroller.Viewport.Height);
-            }
-        }, DispatcherPriority.Background);
+        _isUserAtBottom = true;
+        ScrollToBottom();
     }
 
-
-    private void ChatLoaded(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    private void ScrollToBottom()
     {
-        var vm = DataContext as ChatViewModel;
-        if (vm != null)
-        {
-            vm.ConnectChat();
-        }
+        Dispatcher.UIThread.InvokeAsync(() => _scroller?.ScrollToEnd(), DispatcherPriority.Background);
     }
 }

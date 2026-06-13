@@ -35,6 +35,21 @@ public class CacheService
         return true;
     }
 
+    public bool IsImageCacheValid(string key)
+    {
+        var path = Path.Combine(_avatarsDir, SanitizeKey(key) + ".png");
+        return IsCacheValid(path);
+    }
+
+    // Reads disk file if it exists, regardless of TTL. Returns null if file is missing.
+    public Task<Bitmap?> TryReadCachedImageAsync(string key) => Task.Run<Bitmap?>(() =>
+    {
+        var path = Path.Combine(_avatarsDir, SanitizeKey(key) + ".png");
+        if (!File.Exists(path)) return null;
+        try { return new Bitmap(path); }
+        catch { return null; }
+    });
+
     public async Task<Bitmap?> GetImageAsync(string key, Func<Task<Bitmap?>> fetchFunc)
     {
         var path = Path.Combine(_avatarsDir, SanitizeKey(key) + ".png");

@@ -16,5 +16,11 @@ public class AppSettings
     public string? IrcNickname { get; set; }
     public string? IrcPassword { get; set; }
     public DateTime? CacheInvalidatedAt { get; set; }
+    public List<string>? OpenedChannels { get; set; }
+
+    public bool NotificationsEnabled { get; set; } = true;
+    public bool NotificationSoundEnabled { get; set; } = true;
+    public List<string> HighlightKeywords { get; set; } = [];
+    public List<string> MutedUsers { get; set; } = [];
 }
 
