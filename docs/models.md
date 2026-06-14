@@ -27,8 +27,17 @@ BeatmapSet          — one song folder (multiple difficulties)
 ## Collections
 
 **`Collection`** (`Models/Collection.cs`)  
-- `Name` (string) + `ObservableCollection<Beatmap>`
+- `Name` (string) + `ObservableCollection<Beatmap>` (locally present diffs)
+- `ObservableCollection<MissingBeatmap> MissingBeatmaps` — hashes from `collection.db` not found in `osu!.db`
 - Loaded from `collection.db`, mutations persisted by `CollectionService`
+
+**`MissingBeatmap`** (`Models/MissingBeatmap.cs`)  
+- A collection entry whose MD5 isn't installed locally. Holds `MD5Hash`, resolved `BeatmapSetId` / `BeatmapId` / `Title` / `Artist`, and `IsResolved`
+- Registered with `BeatmapDownloadService.RegisterForLookup` so the lookup loop fills in metadata; `DownloadManager` can enqueue it for download
+
+## Downloads
+
+**`DownloadStatus`** (`Models/Enums/DownloadStatus.cs`) — `AwaitingLookup → Queued → Downloading → Completed / Failed / Cancelled`. `AwaitingLookup` means the MD5 is known but the beatmapset id isn't resolved yet (not persisted to `downloads.json`).
 
 ## Chat
 
@@ -41,4 +50,5 @@ Under `Models/Chat/`:
 ## Enums
 
 **`Mods`** (`Models/Enums/Mods.cs`) — osu! mod flags with bit-mask values and display name mapping  
-**`BeatmapsSearchModeEnum`** (`Models/Enums/BeatmapsSearchModeEnum.cs`) — All / Collections / Favorites
+**`BeatmapsSearchModeEnum`** (`Models/Enums/BeatmapsSearchModeEnum.cs`) — All / Collections / Favorites  
+**`DownloadStatus`** (`Models/Enums/DownloadStatus.cs`) — download queue states (see Downloads above)

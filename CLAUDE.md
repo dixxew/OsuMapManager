@@ -67,6 +67,15 @@ No test project exists yet.
 - Read/write settings through `SettingsService`, not `AppSettingsManager` directly
 - `AppSettings` is the POCO; `appsettings.json` is the persisted file
 
+### osu! API & rate limiting
+- All osu! v2 API calls go through `OsuApiService`. It owns the **single** shared rate limiter (`ThrottleAsync` — token bucket). Do **not** add per-service throttles; the budget is global. CDN/image downloads are not gated.
+
+### Concurrent file writes
+- Fire-and-forget persistence (`_ = SaveAsync()`) must serialize writes to the target file with a `SemaphoreSlim(1,1)` around `File.WriteAllTextAsync` — otherwise parallel saves collide. See `AppSettingsManager`, `BeatmapDownloadService`, `AvatarService`.
+
+### Beatmap downloads
+- `BeatmapDownloadService` is the download hub (queue, mirrors, MD5→set lookup, persistence). Enqueue via `EnqueueByBeatmapSetId` (osu!pps) or `EnqueueByMd5` (collections). UI is the downloads flyout (`DownloadManagerControl` / `DownloadManagerViewModel`). Details in `docs/services.md`.
+
 ## Architecture in One Sentence
 
 `BeatmapDataService` is the central reactive state hub — nearly everything subscribes to or mutates it; services are singletons wired via DI; navigation is region-based via `NavigationService`.

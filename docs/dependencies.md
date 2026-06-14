@@ -16,7 +16,7 @@
 | Package | Purpose |
 |---|---|
 | ReactiveUI | Base MVVM framework (`ReactiveObject`, `ReactiveCommand`) |
-| DynamicData | Reactive collection extensions used internally by ReactiveUI |
+| DynamicData | Reactive collection extensions; used directly for the sorted downloads view (`ToObservableChangeSet` + `AutoRefresh` + `Sort`) |
 
 ## Application Infrastructure
 

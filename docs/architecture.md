@@ -48,6 +48,14 @@ All models and ViewModels inherit `ReactiveObject`. Properties use `this.RaiseAn
 
 `ChatService` connects to osu! IRC via **SmartIrc4net**. Channel list, messages, and users are exposed as `ObservableCollection` properties that the `ChatViewModel` binds to directly.
 
+## osu! API access & rate limiting
+
+`OsuApiService` is the single entry point for the osu! v2 API and owns the **one** rate limiter for the whole app — a shared token bucket (`ThrottleAsync`). Every consumer goes through it; no service throttles independently. CDN/image downloads are not gated.
+
+## Beatmap downloads
+
+`BeatmapDownloadService` runs a persistent download queue for beatmapsets that are missing from collections or picked from the osu!pps farm tab. It resolves MD5 hashes to beatmapset ids via the API, downloads `.osz` files from public mirrors with concurrency limited by settings, and persists state under `%LocalAppData%/MapManager`. The UI is a title-bar flyout (`DownloadManagerControl`) with an active-download badge. See `docs/services.md` for internals. Any service doing fire-and-forget persistence serializes its `File.WriteAllTextAsync` with a `SemaphoreSlim(1,1)`.
+
 ## Theming
 
 SukiUI (6.0.0-rc) provides the base theme. Custom accent: MediumPurple + DarkBlue, configured in `App.axaml.cs`. Icon packs: FontAwesome + ForkAwesome via `IconPacks.Avalonia`.

@@ -28,8 +28,23 @@ All ViewModels live in `MapManager/GUI/ViewModels/` and inherit `ViewModelBase` 
 
 | ViewModel | Notes |
 |---|---|
-| `CollectionsViewModel` | Collection tree; delegates mutations to `CollectionService` |
+| `CollectionsViewModel` | Collection tree; delegates mutations to `CollectionService`; enqueues missing beatmaps via `BeatmapDownloadService.EnqueueByMd5` |
 | `CollectionsSearchViewModel` | Filter collections by name |
+
+## osu!pps (farm)
+
+| ViewModel | Notes |
+|---|---|
+| `OsuPpsViewModel` | Ranked farm list from `OsuPpsService`; filtering/sorting |
+| `OsuPpsFiltersViewModel` | Star/length/mods filters for the farm list |
+| `OsuPpsEntryViewModel` | One farm row; `DownloadCommand` → `BeatmapDownloadService.EnqueueByBeatmapSetId` |
+
+## Downloads
+
+| ViewModel | Notes |
+|---|---|
+| `DownloadManagerViewModel` | Backs the downloads flyout. Exposes a DynamicData-sorted view of `BeatmapDownloadService.Downloads` (active on top), a progress summary (`SummaryText`, `OverallProgress`, error count), mirror/concurrency settings, and `ClearFinishedCommand` |
+| `DownloadEntryViewModel` | One download row. Holds `Status`/`Progress`/`Error`, `StatusLabel`, and `CancelCommand` / `RetryCommand` / `RemoveCommand` gated by `CanCancel` / `CanRetry` / `CanRemove` |
 
 ## Scores
 
