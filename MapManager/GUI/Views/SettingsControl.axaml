@@ -147,6 +147,39 @@
 								Height="14"
 								Margin="0,0,8,0"
 								VerticalAlignment="Center"
+								Kind="RotateSolid" />
+							<TextBlock Text="osu!:" />
+						</StackPanel>
+						<StackPanel HorizontalAlignment="Right" Orientation="Horizontal" Spacing="8">
+							<TextBlock
+								VerticalAlignment="Center"
+								FontSize="12"
+								Foreground="Gray"
+								IsVisible="{Binding IsSyncing}"
+								Text="Синхронизация..." />
+							<Button
+								Margin="0,5"
+								Classes="Standard"
+								Command="{Binding SyncWithOsuCommand}"
+								IsEnabled="{Binding !IsSyncing}">
+								<StackPanel Orientation="Horizontal" Spacing="6">
+									<iconPacks:PackIconFontAwesome
+										Height="13"
+										VerticalAlignment="Center"
+										Kind="RotateSolid" />
+									<TextBlock Text="Синхронизировать с osu!" />
+								</StackPanel>
+							</Button>
+						</StackPanel>
+					</DockPanel>
+				</sukiUi:GlassCard>
+				<sukiUi:GlassCard>
+					<DockPanel FlowDirection="LeftToRight">
+						<StackPanel Orientation="Horizontal">
+							<iconPacks:PackIconFontAwesome
+								Height="14"
+								Margin="0,0,8,0"
+								VerticalAlignment="Center"
 								Kind="DatabaseSolid" />
 							<TextBlock Text="Cache:" />
 						</StackPanel>

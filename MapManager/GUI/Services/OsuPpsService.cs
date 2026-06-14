@@ -32,6 +32,19 @@ public class OsuPpsService
         _beatmapDataService = beatmapDataService;
     }
 
+    // Called after osu.db reload to update IsLocal without re-downloading CSVs
+    public void RefreshLocalIndex()
+    {
+        if (_rankedEntries.Count == 0) return;
+        var idx = BuildLocalIndex();
+        foreach (var entry in _rankedEntries)
+        {
+            idx.TryGetValue(entry.BeatmapId, out var localSet);
+            entry.IsLocal = localSet is not null;
+            entry.LocalBeatmapSet = localSet;
+        }
+    }
+
     public async Task LoadAsync()
     {
         var diffsTask = GetCsvAsync(DiffsUrl, DiffsCachePath);

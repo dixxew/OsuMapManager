@@ -1,0 +1,213 @@
+<UserControl
+	x:Class="MapManager.GUI.Views.DownloadManagerControl"
+	xmlns="https://github.com/avaloniaui"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:iconPacks="https://github.com/MahApps/IconPacks.Avalonia"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+	xmlns:vm="using:MapManager.GUI.ViewModels"
+	xmlns:conv="clr-namespace:Avalonia.Data.Converters;assembly=Avalonia.Base"
+	xmlns:enums="using:MapManager.GUI.Models.Enums"
+	d:DesignHeight="500"
+	d:DesignWidth="380"
+	mc:Ignorable="d">
+	<UserControl.DataContext>
+		<Binding Path="DownloadManagerViewModel" Source="{StaticResource Locator}" />
+	</UserControl.DataContext>
+	<Grid
+		Width="380"
+		RowDefinitions="Auto,Auto,Auto,Auto,Auto"
+		TextElement.Foreground="{DynamicResource SukiText}">
+
+		<!-- Header -->
+		<DockPanel Grid.Row="0">
+			<TextBlock
+				VerticalAlignment="Center"
+				FontSize="16"
+				FontWeight="Bold"
+				Foreground="{DynamicResource SukiText}"
+				Text="Загрузки" />
+			<Button
+				HorizontalAlignment="Right"
+				Classes="Basic"
+				Command="{Binding ClearFinishedCommand}"
+				IsVisible="{Binding HasFinished}"
+				FontSize="12">
+				<StackPanel Orientation="Horizontal" Spacing="4">
+					<iconPacks:PackIconFontAwesome Height="11" VerticalAlignment="Center" Kind="TrashSolid" />
+					<TextBlock VerticalAlignment="Center" Foreground="{DynamicResource SukiText}" Text="Очистить завершённые" />
+				</StackPanel>
+			</Button>
+		</DockPanel>
+
+		<!-- Overall progress summary -->
+		<StackPanel Grid.Row="1" Spacing="4" IsVisible="{Binding HasDownloads}">
+			<ProgressBar
+				Height="4"
+				Maximum="1"
+				Minimum="0"
+				Value="{Binding OverallProgress}" />
+			<DockPanel>
+				<TextBlock
+					FontSize="12"
+					Foreground="{DynamicResource SukiText}"
+					Text="{Binding SummaryText}" />
+				<TextBlock
+					HorizontalAlignment="Right"
+					FontSize="12"
+					FontWeight="SemiBold"
+					Foreground="#FF5C5C"
+					IsVisible="{Binding HasErrors}"
+					Text="{Binding ErrorsText}" />
+			</DockPanel>
+		</StackPanel>
+
+		<!-- Settings -->
+		<sukiUi:GlassCard Grid.Row="2" Padding="10,8">
+			<WrapPanel Orientation="Horizontal">
+				<StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center" Margin="0,0,16,0">
+					<TextBlock FontSize="12" VerticalAlignment="Center" Foreground="{DynamicResource SukiText}" Text="Зеркало:" />
+					<ComboBox
+						FontSize="12"
+						MinWidth="130"
+						ItemsSource="{Binding AvailableMirrors}"
+						SelectedItem="{Binding PreferredMirror}" />
+				</StackPanel>
+				<StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+					<TextBlock FontSize="12" VerticalAlignment="Center" Foreground="{DynamicResource SukiText}" Text="Потоков:" />
+					<NumericUpDown
+						Width="90"
+						FontSize="12"
+						Minimum="1"
+						Maximum="5"
+						Value="{Binding MaxConcurrentDownloads}" />
+				</StackPanel>
+			</WrapPanel>
+		</sukiUi:GlassCard>
+
+		<!-- Empty state -->
+		<TextBlock
+			Grid.Row="3"
+			HorizontalAlignment="Center"
+			FontSize="13"
+			Foreground="Gray"
+			IsVisible="{Binding !HasDownloads}"
+			Margin="0,20"
+			Text="Нет загрузок" />
+
+		<!-- Download list — ListBox provides built-in virtualization -->
+		<ListBox
+			Grid.Row="4"
+			MaxHeight="360"
+			IsVisible="{Binding HasDownloads}"
+			ItemsSource="{Binding Downloads}"
+			Background="Transparent"
+			BorderThickness="0"
+			ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+			<ListBox.Styles>
+				<Style Selector="ListBoxItem">
+					<Setter Property="Padding" Value="0" />
+					<Setter Property="Margin" Value="0" />
+					<Setter Property="MinHeight" Value="0" />
+					<Setter Property="Background" Value="Transparent" />
+				</Style>
+				<Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+					<Setter Property="Background" Value="Transparent" />
+				</Style>
+				<Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
+					<Setter Property="Background" Value="Transparent" />
+				</Style>
+				<Style Selector="ListBoxItem /template/ PathIcon#CheckSelected">
+					<Setter Property="IsVisible" Value="False" />
+				</Style>
+			</ListBox.Styles>
+			<ListBox.ItemTemplate>
+				<DataTemplate DataType="vm:DownloadEntryViewModel">
+					<Border
+						Margin="0,3"
+						Padding="10,8"
+						Background="#14ffffff"
+						CornerRadius="8">
+						<Grid ColumnDefinitions="*,Auto">
+
+							<!-- Left: title + status -->
+							<StackPanel Grid.Column="0" VerticalAlignment="Center" Spacing="4">
+								<TextBlock
+									FontSize="13"
+									Foreground="{DynamicResource SukiText}"
+									Text="{Binding Title}"
+									TextTrimming="CharacterEllipsis" />
+								<TextBlock
+									FontSize="11"
+									Foreground="{DynamicResource SukiText}"
+									Opacity="0.7"
+									IsVisible="{Binding Artist, Converter={x:Static conv:StringConverters.IsNotNullOrEmpty}}"
+									Text="{Binding Artist}"
+									TextTrimming="CharacterEllipsis" />
+								<!-- Progress bar: determinate while downloading, indeterminate while resolving MD5 -->
+								<ProgressBar
+									Height="3"
+									IsVisible="{Binding ShowProgress}"
+									IsIndeterminate="{Binding IsAwaitingLookup}"
+									Maximum="1"
+									Minimum="0"
+									Value="{Binding Progress}" />
+								<TextBlock
+									FontSize="11"
+									Foreground="{Binding Status, Converter={StaticResource DownloadStatusToBrushConverter}}"
+									Text="{Binding StatusLabel}"
+									TextTrimming="CharacterEllipsis"
+									ToolTip.Tip="{Binding Error}" />
+							</StackPanel>
+
+							<!-- Right: action buttons -->
+							<StackPanel
+								Grid.Column="1"
+								Margin="8,0,0,0"
+								VerticalAlignment="Center"
+								Orientation="Horizontal"
+								Spacing="4">
+								<Button
+									Classes="Basic"
+									Command="{Binding RetryCommand}"
+									IsVisible="{Binding CanRetry}"
+									Padding="6,3"
+									ToolTip.Tip="Повторить">
+									<iconPacks:PackIconFontAwesome
+										Height="10"
+										Foreground="SkyBlue"
+										Kind="ArrowsRotateSolid" />
+								</Button>
+								<Button
+									Classes="Basic"
+									Command="{Binding CancelCommand}"
+									IsVisible="{Binding CanCancel}"
+									Padding="6,3"
+									ToolTip.Tip="Отмена">
+									<iconPacks:PackIconFontAwesome
+										Height="10"
+										Foreground="OrangeRed"
+										Kind="XmarkSolid" />
+								</Button>
+								<Button
+									Classes="Basic"
+									Command="{Binding RemoveCommand}"
+									IsVisible="{Binding CanRemove}"
+									Padding="6,3"
+									ToolTip.Tip="Убрать из списка">
+									<iconPacks:PackIconFontAwesome
+										Height="10"
+										Foreground="{DynamicResource SukiText}"
+										Kind="TrashSolid" />
+								</Button>
+							</StackPanel>
+
+						</Grid>
+					</Border>
+				</DataTemplate>
+			</ListBox.ItemTemplate>
+		</ListBox>
+
+	</Grid>
+</UserControl>

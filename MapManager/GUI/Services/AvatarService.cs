@@ -31,16 +31,14 @@ public class AvatarService
     // Limits concurrent network slots; disk reads release this immediately.
     private readonly SemaphoreSlim _slots = new(ConcurrencyLimit, ConcurrencyLimit);
 
-    // Serialises osu! API calls (GetUserAsync) with a cooldown.
-    // Image downloads bypass this gate entirely.
-    private readonly SemaphoreSlim _networkGate = new(1, 1);
-    private DateTime _lastNetworkFetch = DateTime.MinValue;
-    private static readonly TimeSpan NetworkInterval = TimeSpan.FromSeconds(1.2);
+    // osu! API rate limiting now lives centrally in OsuApiService (shared across all consumers).
+    // Image/CDN downloads here are intentionally not rate-limited.
 
     // username → avatar URL; persisted to disk so GetUserAsync is called only once per user.
     private readonly ConcurrentDictionary<string, string> _urlCache =
         new(StringComparer.OrdinalIgnoreCase);
     private readonly string _urlCachePath = Path.Combine("cache", "avatars", "url_map.json");
+    private readonly SemaphoreSlim _urlSaveLock = new(1, 1); // serialises url_map.json writes
 
     public event Action<string>? AvatarLoaded;
 
@@ -149,17 +147,9 @@ public class AvatarService
         // If the URL is already cached we skip the osu! API call entirely.
         if (!_urlCache.TryGetValue(username, out var avatarUrl))
         {
-            await _networkGate.WaitAsync();
             try
             {
-                var wait = NetworkInterval - (DateTime.UtcNow - _lastNetworkFetch);
-                if (wait > TimeSpan.Zero)
-                {
-                    Debug.WriteLine($"[Avatar] rate-limit wait {wait.TotalMilliseconds:0}ms before '{username}'");
-                    await Task.Delay(wait);
-                }
-                _lastNetworkFetch = DateTime.UtcNow;
-
+                // Rate limiting is handled centrally in OsuApiService.
                 avatarUrl = await _osuApiService.GetUserAvatarUrlAsync(username);
                 if (avatarUrl != null)
                 {
@@ -170,10 +160,6 @@ public class AvatarService
             catch (Exception ex)
             {
                 Debug.WriteLine($"[Avatar] URL lookup failed for '{username}': {ex.Message}");
-            }
-            finally
-            {
-                _networkGate.Release();
             }
         }
 
@@ -234,7 +220,10 @@ public class AvatarService
         {
             var snapshot = new Dictionary<string, string>(_urlCache);
             var json = JsonSerializer.Serialize(snapshot);
-            await File.WriteAllTextAsync(_urlCachePath, json);
+
+            await _urlSaveLock.WaitAsync();
+            try { await File.WriteAllTextAsync(_urlCachePath, json); }
+            finally { _urlSaveLock.Release(); }
         }
         catch (Exception ex)
         {

@@ -24,5 +24,8 @@ public class AppSettings
     public bool NotificationSoundEnabled { get; set; } = true;
     public List<string> HighlightKeywords { get; set; } = [];
     public List<string> MutedUsers { get; set; } = [];
+
+    public int MaxConcurrentDownloads { get; set; } = 2;
+    public string PreferredMirror { get; set; } = "catboy.best";
 }
 

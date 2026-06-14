@@ -358,6 +358,21 @@ public class BeatmapDataService
 
 
 
+    public Action? OnBeatmapsReloaded;
+
+    // Clears all state before a full reload (called by AppInitializationService.ReloadAsync)
+    public void Reset()
+    {
+        _isLoading = true;
+        _selectedBeatmapSet = null;
+        _selectedBeatmap = new();
+        BeatmapSets.Clear();
+        FilteredBeatmapSets.Clear();
+        Collections.Clear();
+        FavoriteBeatmapSets.Clear();
+        OnLoadingChanged?.Invoke();
+    }
+
     public Action OnLoadingChanged;
     public Action OnFiltesChanged;
 

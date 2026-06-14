@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
 using System.Reactive;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MapManager.GUI.ViewModels;
@@ -16,20 +17,26 @@ public class OsuPpsEntryViewModel : ViewModelBase
 {
     private static readonly HttpClient _http = new() { Timeout = TimeSpan.FromSeconds(15) };
 
+    // Limit concurrent thumbnail loads to avoid lag when many rows appear at once
+    private static readonly SemaphoreSlim _thumbSlot = new(4, 4);
+
     private static readonly string CdnCacheDir = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
         "MapManager", "cdn-thumbs");
 
     private readonly OsuPpsEntry _entry;
     private readonly ThumbnailService _thumbnailService;
+    private readonly BeatmapDownloadService _downloadService;
 
-    public OsuPpsEntryViewModel(OsuPpsEntry entry, ThumbnailService thumbnailService)
+    public OsuPpsEntryViewModel(OsuPpsEntry entry, ThumbnailService thumbnailService, BeatmapDownloadService downloadService)
     {
         _entry = entry;
         _thumbnailService = thumbnailService;
+        _downloadService = downloadService;
 
         OpenDirectCommand = ReactiveCommand.Create(OpenDirect);
         OpenWebCommand = ReactiveCommand.Create(OpenWeb);
+        DownloadCommand = ReactiveCommand.Create(EnqueueDownload);
     }
 
     public int Rank => _entry.Rank;
@@ -69,6 +76,7 @@ public class OsuPpsEntryViewModel : ViewModelBase
 
     public ReactiveCommand<Unit, Unit> OpenDirectCommand { get; }
     public ReactiveCommand<Unit, Unit> OpenWebCommand { get; }
+    public ReactiveCommand<Unit, Unit> DownloadCommand { get; }
 
     private Bitmap? _thumbnail;
     private bool _thumbnailRequested;
@@ -89,20 +97,28 @@ public class OsuPpsEntryViewModel : ViewModelBase
 
     private async Task LoadThumbnailAsync()
     {
-        Bitmap? bmp;
-
-        if (_entry.IsLocal && _entry.LocalBeatmapSet is { Beatmaps: { Count: > 0 } } localSet)
+        await _thumbSlot.WaitAsync().ConfigureAwait(false);
+        try
         {
-            var b = localSet.Beatmaps[0];
-            bmp = await _thumbnailService.GetAsync(b.FolderName ?? localSet.FolderName, b.FileName);
-        }
-        else
-        {
-            bmp = await GetCdnThumbnailAsync(_entry.BeatmapSetId);
-        }
+            Bitmap? bmp;
 
-        if (bmp is not null)
-            await Dispatcher.UIThread.InvokeAsync(() => Thumbnail = bmp);
+            if (_entry.IsLocal && _entry.LocalBeatmapSet is { Beatmaps: { Count: > 0 } } localSet)
+            {
+                var b = localSet.Beatmaps[0];
+                bmp = await _thumbnailService.GetAsync(b.FolderName ?? localSet.FolderName, b.FileName);
+            }
+            else
+            {
+                bmp = await GetCdnThumbnailAsync(_entry.BeatmapSetId);
+            }
+
+            if (bmp is not null)
+                await Dispatcher.UIThread.InvokeAsync(() => Thumbnail = bmp);
+        }
+        finally
+        {
+            _thumbSlot.Release();
+        }
     }
 
     private static async Task<Bitmap?> GetCdnThumbnailAsync(int beatmapSetId)
@@ -133,4 +149,7 @@ public class OsuPpsEntryViewModel : ViewModelBase
 
     private void OpenWeb() =>
         Process.Start(new ProcessStartInfo($"https://osu.ppy.sh/beatmapsets/{_entry.BeatmapSetId}") { UseShellExecute = true });
+
+    private void EnqueueDownload() =>
+        _downloadService.EnqueueByBeatmapSetId(_entry.BeatmapSetId, _entry.BeatmapId, _entry.Title, _entry.Artist);
 }

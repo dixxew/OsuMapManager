@@ -152,12 +152,23 @@
 												Text="pp" />
 										</StackPanel>
 
-										<!--  Direct / Web buttons — non-local only  -->
+										<!--  Direct / Web / Mirror download buttons — non-local only  -->
 										<StackPanel
 											IsVisible="{Binding !IsLocal}"
 											Orientation="Vertical"
 											VerticalAlignment="Center"
 											Spacing="3">
+											<Button
+												Classes="Basic"
+												Command="{Binding DownloadCommand}"
+												Padding="5,3"
+												ToolTip.Tip="Скачать с зеркала">
+												<iconPacks:PackIconFontAwesome
+													Height="10"
+													VerticalAlignment="Center"
+													Foreground="SkyBlue"
+													Kind="CloudArrowDownSolid" />
+											</Button>
 											<Button
 												Classes="Basic"
 												Command="{Binding OpenDirectCommand}"

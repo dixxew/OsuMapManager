@@ -14,6 +14,7 @@ public class OsuPpsViewModel : ViewModelBase
     private readonly OsuPpsService _osuPpsService;
     private readonly ThumbnailService _thumbnailService;
     private readonly BeatmapDataService _beatmapDataService;
+    private readonly BeatmapDownloadService _beatmapDownloadService;
     private readonly OsuPpsFiltersViewModel _filters;
 
     private const int PageSize = 50;
@@ -21,21 +22,35 @@ public class OsuPpsViewModel : ViewModelBase
     private bool _isLoading;
     private bool _initialized;
 
-    // Current filtered+sorted slice of all entries
     private IReadOnlyList<OsuPpsEntry> _filteredEntries = [];
 
     public OsuPpsViewModel(
         OsuPpsService osuPpsService,
         ThumbnailService thumbnailService,
         BeatmapDataService beatmapDataService,
+        BeatmapDownloadService beatmapDownloadService,
         OsuPpsFiltersViewModel filters)
     {
         _osuPpsService = osuPpsService;
         _thumbnailService = thumbnailService;
         _beatmapDataService = beatmapDataService;
+        _beatmapDownloadService = beatmapDownloadService;
         _filters = filters;
 
         _filters.FiltersChanged += ApplyFilters;
+
+        _beatmapDataService.OnBeatmapsReloaded += OnBeatmapsReloaded;
+
+        // When the initial beatmap load finishes, rebuild the local index if we already
+        // downloaded the CSVs (e.g. OsuPpsControl.Loaded fired before BeatmapSets was ready).
+        _beatmapDataService.OnLoadingChanged += () =>
+        {
+            if (!_beatmapDataService.IsLoading && _initialized)
+            {
+                _osuPpsService.RefreshLocalIndex();
+                ApplyFilters();
+            }
+        };
     }
 
     public ObservableCollection<OsuPpsEntryViewModel> Items { get; } = [];
@@ -72,6 +87,21 @@ public class OsuPpsViewModel : ViewModelBase
         }
     }
 
+    private void OnBeatmapsReloaded()
+    {
+        if (_osuPpsService.RankedEntries.Count > 0)
+        {
+            // Entries already loaded — update local flags and refresh list in-place
+            _osuPpsService.RefreshLocalIndex();
+            ApplyFilters();
+        }
+        else
+        {
+            // CSVs not downloaded yet; reset so next tab visit re-runs InitializeAsync
+            _initialized = false;
+        }
+    }
+
     private void ApplyFilters()
     {
         _filteredEntries = _osuPpsService.RankedEntries
@@ -88,14 +118,13 @@ public class OsuPpsViewModel : ViewModelBase
     {
         int end = Math.Min(_loadedCount + PageSize, _filteredEntries.Count);
         for (int i = _loadedCount; i < end; i++)
-            Items.Add(new OsuPpsEntryViewModel(_filteredEntries[i], _thumbnailService));
+            Items.Add(new OsuPpsEntryViewModel(_filteredEntries[i], _thumbnailService, _beatmapDownloadService));
         _loadedCount = end;
     }
 
     public void SelectLocal(OsuPpsEntryViewModel entry)
     {
         if (!entry.IsLocal || entry.LocalBeatmapSet is null) return;
-        // Find the specific diff by BeatmapId, not just the first one in the set
         var beatmap = entry.LocalBeatmapSet.Beatmaps
             .FirstOrDefault(b => b.BeatmapId == entry.BeatmapId);
         _beatmapDataService.SelectBeatmapSetAndBeatmap(entry.LocalBeatmapSet, beatmap);

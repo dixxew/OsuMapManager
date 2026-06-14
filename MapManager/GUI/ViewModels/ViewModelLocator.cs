@@ -71,6 +71,9 @@ public class ViewModelLocator
     public SetupViewModel SetupViewModel =>
         App.AppHost.Services.GetRequiredService<SetupViewModel>();
 
+    public DownloadManagerViewModel DownloadManagerViewModel =>
+        App.AppHost.Services.GetRequiredService<DownloadManagerViewModel>();
+
     public object GetByType(Type type)
     {
         var prop = GetType()

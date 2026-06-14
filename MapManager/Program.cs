@@ -89,6 +89,8 @@ namespace MapManager
                     services.AddSingleton<OsuPpsFiltersViewModel>();
                     services.AddSingleton<OsuPpsViewModel>();
                     services.AddSingleton<SetupViewModel>();
+                    services.AddSingleton<BeatmapDownloadService>();
+                    services.AddSingleton<DownloadManagerViewModel>();
                     
                     
 
@@ -107,7 +109,8 @@ namespace MapManager
 
 
 
-                    services.AddHostedService<AppInitializationService>();
+                    services.AddSingleton<AppInitializationService>();
+                    services.AddHostedService(sp => sp.GetRequiredService<AppInitializationService>());
                     services.AddSingleton<SettingsViewModel>();
 
                     services.AddSingleton<MainViewModel>();

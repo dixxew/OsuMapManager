@@ -1,4 +1,4 @@
-<UserControl
+﻿<UserControl
 	x:Class="MapManager.GUI.Views.CollectionsControl"
 	xmlns="https://github.com/avaloniaui"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -31,14 +31,17 @@
 				</Style>
 			</TreeView.Styles>
 			<TreeView.DataTemplates>
-				<TreeDataTemplate DataType="model:Collection" ItemsSource="{Binding Beatmaps}">
-					<Grid ColumnDefinitions="* auto">
-						<TextBlock
-							HorizontalAlignment="Stretch"
-							VerticalAlignment="Center"
-							FontSize="14"
-							FontWeight="600"
-							Text="{Binding Name}" />
+				<!-- Collection node: uses AllItems so both Beatmap and MissingBeatmap appear as children -->
+				<TreeDataTemplate DataType="model:Collection" ItemsSource="{Binding AllItems}">
+					<Grid ColumnDefinitions="* auto" RowDefinitions="Auto 4 Auto">
+						<StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+							<TextBlock
+								VerticalAlignment="Center"
+								FontSize="14"
+								FontWeight="600"
+								Text="{Binding Name}" />
+							
+						</StackPanel>
 						<StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
 							<Button
 								Padding="6,2"
@@ -61,16 +64,60 @@
 								Command="{Binding $parent[UserControl].DataContext.RemoveCollection}"
 								CommandParameter="{Binding}"
 								FontSize="12">
+								<iconPacks:PackIconFontAwesome
+									Height="10"
+									VerticalAlignment="Center"
+									Kind="TrashSolid" />
+							</Button>
+						</StackPanel>
+						<StackPanel Grid.Row="2" >
+							<!-- Missing badge -->
+							<Border
+								Padding="5,1"
+								VerticalAlignment="Center"
+								Background="#55ff8800"
+								CornerRadius="4"
+								IsVisible="{Binding HasMissing}">
+								<StackPanel Orientation="Horizontal" Spacing="4">
+									<iconPacks:PackIconFontAwesome
+										Height="9"
+										VerticalAlignment="Center"
+										Foreground="Orange"
+										Kind="TriangleExclamationSolid" />
+									<TextBlock
+										VerticalAlignment="Center"
+										FontSize="10"
+										Foreground="Orange"
+										Text="{Binding MissingCount, StringFormat='{}{0} нет на диске'}" />
+								</StackPanel>
+							</Border>
+						</StackPanel>
+						<StackPanel HorizontalAlignment="Right" Grid.Row="2" Grid.Column="1">
+							
+							<!-- Download all missing — visible only when there are missing maps -->
+							<Button
+								Padding="6,2"
+								VerticalAlignment="Center"
+								Classes="Outlined Rounded"
+								Command="{Binding $parent[UserControl].DataContext.DownloadAllMissingCommand}"
+								CommandParameter="{Binding}"
+								IsVisible="{Binding HasMissing}"
+								ToolTip.Tip="Скачать все отсутствующие карты"
+								FontSize="12">
 								<StackPanel Orientation="Horizontal" Spacing="4">
 									<iconPacks:PackIconFontAwesome
 										Height="10"
 										VerticalAlignment="Center"
-										Kind="TrashSolid" />
+										Foreground="Orange"
+										Kind="CloudArrowDownSolid" />
+									<TextBlock FontSize="10" VerticalAlignment="Center" Foreground="Orange" Text="Скачать все" />
 								</StackPanel>
 							</Button>
 						</StackPanel>
 					</Grid>
 				</TreeDataTemplate>
+
+				<!-- Regular beatmap leaf -->
 				<DataTemplate DataType="model:Beatmap">
 					<Grid
 						Width="{Binding $parent[UserControl].Bounds.Width, Converter={StaticResource TreeViewWidthByParentConveter}}"
@@ -96,6 +143,44 @@
 								<iconPacks:PackIconFontAwesome Height="10" Kind="XmarkSolid" />
 							</Button>
 						</StackPanel>
+					</Grid>
+				</DataTemplate>
+
+				<!-- Missing beatmap leaf -->
+				<DataTemplate DataType="model:MissingBeatmap">
+					<Grid
+						Width="{Binding $parent[UserControl].Bounds.Width, Converter={StaticResource TreeViewWidthByParentConveter}}"
+						Margin="-28,0,0,0"
+						ColumnDefinitions="* auto"
+						Opacity="0.6">
+						<StackPanel Grid.Column="0" HorizontalAlignment="Left" Orientation="Vertical">
+							<TextBlock
+								FontSize="12"
+								Foreground="Orange"
+								Text="{Binding Artist}"
+								IsVisible="{Binding IsResolved}" />
+							<TextBlock
+								FontSize="14"
+								Foreground="LightGray"
+								Text="{Binding DisplayName}"
+								TextTrimming="CharacterEllipsis" />
+						</StackPanel>
+						<Button
+							Grid.Column="1"
+							Margin="0"
+							Padding="8,4"
+							VerticalAlignment="Center"
+							Classes="Outlined Rounded"
+							Command="{Binding $parent[UserControl].DataContext.DownloadMissingCommand}"
+							CommandParameter="{Binding}"
+							ToolTip.Tip="Скачать с зеркала">
+							<StackPanel Orientation="Horizontal" Spacing="4">
+								<iconPacks:PackIconFontAwesome
+									Height="10"
+									VerticalAlignment="Center"
+									Kind="CloudArrowDownSolid" />
+							</StackPanel>
+						</Button>
 					</Grid>
 				</DataTemplate>
 			</TreeView.DataTemplates>

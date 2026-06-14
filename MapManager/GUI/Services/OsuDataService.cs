@@ -167,7 +167,7 @@ public class OsuDataService
     {
         List<Collection> res = new();
         foreach (var path in paths)
-            res.AddRange(CollectionDb.Read(CollectionsDbPath).Collections);
+            res.AddRange(CollectionDb.Read(path).Collections);
 
         return res;
 

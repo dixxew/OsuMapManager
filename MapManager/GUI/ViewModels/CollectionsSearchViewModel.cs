@@ -1,10 +1,9 @@
-﻿using Avalonia.Controls;
+using Avalonia.Controls;
 using Avalonia.Platform.Storage;
 using MapManager.GUI.Dialogs;
 using MapManager.GUI.Models;
 using MapManager.GUI.Services;
 using SukiUI.Dialogs;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -14,7 +13,10 @@ public class CollectionsSearchViewModel : ViewModelBase
 {
     private readonly CollectionService _collectionService;
     private readonly BeatmapDataService _beatmapDataService;
-    public CollectionsSearchViewModel(CollectionService collectionService, BeatmapDataService beatmapDataService)
+
+    public CollectionsSearchViewModel(
+        CollectionService collectionService,
+        BeatmapDataService beatmapDataService)
     {
         _collectionService = collectionService;
         _beatmapDataService = beatmapDataService;
@@ -22,7 +24,6 @@ public class CollectionsSearchViewModel : ViewModelBase
 
     public void AddCollection()
     {
-        //var method = new AccpetMethod....
         MainWindowViewModel.DialogManager
             .CreateDialog()
             .Dismiss().ByClickingBackground()
@@ -33,10 +34,7 @@ public class CollectionsSearchViewModel : ViewModelBase
                 {
                     if (string.IsNullOrWhiteSpace(name))
                         return false;
-                    var collection = new Collection
-                    {
-                        Name = name
-                    };
+                    var collection = new Collection { Name = name };
                     return _collectionService.AddCollection(collection, new() { _beatmapDataService.SelectedBeatmap });
                 })
             })
@@ -49,13 +47,13 @@ public class CollectionsSearchViewModel : ViewModelBase
         {
             Title = "Open collection files",
             AllowMultiple = true,
-            FileTypeFilter = new List<FilePickerFileType>() { new FilePickerFileType("osuDb")
+            FileTypeFilter = new List<FilePickerFileType>
             {
-                Patterns = new List<string>() { "*.db" }
-            }}            
+                new FilePickerFileType("osuDb") { Patterns = new List<string> { "*.db" } }
+            }
         });
 
-        if (files is null || files.Count == 0)
-            _collectionService.ImportCollections(files);
+        if (files is null || files.Count == 0) return;
+        _collectionService.ImportCollections(files);
     }
 }

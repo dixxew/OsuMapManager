@@ -133,6 +133,18 @@ public class SettingsService
         set { _appSettings.MutedUsers = value; _ = SaveAsync(); }
     }
 
+    public int MaxConcurrentDownloads
+    {
+        get => _appSettings.MaxConcurrentDownloads;
+        set { _appSettings.MaxConcurrentDownloads = value; _ = SaveAsync(); }
+    }
+
+    public string PreferredMirror
+    {
+        get => _appSettings.PreferredMirror;
+        set { _appSettings.PreferredMirror = value; _ = SaveAsync(); }
+    }
+
     public async Task UpdateSettings(string propName, object? value)
     {
         var property = typeof(SettingsService).GetProperty(propName);

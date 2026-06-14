@@ -12,6 +12,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MapManager.GUI.Services;
@@ -30,6 +31,45 @@ public class OsuApiService
 
     private readonly HttpClient _httpClient = new HttpClient();
     private static readonly JsonSerializerOptions _jsonOptions = new() { PropertyNameCaseInsensitive = true };
+
+    // ── Shared rate limiter for all osu! API (osu.ppy.sh) calls ─────────────────
+    // Single global budget so every consumer (avatars, md5 lookups, comments, beatmap
+    // fetches) shares one token bucket instead of each throttling independently.
+    // Token bucket: burst up to MaxTokens, then refill RefillPerSecond (~60 req/min sustained,
+    // matching osu!'s guidance). Image/CDN downloads are NOT gated — only API calls.
+    private const double MaxTokens = 8;
+    private const double RefillPerSecond = 1.0;
+    private readonly SemaphoreSlim _rateLock = new(1, 1);
+    private double _tokens = MaxTokens;
+    private DateTime _lastRefill = DateTime.UtcNow;
+
+    public async Task ThrottleAsync(CancellationToken ct = default)
+    {
+        while (true)
+        {
+            TimeSpan wait;
+            await _rateLock.WaitAsync(ct);
+            try
+            {
+                var now = DateTime.UtcNow;
+                var elapsed = (now - _lastRefill).TotalSeconds;
+                if (elapsed > 0)
+                {
+                    _tokens = Math.Min(MaxTokens, _tokens + elapsed * RefillPerSecond);
+                    _lastRefill = now;
+                }
+                if (_tokens >= 1.0)
+                {
+                    _tokens -= 1.0;
+                    return;
+                }
+                wait = TimeSpan.FromSeconds((1.0 - _tokens) / RefillPerSecond);
+            }
+            finally { _rateLock.Release(); }
+
+            await Task.Delay(wait, ct);
+        }
+    }
 
 
 
@@ -50,6 +90,7 @@ public class OsuApiService
 
     public async IAsyncEnumerable<IBeatmapset> GetLastRankedBeatmapsetsAsync(int count)
     {
+        await ThrottleAsync();
         var builder = new BeatmapsetsLookupBuilder()
             .WithGameMode(GameMode.Osu)
             .WithConvertedBeatmaps()
@@ -66,10 +107,12 @@ public class OsuApiService
     }
     public async Task<IBeatmap> GetBeatmapByIdAsync(long id)
     {
+        await ThrottleAsync();
         return await _client.GetBeatmapAsync(id);
     }
     public async Task<IBeatmapScores> GetBeatmapScoresByIdAsync(long id)
     {
+        await ThrottleAsync();
         var scores = await _client.GetBeatmapScoresAsync(id, gameMode: GameMode.Osu);
         return scores;
     }
@@ -77,12 +120,14 @@ public class OsuApiService
 
     public async Task<IBeatmapset> GetBeatmapsetByIdAsync(long id)
     {
+        await ThrottleAsync();
         return await _client.GetBeatmapsetAsync(id);
     }
     public async Task<string?> GetUserAvatarUrlAsync(string username)
     {
         try
         {
+            await ThrottleAsync();
             var user = await _client.GetUserAsync(username);
             var url = user?.AvatarUrl?.ToString();
             Debug.WriteLine($"[OsuApi] avatar URL for '{username}': {url}");
@@ -114,10 +159,40 @@ public class OsuApiService
         return null;
     }
 
+    public Task<(int beatmapId, int beatmapSetId, string title, string artist)?> LookupBeatmapByMd5Async(string md5) =>
+        LookupBeatmapAsync($"checksum={md5}");
+
+    public Task<(int beatmapId, int beatmapSetId, string title, string artist)?> LookupBeatmapByIdAsync(int beatmapId) =>
+        LookupBeatmapAsync($"id={beatmapId}");
+
+    private async Task<(int beatmapId, int beatmapSetId, string title, string artist)?> LookupBeatmapAsync(string queryParam)
+    {
+        try
+        {
+            await ThrottleAsync();
+            var token = await _client.GetOrUpdateAccessTokenAsync();
+            using var request = new HttpRequestMessage(HttpMethod.Get,
+                $"https://osu.ppy.sh/api/v2/beatmaps/lookup?{queryParam}");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token.AccessToken);
+            using var response = await _httpClient.SendAsync(request);
+            if (!response.IsSuccessStatusCode) return null;
+            using var doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+            var root = doc.RootElement;
+            var id = root.GetProperty("id").GetInt32();
+            var setId = root.GetProperty("beatmapset_id").GetInt32();
+            var set = root.GetProperty("beatmapset");
+            var title = set.GetProperty("title").GetString() ?? "";
+            var artist = set.GetProperty("artist").GetString() ?? "";
+            return (id, setId, title, artist);
+        }
+        catch { return null; }
+    }
+
     public async Task<List<BeatmapCommentCacheEntry>> GetBeatmapsetCommentsAsync(long beatmapSetId)
     {
         try
         {
+            await ThrottleAsync();
             var token = await _client.GetOrUpdateAccessTokenAsync();
             using var request = new HttpRequestMessage(HttpMethod.Get,
                 $"https://osu.ppy.sh/api/v2/comments?commentable_type=beatmapset&commentable_id={beatmapSetId}");

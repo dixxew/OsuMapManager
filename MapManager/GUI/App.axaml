@@ -30,6 +30,7 @@
 		<converters:StarRatingToBrushConverter x:Key="StarRatingToBrushConverter" />
 		<converters:RankedStatusToBrushConverter x:Key="RankedStatusToBrushConverter" />
 		<converters:RankToColorConverter x:Key="RankToColorConverter" />
+		<converters:DownloadStatusToBrushConverter x:Key="DownloadStatusToBrushConverter" />
 		<converters:RankToTextConverter x:Key="RankToTextConverter" />
 		<vm:ViewModelLocator x:Key="Locator" />
 	</Application.Resources>

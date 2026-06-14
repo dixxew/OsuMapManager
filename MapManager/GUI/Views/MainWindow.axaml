@@ -20,6 +20,50 @@
 	</sukiUi:SukiWindow.Hosts>
 	<sukiUi:SukiWindow.RightWindowTitleBarControls>
 		<StackPanel Orientation="Horizontal">
+
+			<!-- Downloads flyout -->
+			<Button Classes="Basic Rounded WindowControlsButton">
+				<Panel>
+					<iconPacks:PackIconFontAwesome
+						Height="12"
+						Foreground="White"
+						Kind="CloudArrowDownSolid" />
+					<!-- Active download badge -->
+					<Border
+						HorizontalAlignment="Right"
+						VerticalAlignment="Top"
+						Width="8"
+						Height="8"
+						CornerRadius="4"
+						Background="OrangeRed"
+						IsVisible="{Binding HasActiveDownloads}"
+						Margin="0,-2,-2,0" />
+				</Panel>
+				<Button.Flyout>
+					<Flyout>
+						<Panel>
+							<Border
+								Margin="20"
+								BoxShadow="{DynamicResource SukiPopupShadow}"
+								CornerRadius="20" />
+							<Border
+								MinWidth="420"
+								Margin="20"
+								Background="{DynamicResource SukiCardBackground}"
+								BorderBrush="{DynamicResource SukiLightBorderBrush}"
+								BorderThickness="1"
+								ClipToBounds="True"
+								CornerRadius="15">
+								<Border Padding="15" Background="{DynamicResource PopupGradientBrush}">
+									<view:DownloadManagerControl />
+								</Border>
+							</Border>
+						</Panel>
+					</Flyout>
+				</Button.Flyout>
+			</Button>
+
+			<!-- Settings flyout -->
 			<Button Classes="Basic Rounded WindowControlsButton">
 				<iconPacks:PackIconFontAwesome
 					Height="12"

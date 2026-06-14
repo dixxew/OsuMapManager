@@ -19,6 +19,7 @@ public class SettingsViewModel : ViewModelBase
 {
     private readonly SettingsService _settingsService;
     private readonly CacheService _cacheService;
+    private readonly AppInitializationService _initService;
 
     private static readonly HttpClient _http = new();
 
@@ -30,11 +31,13 @@ public class SettingsViewModel : ViewModelBase
     public ReactiveCommand<Unit, Unit> InvalidateCacheCommand { get; }
     public ReactiveCommand<Unit, Unit> CheckUpdateCommand { get; }
     public ReactiveCommand<Unit, Unit> OpenReleasePageCommand { get; }
+    public ReactiveCommand<Unit, Unit> SyncWithOsuCommand { get; }
 
-    public SettingsViewModel(SettingsService settingsService, CacheService cacheService)
+    public SettingsViewModel(SettingsService settingsService, CacheService cacheService, AppInitializationService initService)
     {
         _settingsService = settingsService;
         _cacheService = cacheService;
+        _initService = initService;
 
         OsuClientSecret = _settingsService.OsuClientSecret;
         OsuClientId = _settingsService.OsuClientId;
@@ -45,6 +48,7 @@ public class SettingsViewModel : ViewModelBase
         InvalidateCacheCommand = ReactiveCommand.CreateFromTask(InvalidateCacheAsync);
         CheckUpdateCommand     = ReactiveCommand.CreateFromTask(CheckUpdateAsync);
         OpenReleasePageCommand = ReactiveCommand.Create(OpenReleasePage);
+        SyncWithOsuCommand     = ReactiveCommand.CreateFromTask(SyncWithOsuAsync);
 
         CreateThemes();
         _ = CheckUpdateAsync();
@@ -57,10 +61,24 @@ public class SettingsViewModel : ViewModelBase
         private set => this.RaiseAndSetIfChanged(ref _cacheInvalidated, value);
     }
 
+    private bool _isSyncing;
+    public bool IsSyncing
+    {
+        get => _isSyncing;
+        private set => this.RaiseAndSetIfChanged(ref _isSyncing, value);
+    }
+
     private async Task InvalidateCacheAsync()
     {
         await _cacheService.InvalidateAllAsync();
         CacheInvalidated = true;
+    }
+
+    private async Task SyncWithOsuAsync()
+    {
+        IsSyncing = true;
+        try { await _initService.ReloadAsync(); }
+        finally { IsSyncing = false; }
     }
 
 
