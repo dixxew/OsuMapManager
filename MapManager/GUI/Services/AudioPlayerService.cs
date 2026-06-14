@@ -1,4 +1,5 @@
 ﻿using MapManager.GUI.Models;
+using Microsoft.Extensions.Logging;
 using NAudio.Wave;
 using OsuSharp.Domain;
 using ReactiveUI;
@@ -18,12 +19,15 @@ public class AudioPlayerService
 {
     private readonly SettingsService _settingsService;
     private readonly BeatmapDataService _beatmapDataService;
+    private readonly ILogger<AudioPlayerService> _logger;
     private Timer _progressTimer;
 
-    public AudioPlayerService(SettingsService settingsService, BeatmapDataService beatmapDataService)
+    public AudioPlayerService(SettingsService settingsService, BeatmapDataService beatmapDataService,
+        ILogger<AudioPlayerService> logger)
     {
         _settingsService = settingsService;
         _beatmapDataService = beatmapDataService;
+        _logger = logger;
 
         _beatmapDataService.OnSelectedBeatmapChanged += OnSelectedBeatmapChanged;
 
@@ -116,9 +120,11 @@ public class AudioPlayerService
             if (!IsPaused)
                 _wavePlayer.Play();
             _wavePlayer.PlaybackStopped += PlaybackStopped;
+            _logger.LogDebug("Playing audio: {Path} (rate={Rate}, paused={Paused})", filePath, _playbackRate, IsPaused);
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.LogWarning(ex, "Failed to play audio: {Path}", filePath);
             Stop();
         }
     }

@@ -1,4 +1,5 @@
 using MapManager.GUI.Models;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -23,13 +24,15 @@ public class OsuPpsService
     private const int CacheHours = 24;
 
     private readonly BeatmapDataService _beatmapDataService;
+    private readonly ILogger<OsuPpsService> _logger;
 
     private List<OsuPpsEntry> _rankedEntries = [];
     public IReadOnlyList<OsuPpsEntry> RankedEntries => _rankedEntries;
 
-    public OsuPpsService(BeatmapDataService beatmapDataService)
+    public OsuPpsService(BeatmapDataService beatmapDataService, ILogger<OsuPpsService> logger)
     {
         _beatmapDataService = beatmapDataService;
+        _logger = logger;
     }
 
     // Called after osu.db reload to update IsLocal without re-downloading CSVs
@@ -47,13 +50,23 @@ public class OsuPpsService
 
     public async Task LoadAsync()
     {
-        var diffsTask = GetCsvAsync(DiffsUrl, DiffsCachePath);
-        var mapsetsTask = GetCsvAsync(MapsetsUrl, MapsetsCachePath);
-        await Task.WhenAll(diffsTask, mapsetsTask);
+        _logger.LogInformation("osu!pps: loading diffs/mapsets CSVs");
+        try
+        {
+            var diffsTask = GetCsvAsync(DiffsUrl, DiffsCachePath);
+            var mapsetsTask = GetCsvAsync(MapsetsUrl, MapsetsCachePath);
+            await Task.WhenAll(diffsTask, mapsetsTask);
 
-        var mapsets = ParseMapsets(await mapsetsTask);
-        var localIndex = BuildLocalIndex();
-        _rankedEntries = BuildRankedList(await diffsTask, mapsets, localIndex);
+            var mapsets = ParseMapsets(await mapsetsTask);
+            var localIndex = BuildLocalIndex();
+            _rankedEntries = BuildRankedList(await diffsTask, mapsets, localIndex);
+            _logger.LogInformation("osu!pps: loaded {Count} ranked entries", _rankedEntries.Count);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "osu!pps: LoadAsync failed");
+            throw;
+        }
     }
 
     // beatmapId → local BeatmapSet
@@ -173,19 +186,24 @@ public class OsuPpsService
     private static bool TryDouble(string s, out double v) =>
         double.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out v);
 
-    private static async Task<string> GetCsvAsync(string url, string cachePath)
+    private async Task<string> GetCsvAsync(string url, string cachePath)
     {
         if (File.Exists(cachePath))
         {
             if ((DateTime.UtcNow - File.GetLastWriteTimeUtc(cachePath)).TotalHours < CacheHours)
+            {
+                _logger.LogDebug("osu!pps: using cached CSV {Path}", cachePath);
                 return await File.ReadAllTextAsync(cachePath);
+            }
         }
 
+        _logger.LogInformation("osu!pps: downloading CSV from {Url}", url);
         using var client = new HttpClient { Timeout = TimeSpan.FromMinutes(3) };
         var text = await client.GetStringAsync(url);
 
         Directory.CreateDirectory(CacheDir);
         await File.WriteAllTextAsync(cachePath, text);
+        _logger.LogDebug("osu!pps: cached {Bytes} bytes to {Path}", text.Length, cachePath);
         return text;
     }
 }

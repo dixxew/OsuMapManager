@@ -2,6 +2,7 @@ using Avalonia.Threading;
 using MapManager.GUI.Models;
 using MapManager.GUI.Models.Enums;
 using MapManager.GUI.ViewModels;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -32,6 +33,7 @@ public class BeatmapDownloadService : IDisposable
 
     private readonly OsuApiService _osuApiService;
     private readonly SettingsService _settingsService;
+    private readonly ILogger<BeatmapDownloadService> _logger;
     private readonly CancellationTokenSource _cts = new();
 
     // Serializes file writes so concurrent fire-and-forget saves don't collide on the same path.
@@ -60,10 +62,12 @@ public class BeatmapDownloadService : IDisposable
 
     public event Action? ActiveCountChanged;
 
-    public BeatmapDownloadService(OsuApiService osuApiService, SettingsService settingsService)
+    public BeatmapDownloadService(OsuApiService osuApiService, SettingsService settingsService,
+        ILogger<BeatmapDownloadService> logger)
     {
         _osuApiService = osuApiService;
         _settingsService = settingsService;
+        _logger = logger;
 
         Directory.CreateDirectory(DataDir);
         LoadLookupCache();
@@ -73,6 +77,8 @@ public class BeatmapDownloadService : IDisposable
         _ = ProcessLookupQueueAsync(_cts.Token);
 
         Kick(); // pick up any Queued entries restored from disk
+        _logger.LogInformation("BeatmapDownloadService initialized ({Queued} entries restored, {Cached} cached lookups)",
+            Downloads.Count, _lookupCache.Count);
     }
 
     // ── Public API ────────────────────────────────────────────────────────────
@@ -86,10 +92,15 @@ public class BeatmapDownloadService : IDisposable
         // and create duplicates of the same set id.
         Dispatcher.UIThread.Post(() =>
         {
-            if (IsAlreadyQueued(beatmapSetId)) return;
+            if (IsAlreadyQueued(beatmapSetId))
+            {
+                _logger.LogDebug("EnqueueDownload: set {SetId} already queued, skipping", beatmapSetId);
+                return;
+            }
             Downloads.Add(vm);
             _ = SaveQueueAsync();
             Kick();
+            _logger.LogInformation("Enqueued download: set {SetId} '{Artist} - {Title}'", beatmapSetId, artist, title);
         });
     }
 
@@ -103,10 +114,15 @@ public class BeatmapDownloadService : IDisposable
         var vm = new DownloadEntryViewModel(Guid.NewGuid(), beatmapSetId, displayTitle, artist, this);
         Dispatcher.UIThread.Post(() =>
         {
-            if (IsAlreadyQueued(beatmapSetId)) return;
+            if (IsAlreadyQueued(beatmapSetId))
+            {
+                _logger.LogDebug("EnqueueByBeatmapSetId: set {SetId} already queued, skipping", beatmapSetId);
+                return;
+            }
             Downloads.Add(vm);
             _ = SaveQueueAsync();
             Kick();
+            _logger.LogInformation("Enqueued download by setId {SetId} (beatmapId {BeatmapId})", beatmapSetId, beatmapId);
 
             if (string.IsNullOrEmpty(title))
                 _ = FetchAndUpdateMetaAsync(vm, beatmapId);
@@ -132,15 +148,21 @@ public class BeatmapDownloadService : IDisposable
                     vm.Artist = result.Value.artist;
                 });
                 _ = SaveQueueAsync();
+                _logger.LogDebug("Fetched metadata for beatmapId {BeatmapId}: '{Artist} - {Title}'",
+                    beatmapId, result.Value.artist, result.Value.title);
             }
         }
-        catch { }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "FetchAndUpdateMetaAsync failed for beatmapId {BeatmapId}", beatmapId);
+        }
     }
 
     // Enqueue by MD5 hash. Creates an AwaitingLookup entry immediately; when the lookup
     // loop resolves the MD5 → BeatmapSetId, the entry is promoted to Queued automatically.
     public void EnqueueByMd5(MissingBeatmap missing)
     {
+        _logger.LogDebug("EnqueueByMd5: {Md5} (resolved={Resolved})", missing.MD5Hash, missing.IsResolved);
         // Fast path 1: model already resolved
         if (missing.IsResolved && missing.BeatmapSetId.HasValue)
         {
@@ -208,6 +230,7 @@ public class BeatmapDownloadService : IDisposable
             NotifyActiveCount();
         });
         _ = SaveQueueAsync();
+        _logger.LogInformation("Download cancelled: {Id} (set {SetId})", id, vm.BeatmapSetId);
     }
 
     // Removes a finished/errored entry from the list (used by per-item ✕ and "clear" actions).
@@ -221,6 +244,7 @@ public class BeatmapDownloadService : IDisposable
 
         Dispatcher.UIThread.Post(() => Downloads.Remove(vm));
         _ = SaveQueueAsync();
+        _logger.LogInformation("Download removed: {Id} (set {SetId})", id, vm.BeatmapSetId);
     }
 
     public void RetryDownload(Guid id)
@@ -236,6 +260,7 @@ public class BeatmapDownloadService : IDisposable
             Kick();
         });
         _ = SaveQueueAsync();
+        _logger.LogInformation("Download retry queued: {Id} (set {SetId})", id, vm.BeatmapSetId);
     }
 
     // Called by AppInitializationService/CollectionService to register unresolved MD5s for model updates
@@ -285,7 +310,10 @@ public class BeatmapDownloadService : IDisposable
             try { await File.WriteAllTextAsync(QueuePath, json); }
             finally { _queueSaveLock.Release(); }
         }
-        catch { }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "SaveQueueAsync failed");
+        }
     }
 
     // ── Private: download loop ────────────────────────────────────────────────
@@ -327,6 +355,9 @@ public class BeatmapDownloadService : IDisposable
             .Take(slots)
             .ToList();
 
+        if (toStart.Count > 0)
+            _logger.LogDebug("Starting {Count} download(s) (max concurrent={Max})", toStart.Count, max);
+
         foreach (var next in toStart)
         {
             Interlocked.Increment(ref _activeDownloads);
@@ -350,6 +381,8 @@ public class BeatmapDownloadService : IDisposable
         bool success = false;
         string? lastError = null;
 
+        _logger.LogInformation("Download started: set {SetId} → {OutPath}", vm.BeatmapSetId, outPath);
+
         // Throttle progress posts: at most when it advances ≥1% (avoids flooding the UI thread).
         double lastReported = -1;
         void ReportProgress(double p)
@@ -365,13 +398,18 @@ public class BeatmapDownloadService : IDisposable
             try
             {
                 lastReported = -1;
+                _logger.LogDebug("Download attempt: set {SetId} via {Url}", vm.BeatmapSetId, url);
                 await DownloadFileAsync(url, tmpPath, ReportProgress, cts.Token);
                 File.Move(tmpPath, outPath, overwrite: true);
                 success = true;
                 break;
             }
             catch (OperationCanceledException) { break; }
-            catch (Exception ex) { lastError = ex.Message; }
+            catch (Exception ex)
+            {
+                lastError = ex.Message;
+                _logger.LogWarning(ex, "Mirror {Url} failed for set {SetId}", url, vm.BeatmapSetId);
+            }
         }
 
         if (!success) TryDelete(tmpPath);
@@ -386,17 +424,20 @@ public class BeatmapDownloadService : IDisposable
             if (cts.Token.IsCancellationRequested)
             {
                 vm.Status = DownloadStatus.Cancelled;
+                _logger.LogInformation("Download cancelled mid-flight: set {SetId}", vm.BeatmapSetId);
             }
             else if (success)
             {
                 vm.Status = DownloadStatus.Completed;
                 vm.CompletedAt = DateTime.UtcNow;
                 vm.Progress = 1.0;
+                _logger.LogInformation("Download completed: set {SetId}", vm.BeatmapSetId);
             }
             else
             {
                 vm.Status = DownloadStatus.Failed;
                 vm.Error = lastError ?? "Все зеркала недоступны";
+                _logger.LogError("Download failed: set {SetId} — {Error}", vm.BeatmapSetId, vm.Error);
             }
         });
 
@@ -521,19 +562,24 @@ public class BeatmapDownloadService : IDisposable
                         _pendingLookups.Remove(item);
                         _nextAttempt.Remove(item);
                     }
+
+                    _logger.LogInformation("MD5 lookup resolved: {Md5} → set {SetId} '{Artist} - {Title}'",
+                        item.MD5Hash, r.beatmapSetId, r.artist, r.title);
                 }
                 else
                 {
                     // Not found right now — back off this item only, keep processing others.
                     lock (_pendingLookups)
                         _nextAttempt[item] = DateTime.UtcNow.AddSeconds(60);
+                    _logger.LogDebug("MD5 lookup not found: {Md5} — backing off 60s", item.MD5Hash);
                 }
             }
             catch (OperationCanceledException) { break; }
-            catch
+            catch (Exception ex)
             {
                 lock (_pendingLookups)
                     _nextAttempt[item] = DateTime.UtcNow.AddSeconds(30);
+                _logger.LogWarning(ex, "MD5 lookup threw for {Md5} — backing off 30s", item.MD5Hash);
             }
 
             // No local delay needed: LookupBeatmapByMd5Async is rate-limited centrally in OsuApiService.
@@ -562,8 +608,12 @@ public class BeatmapDownloadService : IDisposable
                 };
                 Downloads.Add(vm);
             }
+            _logger.LogDebug("Loaded download queue: {Count} entries from {Path}", Downloads.Count, QueuePath);
         }
-        catch { }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "LoadDownloadQueue failed");
+        }
     }
 
     private void LoadLookupCache()
@@ -574,8 +624,12 @@ public class BeatmapDownloadService : IDisposable
             var json = File.ReadAllText(LookupCachePath);
             lock (_lookupSync)
                 _lookupCache = JsonSerializer.Deserialize<Dictionary<string, LookupCacheEntry>>(json, JsonOpts) ?? new();
+            _logger.LogDebug("Loaded MD5 lookup cache: {Count} entries", _lookupCache.Count);
         }
-        catch { }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "LoadLookupCache failed");
+        }
     }
 
     private async Task SaveLookupCacheAsync()
@@ -590,13 +644,17 @@ public class BeatmapDownloadService : IDisposable
             try { await File.WriteAllTextAsync(LookupCachePath, json); }
             finally { _cacheSaveLock.Release(); }
         }
-        catch { }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "SaveLookupCacheAsync failed");
+        }
     }
 
     private void NotifyActiveCount() => ActiveCountChanged?.Invoke();
 
     public void Dispose()
     {
+        _logger.LogInformation("BeatmapDownloadService disposing");
         try { _cts.Cancel(); } catch { }
         _cts.Dispose();
         _kick.Dispose();

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace MapManager.GUI.Services;
 
@@ -12,20 +13,28 @@ public class FavoriteBeatmapManager
 {
     private readonly static string _filePath = "favorites.json";
 
+    // Прокидывается из Program.BuildHost. Может быть null до поднятия хоста — обращаемся через ?.
+    public static ILogger? Logger { get; set; }
+
     // Чтение избранных карт из файла
     public static List<int> Load()
     {
         if (!File.Exists(_filePath))
+        {
+            Logger?.LogDebug("Favorites file {Path} not found — empty list", _filePath);
             return new List<int>();
+        }
 
         try
         {
             var json = File.ReadAllText(_filePath);
-            return JsonSerializer.Deserialize<List<int>>(json) ?? new List<int>();
+            var list = JsonSerializer.Deserialize<List<int>>(json) ?? new List<int>();
+            Logger?.LogDebug("Loaded {Count} favorite beatmap set(s) from {Path}", list.Count, _filePath);
+            return list;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Ошибка при чтении файла: {ex.Message}");
+            Logger?.LogError(ex, "Failed to read favorites from {Path}", _filePath);
             return new List<int>();
         }
     }
@@ -37,10 +46,11 @@ public class FavoriteBeatmapManager
         {
             var json = JsonSerializer.Serialize(favoriteBeatmaps);
             File.WriteAllText(_filePath, json);
+            Logger?.LogDebug("Saved {Count} favorite beatmap set(s) to {Path}", favoriteBeatmaps.Count, _filePath);
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Ошибка при записи в файл: {ex.Message}");
+            Logger?.LogError(ex, "Failed to write favorites to {Path}", _filePath);
         }
     }
 
@@ -53,6 +63,7 @@ public class FavoriteBeatmapManager
 
         favorites.Add(beatmapSetId);
         Save(favorites);
+        Logger?.LogInformation("Beatmap set {SetId} added to favorites", beatmapSetId);
         return true;
     }
 
@@ -65,6 +76,7 @@ public class FavoriteBeatmapManager
 
         favorites.Remove(beatmapSetId);
         Save(favorites);
+        Logger?.LogInformation("Beatmap set {SetId} removed from favorites", beatmapSetId);
         return true;
     }
 

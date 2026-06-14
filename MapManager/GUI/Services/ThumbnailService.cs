@@ -1,4 +1,5 @@
 using Avalonia.Media.Imaging;
+using Microsoft.Extensions.Logging;
 using SkiaSharp;
 using System;
 using System.Collections.Concurrent;
@@ -13,6 +14,7 @@ public class ThumbnailService
     public static ThumbnailService? Current { get; private set; }
 
     private readonly OsuDataService _osuDataService;
+    private readonly ILogger<ThumbnailService> _logger;
     private readonly string _thumbsDir;
     private readonly ConcurrentDictionary<string, Bitmap?> _memoryCache = new();
     private readonly SemaphoreSlim _semaphore = new(4, 4);
@@ -20,12 +22,14 @@ public class ThumbnailService
     private const int TargetWidth = 160;
     private const int JpegQuality = 55;
 
-    public ThumbnailService(OsuDataService osuDataService)
+    public ThumbnailService(OsuDataService osuDataService, ILogger<ThumbnailService> logger)
     {
         _osuDataService = osuDataService;
+        _logger = logger;
         _thumbsDir = Path.Combine("cache", "thumbnails");
         Directory.CreateDirectory(_thumbsDir);
         Current = this;
+        _logger.LogInformation("ThumbnailService initialized ({Dir})", _thumbsDir);
     }
 
     public async Task<Bitmap?> GetAsync(string folderName, string beatmapFileName)
@@ -49,7 +53,7 @@ public class ThumbnailService
                     _memoryCache[folderName] = fromDisk;
                     return fromDisk;
                 }
-                catch { }
+                catch (Exception ex) { _logger.LogWarning(ex, "Thumbnail disk read failed for '{Folder}'", folderName); }
             }
 
             return await Task.Run(() =>
@@ -77,10 +81,12 @@ public class ThumbnailService
 
                     var bitmap = new Bitmap(diskPath);
                     _memoryCache[folderName] = bitmap;
+                    _logger.LogTrace("Thumbnail generated for '{Folder}'", folderName);
                     return bitmap;
                 }
-                catch
+                catch (Exception ex)
                 {
+                    _logger.LogWarning(ex, "Thumbnail generation failed for '{Folder}'", folderName);
                     return null;
                 }
             });

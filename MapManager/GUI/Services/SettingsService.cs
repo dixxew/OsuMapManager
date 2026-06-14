@@ -1,4 +1,5 @@
 ﻿using MapManager;
+using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 using System;
 using System.Collections.Generic;
@@ -10,10 +11,12 @@ namespace MapManager.GUI.Services;
 public class SettingsService
 {
     private readonly AppSettings _appSettings;
+    private readonly ILogger<SettingsService> _logger;
 
-    public SettingsService(AppSettings appSettings)
+    public SettingsService(AppSettings appSettings, ILogger<SettingsService> logger)
     {
         _appSettings = appSettings;
+        _logger = logger;
 
         OsuClientId = _appSettings.OsuClientId.ToString();
         OsuClientSecret = _appSettings.OsuClientSecret;
@@ -148,10 +151,15 @@ public class SettingsService
     public async Task UpdateSettings(string propName, object? value)
     {
         var property = typeof(SettingsService).GetProperty(propName);
-        if (property is null || !property.CanWrite) return;
+        if (property is null || !property.CanWrite)
+        {
+            _logger.LogWarning("UpdateSettings: property '{Prop}' not found or read-only", propName);
+            return;
+        }
 
         var convertedValue = Convert.ChangeType(value, property.PropertyType);
         property.SetValue(this, convertedValue);
+        _logger.LogInformation("Setting '{Prop}' updated", propName);
 
         await SaveAsync();
     }
@@ -169,7 +177,7 @@ public class SettingsService
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Не удалось открыть URL: {ex.Message}");
+            _logger.LogWarning(ex, "Failed to open osu! API key page");
         }
     }
 
@@ -181,6 +189,7 @@ public class SettingsService
     public Action OnOsuApiSettingsChanged;
     private void OsuApiSettingsChanged()
     {
+        _logger.LogDebug("osu! API settings changed");
         OnOsuApiSettingsChanged?.Invoke();
     }
 
@@ -188,6 +197,7 @@ public class SettingsService
     public Action OnIrcSettingsChanged;
     private void IrcSettingsChanged()
     {
+        _logger.LogDebug("IRC settings changed");
         OnIrcSettingsChanged?.Invoke();
     }
 }

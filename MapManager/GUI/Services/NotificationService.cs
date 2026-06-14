@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Threading;
 using MapManager.GUI.Models.Chat;
+using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 using System;
 using System.Diagnostics;
@@ -18,19 +19,22 @@ public class NotificationService
 
     private readonly ChatService _chat;
     private readonly SettingsService _settings;
+    private readonly ILogger<NotificationService> _logger;
 
     public bool OsNotificationsBlocked { get; private set; }
 
-    public NotificationService(ChatService chat, SettingsService settings)
+    public NotificationService(ChatService chat, SettingsService settings, ILogger<NotificationService> logger)
     {
         _chat = chat;
         _settings = settings;
+        _logger = logger;
         RegisterAumid();
         CheckOsSetting();
         _chat.MessageReceived += OnMessageReceived;
+        _logger.LogInformation("NotificationService initialized (OS notifications blocked: {Blocked})", OsNotificationsBlocked);
     }
 
-    private static void RegisterAumid()
+    private void RegisterAumid()
     {
         try
         {
@@ -43,7 +47,7 @@ public class NotificationService
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"[Notif] RegisterAumid failed: {ex}");
+            _logger.LogWarning(ex, "RegisterAumid failed");
         }
     }
 
@@ -54,9 +58,13 @@ public class NotificationService
             var setting = ToastNotificationManager.CreateToastNotifier(AppId).Setting;
             OsNotificationsBlocked = setting != NotificationSetting.Enabled;
             if (OsNotificationsBlocked)
-                Debug.WriteLine($"[Notif] OS notifications blocked: {setting}");
+                _logger.LogWarning("OS notifications blocked: {Setting}", setting);
         }
-        catch { OsNotificationsBlocked = true; }
+        catch (Exception ex)
+        {
+            OsNotificationsBlocked = true;
+            _logger.LogWarning(ex, "CheckOsSetting failed — assuming notifications blocked");
+        }
     }
 
     private void OnMessageReceived(ChatChannel channel, ChatMessage message)
@@ -129,10 +137,11 @@ public class NotificationService
 
             ToastNotificationManager.CreateToastNotifier(AppId)
                 .Show(new ToastNotification(xml));
+            _logger.LogDebug("Toast shown for {Sender} in {Channel}", sender, channel);
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"[Notif] ShowToast failed: {ex}");
+            _logger.LogWarning(ex, "ShowToast failed");
         }
     }
 

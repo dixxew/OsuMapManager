@@ -3,6 +3,7 @@ using Avalonia;
 using Avalonia.ReactiveUI;
 using MapManager.GUI;
 using MapManager.GUI.Services;
+using MapManager.GUI.Services.Logging;
 using MapManager.GUI.ViewModels;
 using MapManager.GUI.Views;
 using Meebey.SmartIrc4net;
@@ -48,7 +49,7 @@ namespace MapManager
         {
             var appSettings = AppSettingsManager.LoadSettingsAsync();
 
-            return Host.CreateDefaultBuilder(args)
+            var host = Host.CreateDefaultBuilder(args)
                 .ConfigureOsuSharp((ctx, options) => options.Configuration = new OsuClientConfiguration
                 {
                     ClientId = 0,
@@ -58,11 +59,14 @@ namespace MapManager
                 {
                     services.AddLogging(b =>
                     {
-                        b.AddConsole();                              // или AddSimpleConsole / AddDebug
-                        b.SetMinimumLevel(LogLevel.Error);     // глобальный потолок
-                        // b.AddFilter("MapManager.GUI.Services.ChatService", LogLevel.Trace);  // сырьё IRC видно
-                        // b.AddFilter("Microsoft", LogLevel.Warning);  // заглушить хостинг-шум
-                        // b.AddFilter("OsuSharp", LogLevel.Warning);
+                        b.ClearProviders();
+                        b.AddFileLogger(LogLevel.Trace);       // основной sink — файл (см. FileLoggerProvider)
+                        b.AddDebug();                          // дублируем в Debug-вывод для Rider
+                        b.SetMinimumLevel(LogLevel.Trace);     // альфа: пишем максимально подробно
+                        b.AddFilter("Microsoft", LogLevel.Warning);     // заглушить хостинг-шум
+                        b.AddFilter("System", LogLevel.Warning);
+                        b.AddFilter("OsuSharp", LogLevel.Warning);
+                        // Наш код (MapManager.*) пишется на Trace без ограничений.
                     });
 
                     services.AddSingleton(appSettings);
@@ -137,6 +141,16 @@ namespace MapManager
                     services.AddSingleton<MainWindowViewModel>();
                 })
                 .Build();
+
+            // Прокидываем логгер в статические хелперы, у которых нет DI-конструктора.
+            var loggerFactory = host.Services.GetRequiredService<ILoggerFactory>();
+            AppSettingsManager.Logger = loggerFactory.CreateLogger("MapManager.AppSettingsManager");
+            FavoriteBeatmapManager.Logger = loggerFactory.CreateLogger("MapManager.GUI.Services.FavoriteBeatmapManager");
+
+            var bootLog = loggerFactory.CreateLogger("MapManager.Program");
+            bootLog.LogInformation("Host built; logs at {LogDir}", FileLoggerProvider.LogDirectory);
+
+            return host;
         }
     }
 }

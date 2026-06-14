@@ -1,4 +1,5 @@
 using MapManager.GUI.Models;
+using Microsoft.Extensions.Logging;
 using osu_database_reader.Components.Player;
 using OsuSharp.Interfaces;
 using System;
@@ -13,27 +14,41 @@ public class RankingService
     private readonly OsuApiService _osuApiService;
     private readonly OsuDataService _osuDataReader;
     private readonly CacheService _cacheService;
+    private readonly ILogger<RankingService> _logger;
 
-    public RankingService(OsuApiService osuService, OsuDataService osuDataReader, CacheService cacheService)
+    public RankingService(OsuApiService osuService, OsuDataService osuDataReader, CacheService cacheService,
+        ILogger<RankingService> logger)
     {
         _osuApiService = osuService;
         _osuDataReader = osuDataReader;
         _cacheService = cacheService;
+        _logger = logger;
     }
 
     public List<Replay> GetAllLocalScores() => _osuDataReader.GetScoresList();
 
     public async Task<List<GlobalScore>> GetGlobalRanksByBeatmapIdAsync(int beatmapId)
     {
-        var entries = await _cacheService.GetJsonAsync<List<GlobalScoreCacheEntry>>(
-            $"scores_{beatmapId}",
-            async () =>
-            {
-                var result = await _osuApiService.GetBeatmapScoresByIdAsync(beatmapId);
-                return result.Scores.Select(ToDto).ToList();
-            });
+        _logger.LogDebug("GetGlobalRanksByBeatmapIdAsync(beatmapId={BeatmapId})", beatmapId);
+        try
+        {
+            var entries = await _cacheService.GetJsonAsync<List<GlobalScoreCacheEntry>>(
+                $"scores_{beatmapId}",
+                async () =>
+                {
+                    var result = await _osuApiService.GetBeatmapScoresByIdAsync(beatmapId);
+                    return result.Scores.Select(ToDto).ToList();
+                });
 
-        return entries?.Select(FromDto).ToList() ?? [];
+            var scores = entries?.Select(FromDto).ToList() ?? [];
+            _logger.LogDebug("GetGlobalRanksByBeatmapIdAsync(beatmapId={BeatmapId}) → {Count} scores", beatmapId, scores.Count);
+            return scores;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "GetGlobalRanksByBeatmapIdAsync failed for beatmapId={BeatmapId}", beatmapId);
+            return [];
+        }
     }
 
     private static GlobalScoreCacheEntry ToDto(IScore s) => new()

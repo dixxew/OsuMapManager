@@ -3,6 +3,7 @@ using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Avalonia.Media.Imaging;
+using Microsoft.Extensions.Logging;
 
 namespace MapManager.GUI.Services;
 
@@ -13,16 +14,19 @@ public class CacheService
     private readonly string _avatarsDir;
     private readonly string _scoresDir;
     private readonly AppSettings _appSettings;
+    private readonly ILogger<CacheService> _logger;
     private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = false };
 
-    public CacheService(AppSettings appSettings)
+    public CacheService(AppSettings appSettings, ILogger<CacheService> logger)
     {
         _appSettings = appSettings;
+        _logger = logger;
         _avatarsDir = Path.Combine("cache", "avatars");
         _scoresDir = Path.Combine("cache", "scores");
         Directory.CreateDirectory(_avatarsDir);
         Directory.CreateDirectory(_scoresDir);
         Current = this;
+        _logger.LogInformation("CacheService initialized (avatars: {Avatars}, scores: {Scores})", _avatarsDir, _scoresDir);
     }
 
     private bool IsCacheValid(string path)
@@ -55,15 +59,16 @@ public class CacheService
         var path = Path.Combine(_avatarsDir, SanitizeKey(key) + ".png");
         if (IsCacheValid(path))
         {
-            try { return new Bitmap(path); }
-            catch { }
+            try { _logger.LogTrace("Image cache hit: {Key}", key); return new Bitmap(path); }
+            catch (Exception ex) { _logger.LogWarning(ex, "Image cache read failed: {Key}", key); }
         }
 
+        _logger.LogTrace("Image cache miss: {Key} — fetching", key);
         var bitmap = await fetchFunc();
         if (bitmap != null)
         {
             try { bitmap.Save(path); }
-            catch { }
+            catch (Exception ex) { _logger.LogWarning(ex, "Image cache save failed: {Key}", key); }
         }
         return bitmap;
     }
@@ -77,11 +82,12 @@ public class CacheService
             {
                 var json = await File.ReadAllTextAsync(path);
                 var result = JsonSerializer.Deserialize<T>(json, JsonOptions);
-                if (result != null) return result;
+                if (result != null) { _logger.LogTrace("JSON cache hit: {Key}", key); return result; }
             }
-            catch { }
+            catch (Exception ex) { _logger.LogWarning(ex, "JSON cache read failed: {Key}", key); }
         }
 
+        _logger.LogTrace("JSON cache miss: {Key} — fetching", key);
         var data = await fetchFunc();
         if (data != null)
         {
@@ -90,13 +96,14 @@ public class CacheService
                 var json = JsonSerializer.Serialize(data, JsonOptions);
                 await File.WriteAllTextAsync(path, json);
             }
-            catch { }
+            catch (Exception ex) { _logger.LogWarning(ex, "JSON cache save failed: {Key}", key); }
         }
         return data;
     }
 
     public async Task InvalidateAllAsync()
     {
+        _logger.LogInformation("Invalidating all caches");
         _appSettings.CacheInvalidatedAt = DateTime.UtcNow;
         await AppSettingsManager.SaveSettingsAsync(_appSettings);
     }

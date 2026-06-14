@@ -3,6 +3,7 @@ using DynamicData;
 using MapManager.GUI.Models;
 using MapManager.GUI.Models.Enums;
 using MapManager.GUI.ViewModels;
+using Microsoft.Extensions.Logging;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
@@ -14,11 +15,13 @@ namespace MapManager.GUI.Services;
 public class BeatmapDataService
 {
     private readonly OsuDataService _osuDataReader;
+    private readonly ILogger<BeatmapDataService> _logger;
 
 
-    public BeatmapDataService(OsuDataService osuDataReader)
+    public BeatmapDataService(OsuDataService osuDataReader, ILogger<BeatmapDataService> logger)
     {
         _osuDataReader = osuDataReader;
+        _logger = logger;
     }
 
 
@@ -115,6 +118,7 @@ public class BeatmapDataService
             _isLoading = false;
             OnLoadingChanged?.Invoke();
         }
+        _logger.LogDebug("Search(mode={Mode}, query='{Query}', onlyFav={Fav})", SearchMode, QueryText, IsOnlyFavorite);
         switch (SearchMode)
         {
             case BeatmapsSearchModeEnum.QUERY:
@@ -133,6 +137,7 @@ public class BeatmapDataService
                 FiltesChanged();
                 break;
         }
+        _logger.LogTrace("Search done: {Count} sets in filtered list", FilteredBeatmapSets.Count);
     }
     public void LoadFavoriteBeatmaps()
     {
@@ -143,9 +148,11 @@ public class BeatmapDataService
         {
             bs.IsFavorite = favorites.Contains(bs.Id);
         }
+        _logger.LogInformation("Loaded {Count} favorite beatmap sets", FavoriteBeatmapSets.Count);
     }
     public void ToggleSelectedBeatmapSetFavorite(bool value)
     {
+        _logger.LogInformation("Toggle favorite for set {SetId} → {Value}", SelectedBeatmapSet?.Id, value);
         SelectedBeatmapSet.IsFavorite = value;
         UpdateFavoriteBeatmapSets(value);
         Search();
@@ -363,6 +370,7 @@ public class BeatmapDataService
     // Clears all state before a full reload (called by AppInitializationService.ReloadAsync)
     public void Reset()
     {
+        _logger.LogInformation("Resetting beatmap data state");
         _isLoading = true;
         _selectedBeatmapSet = null;
         _selectedBeatmap = new();
@@ -383,12 +391,18 @@ public class BeatmapDataService
     public Action OnSelectedBeatmapSetChanged;
 
     private void SelectedBeatmapSetChanged()
-        => OnSelectedBeatmapSetChanged?.Invoke();
+    {
+        _logger.LogTrace("Selected beatmap set changed → {SetId} '{Title}'", _selectedBeatmapSet?.Id, _selectedBeatmapSet?.Title);
+        OnSelectedBeatmapSetChanged?.Invoke();
+    }
 
     public Action OnSelectedBeatmapChanged;
 
     private void SelectedBeatmapChanged()
-        => OnSelectedBeatmapChanged?.Invoke();
+    {
+        _logger.LogTrace("Selected beatmap changed → {BeatmapId}", _selectedBeatmap?.BeatmapId);
+        OnSelectedBeatmapChanged?.Invoke();
+    }
 
 
 }

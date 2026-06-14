@@ -1,5 +1,6 @@
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -18,6 +19,7 @@ public class AvatarService
 
     private readonly OsuApiService _osuApiService;
     private readonly CacheService _cacheService;
+    private readonly ILogger<AvatarService> _logger;
 
     // ── UI-thread-only ────────────────────────────────────────────────────────
 
@@ -42,10 +44,11 @@ public class AvatarService
 
     public event Action<string>? AvatarLoaded;
 
-    public AvatarService(OsuApiService osuApiService, CacheService cacheService)
+    public AvatarService(OsuApiService osuApiService, CacheService cacheService, ILogger<AvatarService> logger)
     {
         _osuApiService = osuApiService;
         _cacheService = cacheService;
+        _logger = logger;
         LoadUrlCache();
     }
 
@@ -116,7 +119,7 @@ public class AvatarService
     {
         Bitmap? bitmap = null;
         try { bitmap = await _cacheService.TryReadCachedImageAsync(cacheKey); }
-        catch (Exception ex) { Debug.WriteLine($"[Avatar] disk read failed for '{username}': {ex.Message}"); }
+        catch (Exception ex) { _logger.LogWarning(ex, "Avatar disk read failed for '{Username}'", username); }
 
         await Dispatcher.UIThread.InvokeAsync(() =>
         {
@@ -159,7 +162,7 @@ public class AvatarService
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[Avatar] URL lookup failed for '{username}': {ex.Message}");
+                _logger.LogWarning(ex, "Avatar URL lookup failed for '{Username}'", username);
             }
         }
 
@@ -181,7 +184,7 @@ public class AvatarService
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"[Avatar] image download failed for '{username}': {ex.Message}");
+            _logger.LogWarning(ex, "Avatar image download failed for '{Username}'", username);
         }
 
         await Dispatcher.UIThread.InvokeAsync(() =>
@@ -210,7 +213,7 @@ public class AvatarService
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"[Avatar] URL cache load failed: {ex.Message}");
+            _logger.LogWarning(ex, "Avatar URL cache load failed");
         }
     }
 
@@ -227,7 +230,7 @@ public class AvatarService
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"[Avatar] URL cache save failed: {ex.Message}");
+            _logger.LogWarning(ex, "Avatar URL cache save failed");
         }
     }
 

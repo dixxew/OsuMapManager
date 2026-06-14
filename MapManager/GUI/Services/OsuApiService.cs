@@ -4,6 +4,7 @@ using OsuSharp;
 using OsuSharp.Domain;
 using OsuSharp.Interfaces;
 using OsuSharp.Legacy;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -20,13 +21,16 @@ public class OsuApiService
 {
     private readonly IOsuClient _client;
     private readonly SettingsService _settingsService;
+    private readonly ILogger<OsuApiService> _logger;
 
-    public OsuApiService(IOsuClient client,  SettingsService settingsService)
+    public OsuApiService(IOsuClient client,  SettingsService settingsService, ILogger<OsuApiService> logger)
     {
         _client = client;
         _settingsService = settingsService;
+        _logger = logger;
         _settingsService.OnOsuApiSettingsChanged += OnOsuApiSettingsChanged;
         UpdateClientSettings();
+        _logger.LogInformation("OsuApiService initialized");
     }
 
     private readonly HttpClient _httpClient = new HttpClient();
@@ -67,6 +71,7 @@ public class OsuApiService
             }
             finally { _rateLock.Release(); }
 
+            _logger.LogTrace("Rate limiter: out of tokens, waiting {WaitMs:F0}ms", wait.TotalMilliseconds);
             await Task.Delay(wait, ct);
         }
     }
@@ -76,20 +81,24 @@ public class OsuApiService
 
     private void OnOsuApiSettingsChanged()
     {
+        _logger.LogInformation("osu! API settings changed — updating client");
         UpdateClientSettings();
     }
 
     private void UpdateClientSettings()
     {
-        
+
         _client.Configuration.ClientSecret = _settingsService.OsuClientSecret ?? "";
-        _client.Configuration.ClientId = long.TryParse(_settingsService.OsuClientId, out var osuClientId) 
-            ? osuClientId 
+        _client.Configuration.ClientId = long.TryParse(_settingsService.OsuClientId, out var osuClientId)
+            ? osuClientId
             : _client.Configuration.ClientId;
+        _logger.LogDebug("osu! API client settings updated (clientId={ClientId}, secret={HasSecret})",
+            _client.Configuration.ClientId, string.IsNullOrEmpty(_client.Configuration.ClientSecret) ? "no" : "yes");
     }
 
     public async IAsyncEnumerable<IBeatmapset> GetLastRankedBeatmapsetsAsync(int count)
     {
+        _logger.LogDebug("GetLastRankedBeatmapsetsAsync(count={Count})", count);
         await ThrottleAsync();
         var builder = new BeatmapsetsLookupBuilder()
             .WithGameMode(GameMode.Osu)
@@ -107,21 +116,49 @@ public class OsuApiService
     }
     public async Task<IBeatmap> GetBeatmapByIdAsync(long id)
     {
+        _logger.LogDebug("GetBeatmapByIdAsync(id={Id})", id);
         await ThrottleAsync();
-        return await _client.GetBeatmapAsync(id);
+        try
+        {
+            return await _client.GetBeatmapAsync(id);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "GetBeatmapByIdAsync failed for id={Id}", id);
+            throw;
+        }
     }
     public async Task<IBeatmapScores> GetBeatmapScoresByIdAsync(long id)
     {
+        _logger.LogDebug("GetBeatmapScoresByIdAsync(id={Id})", id);
         await ThrottleAsync();
-        var scores = await _client.GetBeatmapScoresAsync(id, gameMode: GameMode.Osu);
-        return scores;
+        try
+        {
+            var scores = await _client.GetBeatmapScoresAsync(id, gameMode: GameMode.Osu);
+            _logger.LogTrace("GetBeatmapScoresByIdAsync(id={Id}) → {Count} scores", id, scores?.Scores?.Count ?? 0);
+            return scores;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "GetBeatmapScoresByIdAsync failed for id={Id}", id);
+            throw;
+        }
     }
 
 
     public async Task<IBeatmapset> GetBeatmapsetByIdAsync(long id)
     {
+        _logger.LogDebug("GetBeatmapsetByIdAsync(id={Id})", id);
         await ThrottleAsync();
-        return await _client.GetBeatmapsetAsync(id);
+        try
+        {
+            return await _client.GetBeatmapsetAsync(id);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "GetBeatmapsetByIdAsync failed for id={Id}", id);
+            throw;
+        }
     }
     public async Task<string?> GetUserAvatarUrlAsync(string username)
     {
@@ -130,12 +167,12 @@ public class OsuApiService
             await ThrottleAsync();
             var user = await _client.GetUserAsync(username);
             var url = user?.AvatarUrl?.ToString();
-            Debug.WriteLine($"[OsuApi] avatar URL for '{username}': {url}");
+            _logger.LogDebug("Avatar URL for '{Username}': {Url}", username, url ?? "(none)");
             return url;
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"[OsuApi] GetUserAsync failed for '{username}': {ex.GetType().Name}: {ex.Message}");
+            _logger.LogWarning(ex, "GetUserAsync failed for '{Username}'", username);
             return null;
         }
     }
@@ -148,13 +185,14 @@ public class OsuApiService
             if (response.IsSuccessStatusCode)
             {
                 using var stream = await response.Content.ReadAsStreamAsync();
+                _logger.LogTrace("Avatar downloaded from {Url}", url);
                 return new Bitmap(stream);
             }
-            Debug.WriteLine($"[OsuApi] avatar HTTP {(int)response.StatusCode} for URL: {url}");
+            _logger.LogWarning("Avatar download HTTP {Status} for URL: {Url}", (int)response.StatusCode, url);
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"[OsuApi] DownloadAvatarFromUrlAsync failed: {ex.GetType().Name}: {ex.Message}");
+            _logger.LogWarning(ex, "DownloadAvatarFromUrlAsync failed for {Url}", url);
         }
         return null;
     }
@@ -175,7 +213,11 @@ public class OsuApiService
                 $"https://osu.ppy.sh/api/v2/beatmaps/lookup?{queryParam}");
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token.AccessToken);
             using var response = await _httpClient.SendAsync(request);
-            if (!response.IsSuccessStatusCode) return null;
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogDebug("Beatmap lookup ({Query}) → HTTP {Status}", queryParam, (int)response.StatusCode);
+                return null;
+            }
             using var doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
             var root = doc.RootElement;
             var id = root.GetProperty("id").GetInt32();
@@ -183,15 +225,21 @@ public class OsuApiService
             var set = root.GetProperty("beatmapset");
             var title = set.GetProperty("title").GetString() ?? "";
             var artist = set.GetProperty("artist").GetString() ?? "";
+            _logger.LogDebug("Beatmap lookup ({Query}) → set {SetId} '{Artist} - {Title}'", queryParam, setId, artist, title);
             return (id, setId, title, artist);
         }
-        catch { return null; }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Beatmap lookup ({Query}) failed", queryParam);
+            return null;
+        }
     }
 
     public async Task<List<BeatmapCommentCacheEntry>> GetBeatmapsetCommentsAsync(long beatmapSetId)
     {
         try
         {
+            _logger.LogDebug("GetBeatmapsetCommentsAsync(setId={SetId})", beatmapSetId);
             await ThrottleAsync();
             var token = await _client.GetOrUpdateAccessTokenAsync();
             using var request = new HttpRequestMessage(HttpMethod.Get,
@@ -199,7 +247,11 @@ public class OsuApiService
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token.AccessToken);
 
             using var response = await _httpClient.SendAsync(request);
-            if (!response.IsSuccessStatusCode) return [];
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogDebug("Comments for set {SetId} → HTTP {Status}", beatmapSetId, (int)response.StatusCode);
+                return [];
+            }
 
             var json = await response.Content.ReadAsStringAsync();
             var bundle = JsonSerializer.Deserialize<CommentBundleJson>(json, _jsonOptions);
@@ -228,8 +280,9 @@ public class OsuApiService
                 })
                 .ToList();
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.LogWarning(ex, "GetBeatmapsetCommentsAsync failed for set {SetId}", beatmapSetId);
             return [];
         }
     }
